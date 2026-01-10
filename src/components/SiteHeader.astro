@@ -1,15 +1,20 @@
 <header class="w-full border-b border-gray-200 bg-white/90 backdrop-blur">
   <div class="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between gap-4">
     <!-- Left: brand -->
-    <a href="/" class="font-semibold text-gray-900 hover:opacity-80">
+    <a
+      href="/"
+      class="font-semibold text-gray-900 hover:opacity-80"
+      style="cursor:pointer;"
+    >
       Camera Central
     </a>
 
-    <!-- Right: nav -->
-    <nav class="flex items-center gap-4 text-sm text-gray-700">
-      <a href="/find" class="hover:text-gray-900">Finder</a>
-      <a href="/about" class="hover:text-gray-900">About</a>
-      <a href="/disclaimer" class="hover:text-gray-900">Disclaimer</a>
+    <!-- Right: desktop nav -->
+    <nav class="hidden sm:flex items-center gap-4 text-sm text-gray-700">
+      <a href="/" class="hover:text-gray-900" style="cursor:pointer;">Home</a>
+      <a href="/find" class="hover:text-gray-900" style="cursor:pointer;">Finder</a>
+      <a href="/about" class="hover:text-gray-900" style="cursor:pointer;">About</a>
+      <a href="/disclaimer" class="hover:text-gray-900" style="cursor:pointer;">Disclaimer</a>
 
       <a
         id="headerCompareLink"
@@ -26,37 +31,120 @@
         </span>
       </a>
     </nav>
+
+    <!-- Mobile menu button -->
+    <button
+      id="ccMobileMenuBtn"
+      type="button"
+      class="sm:hidden inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 hover:bg-gray-50"
+      aria-expanded="false"
+      aria-controls="ccMobileMenu"
+      style="cursor:pointer;"
+    >
+      Menu <span aria-hidden="true" class="ml-2">☰</span>
+    </button>
+  </div>
+
+  <!-- Mobile menu panel -->
+  <div id="ccMobileMenu" class="sm:hidden hidden border-t border-gray-200 bg-white">
+    <nav class="mx-auto max-w-5xl px-6 py-3 flex flex-col gap-2 text-sm text-gray-700">
+      <a href="/" class="py-2 hover:text-gray-900" style="cursor:pointer;">Home</a>
+      <a href="/find" class="py-2 hover:text-gray-900" style="cursor:pointer;">Finder</a>
+      <a href="/about" class="py-2 hover:text-gray-900" style="cursor:pointer;">About</a>
+      <a href="/disclaimer" class="py-2 hover:text-gray-900" style="cursor:pointer;">Disclaimer</a>
+
+      <a
+        href="/compare"
+        class="py-2 inline-flex items-center gap-2 font-medium text-gray-900 hover:opacity-80"
+        style="cursor:pointer;"
+      >
+        Compare
+        <span
+          id="ccCompareBadgeMobile"
+          class="hidden rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none"
+        >
+          0
+        </span>
+      </a>
+    </nav>
   </div>
 </header>
 
-<!-- Optional local sync (BaseLayout already syncs it globally, but this doesn't hurt) -->
+<!-- Local sync + mobile menu behavior -->
 <script is:inline>
   (function () {
     const KEY = "cc_compare";
-    function safeCount() {
+
+    function safeIds() {
       try {
         const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
-        return Array.isArray(arr) ? arr.filter(Boolean).length : 0;
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
       } catch {
-        return 0;
+        return [];
       }
     }
-    function setBadge(n) {
-      const badge = document.getElementById("ccCompareBadge");
-      if (!badge) return;
-      if (!n) {
-        badge.classList.add("hidden");
-        badge.textContent = "0";
-      } else {
-        badge.classList.remove("hidden");
-        badge.textContent = String(n);
-      }
+
+    function setBadgeCount(n) {
+      const b1 = document.getElementById("ccCompareBadge");
+      const b2 = document.getElementById("ccCompareBadgeMobile");
+
+      [b1, b2].forEach((badge) => {
+        if (!badge) return;
+        if (!n) {
+          badge.classList.add("hidden");
+          badge.textContent = "0";
+        } else {
+          badge.classList.remove("hidden");
+          badge.textContent = String(n);
+        }
+      });
     }
-    setBadge(safeCount());
+
+    // Initial
+    setBadgeCount(safeIds().length);
+
+    // Updates from results.js (and others)
     window.addEventListener("cc-compare-updated", (e) => {
       const ids = e?.detail?.ids;
-      if (Array.isArray(ids)) setBadge(ids.filter(Boolean).length);
-      else setBadge(safeCount());
+      if (Array.isArray(ids)) setBadgeCount(ids.filter(Boolean).length);
+      else setBadgeCount(safeIds().length);
     });
+
+    // Other tabs
+    window.addEventListener("storage", (e) => {
+      if (e.key === KEY) setBadgeCount(safeIds().length);
+    });
+
+    // Mobile menu toggle
+    const btn = document.getElementById("ccMobileMenuBtn");
+    const panel = document.getElementById("ccMobileMenu");
+
+    function closeMenu() {
+      if (!btn || !panel) return;
+      panel.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMenu() {
+      if (!btn || !panel) return;
+      const isOpen = !panel.classList.contains("hidden");
+      panel.classList.toggle("hidden");
+      btn.setAttribute("aria-expanded", String(!isOpen));
+    }
+
+    btn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleMenu();
+    });
+
+    // Close mobile menu after clicking a link
+    panel?.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href]");
+      if (a) closeMenu();
+    });
+
+    // Close menu after Astro page swaps (prevents "stuck open" feel)
+    document.addEventListener("astro:after-swap", closeMenu);
+    document.addEventListener("astro:page-load", closeMenu);
   })();
 </script>

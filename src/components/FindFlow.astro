@@ -5,8 +5,8 @@
   <div id="flow" class="flex-1 flex flex-col space-y-4">
     <div class="space-y-3">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500" id="progress">Question 1 of 6</p>
-        <p class="text-sm text-gray-500" id="percent">17%</p>
+        <p class="text-sm text-gray-500" id="progress">Question 1 of 7</p>
+        <p class="text-sm text-gray-500" id="percent">14%</p>
       </div>
 
       <!-- Progress bar -->
@@ -57,171 +57,192 @@
 </div>
 
 <script is:inline>
-  window.addEventListener("DOMContentLoaded", () => {
-    const questions = [
-      {
-        id: "genre",
-        q: "What do you shoot most when you travel?",
-        helper: "Pick what you care about most. You can refine later.",
-        options: ["Landscapes", "City/Street", "People", "A mix of everything"],
-      },
-      {
-        id: "primary",
-        q: "What’s your primary use?",
-        helper: "This helps prioritize photo resolution vs video features.",
-        options: ["Photography", "Videography", "Both"],
-      },
-      {
-        id: "budget",
-        q: "What’s your camera body budget?",
-        helper: "Just the camera body, not lenses.",
-        options: ["Under $1,000", "$1,000–$1,800", "$1,800–$2,800", "$2,800+"],
-      },
-      {
-        id: "weight",
-        q: "How important is portability?",
-        helper: "If you hike or carry it all day, this matters a lot.",
-        options: ["Must be light", "Nice to be light", "Not important"],
-      },
-      {
-        id: "lowlight",
-        q: "Do you often shoot sunrise/sunset or low light?",
-        helper: "This affects sensor and stabilization priorities.",
-        options: ["Often", "Sometimes", "Rarely"],
-      },
-      {
-        id: "experience",
-        q: "What’s your experience level?",
-        helper: "This changes how much complexity you’ll actually enjoy.",
-        options: ["Beginner", "Hobbyist", "Advanced"],
-      },
-      {
-        id: "upgrade",
-        q: "Are you upgrading from something?",
-        helper: "This helps avoid recommending upgrades you won’t notice.",
-        options: ["Phone only", "Older DSLR", "Older mirrorless", "Not sure"],
-      },
-    ];
+  (function () {
+    function initFindFlow() {
+      // Guard: if this instance is already initialized, do nothing
+      const flowRoot = document.getElementById("flow");
+      if (!flowRoot) return;
+      if (flowRoot.dataset.ccInit === "1") return;
+      flowRoot.dataset.ccInit = "1";
 
-    // Storage keys
-    const SESSION_KEY = "cameraCentralAnswers"; // keeps progress if user refreshes mid-quiz
-    const LS_KEY = "cc_answers";               // used by /results (clean URL)
-    const LS_META_KEY = "cc_answers_meta";     // optional
+      const questions = [
+        {
+          id: "genre",
+          q: "What do you shoot most when you travel?",
+          helper: "Pick what you care about most. You can refine later.",
+          options: ["Landscapes", "City/Street", "People", "A mix of everything"],
+        },
+        {
+          id: "primary",
+          q: "What’s your primary use?",
+          helper: "This helps prioritize photo resolution vs video features.",
+          options: ["Photography", "Videography", "Both"],
+        },
+        {
+          id: "budget",
+          q: "What’s your camera body budget?",
+          helper: "Just the camera body, not lenses.",
+          options: ["Under $1,000", "$1,000–$1,800", "$1,800–$2,800", "$2,800+"],
+        },
+        {
+          id: "weight",
+          q: "How important is portability?",
+          helper: "If you hike or carry it all day, this matters a lot.",
+          options: ["Must be light", "Nice to be light", "Not important"],
+        },
+        {
+          id: "lowlight",
+          q: "Do you often shoot sunrise/sunset or low light?",
+          helper: "This affects sensor and stabilization priorities.",
+          options: ["Often", "Sometimes", "Rarely"],
+        },
+        {
+          id: "experience",
+          q: "What’s your experience level?",
+          helper: "This changes how much complexity you’ll actually enjoy.",
+          options: ["Beginner", "Hobbyist", "Advanced"],
+        },
+        {
+          id: "upgrade",
+          q: "Are you upgrading from something?",
+          helper: "This helps avoid recommending upgrades you won’t notice.",
+          options: ["Phone only", "Older DSLR", "Older mirrorless", "Not sure"],
+        },
+      ];
 
-    let idx = 0;
-    const answers = {};
+      // Storage keys
+      const SESSION_KEY = "cameraCentralAnswers"; // keeps progress if user refreshes mid-quiz
+      const LS_KEY = "cc_answers";               // used by /results
+      const LS_META_KEY = "cc_answers_meta";     // optional
 
-    // Load saved in-progress answers (if any)
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) {
-      try {
-        Object.assign(answers, JSON.parse(saved));
-      } catch {}
-    }
+      let idx = 0;
+      const answers = {};
 
-    const optionBase =
-      "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
+      // Load saved in-progress answers (if any)
+      const saved = sessionStorage.getItem(SESSION_KEY);
+      if (saved) {
+        try {
+          Object.assign(answers, JSON.parse(saved));
+        } catch {}
+      }
 
-    const optionUnselected =
-      "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 active:scale-[0.99]";
+      const optionBase =
+        "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
 
-    const optionSelected = "border-gray-900 bg-gray-50";
+      const optionUnselected =
+        "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 active:scale-[0.99]";
 
-    const progress = document.getElementById("progress");
-    const percentEl = document.getElementById("percent");
-    const bar = document.getElementById("bar");
+      const optionSelected = "border-gray-900 bg-gray-50";
 
-    const question = document.getElementById("question");
-    const helper = document.getElementById("helper");
-    const optionsWrap = document.getElementById("options");
-    const backBtn = document.getElementById("backBtn");
-    const nextBtn = document.getElementById("nextBtn");
+      const progress = document.getElementById("progress");
+      const percentEl = document.getElementById("percent");
+      const bar = document.getElementById("bar");
 
-    if (!progress || !percentEl || !bar || !question || !helper || !optionsWrap || !backBtn || !nextBtn) {
-      console.warn("[FindFlow] Missing expected DOM elements. Quiz script not started.");
-      return;
-    }
+      const question = document.getElementById("question");
+      const helper = document.getElementById("helper");
+      const optionsWrap = document.getElementById("options");
+      const backBtn = document.getElementById("backBtn");
+      const nextBtn = document.getElementById("nextBtn");
 
-    function updateProgressUI() {
-      const pct = Math.round(((idx + 1) / questions.length) * 100);
-      bar.style.width = `${pct}%`;
-      percentEl.textContent = `${pct}%`;
+      if (!progress || !percentEl || !bar || !question || !helper || !optionsWrap || !backBtn || !nextBtn) {
+        console.warn("[FindFlow] Missing expected DOM elements. Quiz script not started.");
+        return;
+      }
 
-      const pb = bar.parentElement;
-      if (pb) pb.setAttribute("aria-valuenow", String(pct));
-    }
+      function updateProgressUI() {
+        const pct = Math.round(((idx + 1) / questions.length) * 100);
+        bar.style.width = `${pct}%`;
+        percentEl.textContent = `${pct}%`;
 
-    function saveProgress() {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
-    }
+        const pb = bar.parentElement;
+        if (pb) pb.setAttribute("aria-valuenow", String(pct));
+      }
 
-    function finalizeAndGoToResults() {
-      try {
-        localStorage.setItem(LS_KEY, JSON.stringify(answers));
-        localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
-      } catch {}
+      function saveProgress() {
+        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers)); } catch {}
+      }
 
-      try {
-        sessionStorage.removeItem(SESSION_KEY);
-      } catch {}
+      function finalizeAndGoToResults() {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(answers));
+          localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
+        } catch {}
 
-      window.location.href = "/results";
-    }
+        try { sessionStorage.removeItem(SESSION_KEY); } catch {}
 
-    function render() {
-      const q = questions[idx];
-      progress.textContent = `Question ${idx + 1} of ${questions.length}`;
-      question.textContent = q.q;
-      helper.textContent = q.helper || "";
+        window.location.href = "/results";
+      }
 
-      updateProgressUI();
+      function render() {
+        const q = questions[idx];
+        progress.textContent = `Question ${idx + 1} of ${questions.length}`;
+        question.textContent = q.q;
+        helper.textContent = q.helper || "";
 
-      optionsWrap.innerHTML = "";
-      const selected = answers[q.id];
+        updateProgressUI();
 
-      q.options.forEach((opt) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
+        optionsWrap.innerHTML = "";
+        const selected = answers[q.id];
 
-        btn.innerHTML = `
-          <span class="flex items-center justify-between">
-            <span>${opt}</span>
-            <span class="text-sm text-gray-500 w-4 text-right">${selected === opt ? "✓" : ""}</span>
-          </span>
-        `;
+        q.options.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
 
-        btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+          btn.innerHTML = `
+            <span class="flex items-center justify-between">
+              <span>${opt}</span>
+              <span class="text-sm text-gray-500 w-4 text-right">${selected === opt ? "✓" : ""}</span>
+            </span>
+          `;
 
-        btn.addEventListener("click", () => {
-          answers[q.id] = opt;
-          saveProgress();
-          nextBtn.disabled = false;
-          render();
+          btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+
+          btn.addEventListener("click", () => {
+            answers[q.id] = opt;
+            saveProgress();
+            nextBtn.disabled = false;
+            render();
+          });
+
+          optionsWrap.appendChild(btn);
         });
 
-        optionsWrap.appendChild(btn);
+        backBtn.disabled = idx === 0;
+        nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
+        nextBtn.disabled = !answers[q.id];
+      }
+
+      backBtn.addEventListener("click", () => {
+        if (idx > 0) idx--;
+        render();
       });
 
-      backBtn.disabled = idx === 0;
-      nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
-      nextBtn.disabled = !answers[q.id];
+      nextBtn.addEventListener("click", () => {
+        if (idx < questions.length - 1) {
+          idx++;
+          render();
+        } else {
+          finalizeAndGoToResults();
+        }
+      });
+
+      render();
     }
 
-    backBtn.addEventListener("click", () => {
-      if (idx > 0) idx--;
-      render();
-    });
+    function boot() {
+      try { initFindFlow(); } catch (e) { console.error("[FindFlow] init error", e); }
+    }
 
-    nextBtn.addEventListener("click", () => {
-      if (idx < questions.length - 1) {
-        idx++;
-        render();
-      } else {
-        finalizeAndGoToResults();
-      }
-    });
+    // ✅ First load
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot, { once: true });
+    } else {
+      boot();
+    }
 
-    render();
-  });
+    // ✅ Astro transitions (client-side nav)
+    document.addEventListener("astro:page-load", boot);
+    document.addEventListener("astro:after-swap", boot);
+  })();
 </script>
