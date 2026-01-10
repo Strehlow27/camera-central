@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import { ClientRouter } from "astro:transitions";
+import Analytics from '@vercel/analytics/astro'
 const { title = "Camera Central" } = Astro.props;
 ---
 
@@ -176,5 +177,6 @@ const { title = "Camera Central" } = Astro.props;
         document.addEventListener("astro:page-load", syncFromStorage);
       })();
     </script>
+    <Analytics />
   </body>
 </html>
