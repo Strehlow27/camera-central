@@ -1,72 +1,62 @@
-<header class="flex items-center justify-between">
-  <!-- MARKUP -->
-  <a
-    id="headerCompareLink"
-    href="/compare"
-    class="relative inline-flex items-center gap-1"
-  >
-    Compare
-    <span
-      id="ccCompareBadge"
-      class="hidden ml-2 inline-flex items-center justify-center rounded-full bg-black text-white text-[11px] leading-none px-2 py-1"
-      aria-label="Compare count"
-    ></span>
-  </a>
+<header class="w-full border-b border-gray-200 bg-white/90 backdrop-blur">
+  <div class="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between gap-4">
+    <!-- Left: brand -->
+    <a href="/" class="font-semibold text-gray-900 hover:opacity-80">
+      Camera Central
+    </a>
+
+    <!-- Right: nav -->
+    <nav class="flex items-center gap-4 text-sm text-gray-700">
+      <a href="/find" class="hover:text-gray-900">Finder</a>
+      <a href="/about" class="hover:text-gray-900">About</a>
+      <a href="/disclaimer" class="hover:text-gray-900">Disclaimer</a>
+
+      <a
+        id="headerCompareLink"
+        href="/compare"
+        class="relative inline-flex items-center gap-1 font-medium text-gray-900 hover:opacity-80"
+        style="cursor:pointer;"
+      >
+        Compare
+        <span
+          id="ccCompareBadge"
+          class="hidden ml-1 rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none"
+        >
+          0
+        </span>
+      </a>
+    </nav>
+  </div>
 </header>
 
-<!-- SCRIPT GOES BELOW THE MARKUP -->
+<!-- Optional local sync (BaseLayout already syncs it globally, but this doesn't hurt) -->
 <script is:inline>
   (function () {
     const KEY = "cc_compare";
-
-    function safeLoad() {
+    function safeCount() {
       try {
-        const raw = JSON.parse(localStorage.getItem(KEY) || "[]");
-        return Array.isArray(raw) ? raw.filter(Boolean) : [];
+        const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+        return Array.isArray(arr) ? arr.filter(Boolean).length : 0;
       } catch {
-        return [];
+        return 0;
       }
     }
-
-    function unique(list) {
-      const seen = new Set();
-      return (list || []).filter((x) => {
-        const k = String(x || "");
-        if (!k || seen.has(k)) return false;
-        seen.add(k);
-        return true;
-      });
-    }
-
-    function updateHeaderCompare() {
-      const ids = unique(safeLoad());
-      const count = ids.length;
-
+    function setBadge(n) {
       const badge = document.getElementById("ccCompareBadge");
       if (!badge) return;
-
-      if (count > 0) {
-        badge.textContent = String(count);
-        badge.classList.remove("hidden");
-      } else {
-        badge.textContent = "";
+      if (!n) {
         badge.classList.add("hidden");
+        badge.textContent = "0";
+      } else {
+        badge.classList.remove("hidden");
+        badge.textContent = String(n);
       }
     }
-
-    // Initial
-    updateHeaderCompare();
-
-    // When results.js dispatches updates
-    window.addEventListener("cc-compare-updated", updateHeaderCompare);
-
-    // If compare changes in another tab
-    window.addEventListener("storage", (e) => {
-      if (e.key === KEY) updateHeaderCompare();
+    setBadge(safeCount());
+    window.addEventListener("cc-compare-updated", (e) => {
+      const ids = e?.detail?.ids;
+      if (Array.isArray(ids)) setBadge(ids.filter(Boolean).length);
+      else setBadge(safeCount());
     });
-
-    // Astro transitions: re-run after page swap
-    document.addEventListener("astro:page-load", updateHeaderCompare);
-    document.addEventListener("astro:after-swap", updateHeaderCompare);
   })();
 </script>

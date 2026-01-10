@@ -11,8 +11,16 @@ import { CAMERAS } from "../data/cameras.js";
         Based on your answers, here are the best fits to start with.
       </p>
 
-      <!-- Refine panel toggle -->
-      <div class="mt-5">
+      <!-- Back + Refine -->
+      <div class="mt-5 flex items-center gap-3">
+        <a
+          href="/find"
+          class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition"
+          style="cursor:pointer;"
+        >
+          ← Back to questions
+        </a>
+
         <button
           id="tuneToggle"
           class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition cursor-pointer"
@@ -212,9 +220,13 @@ import { CAMERAS } from "../data/cameras.js";
     window.CAMERAS = CAMERAS;
   </script>
 
-  <!-- Make sure the hand cursor ALWAYS shows on compare buttons -->
+  <!-- Make sure the hand cursor ALWAYS shows on compare + buying buttons -->
   <style is:global>
     button[data-compare] {
+      cursor: pointer !important;
+    }
+
+    button[data-buy-btn] {
       cursor: pointer !important;
     }
 
