@@ -1,0 +1,233 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { CAMERAS } from "../data/cameras.js";
+---
+
+<BaseLayout title="Results – Camera Central">
+  <div class="w-full max-w-2xl mx-auto space-y-6">
+    <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
+      <h1 class="text-3xl font-semibold tracking-tight mb-2">Your recommendation</h1>
+      <p class="text-gray-600">
+        Based on your answers, here are the best fits to start with.
+      </p>
+
+      <!-- Refine panel toggle -->
+      <div class="mt-5">
+        <button
+          id="tuneToggle"
+          class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition cursor-pointer"
+          type="button"
+        >
+          Refine priorities
+          <span id="tuneChevron" class="text-gray-500">▾</span>
+        </button>
+      </div>
+
+      <!-- Refine panel -->
+      <div
+        id="tunePanel"
+        class="mt-4 hidden rounded-2xl border border-gray-200 bg-gray-50 p-5"
+      >
+        <p class="text-sm text-gray-600 mb-4">
+          Adjust what matters most. Results update instantly.
+        </p>
+
+        <div class="space-y-4">
+          <!-- Photo -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-semibold" for="wPhoto">Photo quality</label>
+              <span id="wPhotoVal" class="text-sm text-gray-600">3</span>
+            </div>
+
+            <div class="relative h-10">
+              <div class="budget-track"></div>
+              <div id="wPhotoFill" class="budget-fill" style="left: 0%; right: 0%;"></div>
+
+              <input
+                id="wPhoto"
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value="3"
+                class="range absolute inset-0 w-full"
+              />
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+              Resolution, dynamic range, overall still image quality.
+            </p>
+          </div>
+
+          <!-- Portability -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-semibold" for="wPort">Portability</label>
+              <span id="wPortVal" class="text-sm text-gray-600">3</span>
+            </div>
+
+            <div class="relative h-10">
+              <div class="budget-track"></div>
+              <div id="wPortFill" class="budget-fill" style="left: 0%; right: 0%;"></div>
+
+              <input
+                id="wPort"
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value="3"
+                class="range absolute inset-0 w-full"
+              />
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+              Smaller/lighter bodies get boosted.
+            </p>
+          </div>
+
+          <!-- Video -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-semibold" for="wVideo">Video</label>
+              <span id="wVideoVal" class="text-sm text-gray-600">3</span>
+            </div>
+
+            <div class="relative h-10">
+              <div class="budget-track"></div>
+              <div id="wVideoFill" class="budget-fill" style="left: 0%; right: 0%;"></div>
+
+              <input
+                id="wVideo"
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value="3"
+                class="range absolute inset-0 w-full"
+              />
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+              Stabilization, codecs, overheating behavior, video usability.
+            </p>
+          </div>
+
+          <!-- Budget range -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-semibold">Budget range (body)</label>
+              <span id="wBudgetLabel" class="text-sm text-gray-600">$800 — $3000</span>
+            </div>
+
+            <button
+              id="budgetResetToQuiz"
+              type="button"
+              class="mt-2 text-xs underline text-gray-600 hover:text-gray-900"
+            >
+              Reset budget to my quiz answer
+            </button>
+
+            <div class="relative h-10">
+              <div class="budget-track"></div>
+
+              <div
+                id="budgetFill"
+                class="budget-fill"
+                style="left: 0%; right: 0%;"
+              ></div>
+
+              <input
+                id="wBudgetMin"
+                type="range"
+                min="500"
+                max="4500"
+                step="50"
+                value="900"
+                class="range range-min absolute inset-0 w-full z-30"
+              />
+              <input
+                id="wBudgetMax"
+                type="range"
+                min="500"
+                max="4500"
+                step="50"
+                value="3000"
+                class="range range-max absolute inset-0 w-full z-40"
+              />
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+              Cameras outside this range will be hidden.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <button
+              id="tuneReset"
+              class="text-sm underline text-gray-600 hover:text-gray-900"
+              type="button"
+            >
+              Reset
+            </button>
+
+            <p class="text-xs text-gray-500">
+              Saved automatically
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debug -->
+    {import.meta.env.DEV && (
+      <>
+        <div class="rounded-2xl bg-white border border-gray-200 p-6">
+          <p class="text-sm font-semibold mb-2">Debug: Answers received</p>
+          <pre id="debugAnswers" class="text-xs text-gray-700 whitespace-pre-wrap">{}</pre>
+        </div>
+
+        <div class="rounded-2xl bg-white border border-gray-200 p-6">
+          <p class="text-sm font-semibold mb-3">Debug: Scores (top 12)</p>
+          <div id="debugScores" class="space-y-2"></div>
+        </div>
+      </>
+    )}
+
+    <!-- Results -->
+    <div
+      id="budgetNote"
+      class="hidden rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-600"
+    ></div>
+    <div id="resultsCards" class="space-y-4"></div>
+
+    <div class="pt-2">
+      <a class="text-sm text-gray-600 underline" href="/find">← Back to finder</a>
+    </div>
+  </div>
+
+  <!-- ✅ Single source of truth -->
+  <script define:vars={{ CAMERAS }}>
+    window.CAMERAS = CAMERAS;
+  </script>
+
+  <!-- Make sure the hand cursor ALWAYS shows on compare buttons -->
+  <style is:global>
+    button[data-compare] {
+      cursor: pointer !important;
+    }
+
+    /* Sticky compare bar buttons */
+    #ccCompareBar button {
+      cursor: pointer !important;
+    }
+
+    /* Disabled compare-now state */
+    #ccCompareGo:disabled {
+      cursor: not-allowed !important;
+    }
+  </style>
+
+  <script type="module" src="/scripts/results.js"></script>
+</BaseLayout>

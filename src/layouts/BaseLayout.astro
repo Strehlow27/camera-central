@@ -1,0 +1,180 @@
+---
+import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import { ClientRouter } from "astro:transitions";
+const { title = "Camera Central" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+
+    <!-- ✅ Basic SEO (MVP-safe) -->
+    <meta name="description" content="Find the right camera fast. Personalized picks and side-by-side compare." />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- ✅ Social share preview (safe defaults) -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="Find the right camera fast. Personalized picks and side-by-side compare." />
+    <meta property="og:type" content="website" />
+
+    <!-- ✅ Favicon(s)
+         Put favicon.ico in /public/favicon.ico (required)
+         Only include the SVG line if you ACTUALLY have /public/favicon.svg
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <!-- If you don’t have favicon.svg yet, KEEP THIS COMMENTED OUT -->
+    <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> -->
+
+    <!-- ✅ Enables smooth page transitions -->
+    <ClientRouter />
+
+    <!-- ✅ Global click tracking (available on every page) -->
+    <script is:inline>
+      (function () {
+        const KEY = "cc_event_queue";
+        const MAX = 300;
+
+        function safeJsonParse(s, fallback) {
+          try { return JSON.parse(s); } catch { return fallback; }
+        }
+
+        function enqueue(evt) {
+          try {
+            const arr = safeJsonParse(localStorage.getItem(KEY) || "[]", []);
+            arr.push(evt);
+            while (arr.length > MAX) arr.shift();
+            localStorage.setItem(KEY, JSON.stringify(arr));
+          } catch {}
+        }
+
+        function trySend(evt) {
+          // Disabled for MVP (no backend endpoint yet)
+          return;
+        }
+
+        // Expose globally
+        window.ccTrack = function (name, props) {
+          const evt = {
+            name: String(name || "event"),
+            props: props && typeof props === "object" ? props : {},
+            path: window.location.pathname,
+            url: window.location.href,
+            ref: document.referrer || "",
+            ts: Date.now(),
+          };
+
+          // Always store locally
+          enqueue(evt);
+
+          // Dev-only console logging (keeps prod clean)
+          try {
+            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+              console.log("[ccTrack]", evt.name, evt.props);
+            }
+          } catch {}
+
+          // Future-proof: if you add analytics later, this starts sending
+          try {
+            if (typeof window.plausible === "function") {
+              window.plausible(evt.name, { props: evt.props });
+            }
+          } catch {}
+
+          try {
+            if (typeof window.gtag === "function") {
+              window.gtag("event", evt.name, evt.props);
+            }
+          } catch {}
+
+          try {
+            if (Array.isArray(window.dataLayer)) {
+              window.dataLayer.push({ event: evt.name, ...evt.props });
+            }
+          } catch {}
+
+          // Optional beacon send
+          trySend(evt);
+        };
+      })();
+    </script>
+  </head>
+
+  <body class="bg-white text-gray-900 antialiased">
+    <!-- ✅ Persist header across transitions (prevents flicker + keeps state) -->
+    <SiteHeader transition:persist />
+
+    <main class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div class={`max-w-5xl mx-auto px-6 ${Astro.props.tight ? "py-6" : "py-12"}`}>
+        <slot />
+      </div>
+    </main>
+
+    <!-- ✅ Global compare badge sync (works across transitions) -->
+    <script is:inline>
+      (function () {
+        const KEY = "cc_compare";
+
+        function safeLoadIds() {
+          try {
+            const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+            return Array.isArray(arr) ? arr.filter(Boolean) : [];
+          } catch {
+            return [];
+          }
+        }
+
+        function unique(list) {
+          const seen = new Set();
+          return (list || []).filter((x) => {
+            const k = String(x || "");
+            if (!k || seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+        }
+
+        function setBadge(count) {
+          const badge = document.getElementById("ccCompareBadge");
+          if (!badge) return;
+
+          if (!count) {
+            badge.textContent = "";
+            badge.classList.add("hidden");
+            return;
+          }
+
+          badge.textContent = String(count);
+          badge.classList.remove("hidden");
+        }
+
+        function syncFromStorage() {
+          const ids = unique(safeLoadIds());
+          setBadge(ids.length);
+        }
+
+        // Initial sync
+        syncFromStorage();
+
+        // Sync when results.js dispatches compare updates
+        window.addEventListener("cc-compare-updated", (e) => {
+          const ids = e?.detail?.ids;
+          if (Array.isArray(ids)) setBadge(unique(ids).length);
+          else syncFromStorage();
+        });
+
+        // Sync if localStorage changes (other tabs)
+        window.addEventListener("storage", (e) => {
+          if (e.key === KEY) syncFromStorage();
+        });
+
+        // Sync after Astro swaps pages (transitions)
+        document.addEventListener("astro:after-swap", syncFromStorage);
+        document.addEventListener("astro:page-load", syncFromStorage);
+      })();
+    </script>
+  </body>
+</html>

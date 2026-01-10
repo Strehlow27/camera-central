@@ -1,0 +1,425 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { CAMERAS as RAW_CAMERAS } from "../data/cameras.js";
+
+// Ensure IDs match results.js
+function ensureId(c) {
+  const id =
+    typeof c.id === "string" && c.id.trim()
+      ? c.id.trim()
+      : `${c.brand || "camera"}-${c.model || "unknown"}`
+          .toLowerCase()
+          .replaceAll("&", "and")
+          .replaceAll("’", "")
+          .replaceAll("'", "")
+          .replaceAll('"', "")
+          .replaceAll(".", "")
+          .replaceAll("/", "-")
+          .replaceAll("  ", " ")
+          .trim()
+          .replaceAll(" ", "-")
+          .replaceAll("--", "-");
+
+  return { ...c, id };
+}
+
+const CAMERAS = (Array.isArray(RAW_CAMERAS) ? RAW_CAMERAS : [])
+  .filter(Boolean)
+  .map(ensureId);
+---
+
+<BaseLayout title="Compare – Camera Central">
+  <!-- Provide cameras to the browser -->
+  <script define:vars={{ CAMERAS }}>
+    window.CAMERAS = CAMERAS;
+  </script>
+
+  <div class="w-full max-w-6xl mx-auto space-y-6">
+    <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
+      <h1 class="text-3xl font-semibold tracking-tight">Compare</h1>
+      <p class="text-gray-600 mt-2">Side-by-side specs to help you choose confidently.</p>
+
+      <div class="mt-4 flex items-center justify-between gap-3 flex-wrap">
+        <a class="text-sm text-gray-600 underline" href="/results">← Back to results</a>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="copyShareLink"
+            type="button"
+            class="px-3 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm cursor-pointer"
+          >
+            Copy share link
+          </button>
+
+          <button
+            id="clearCompareTop"
+            type="button"
+            class="px-3 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm cursor-pointer"
+          >
+            Clear compare
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-5 border-t border-gray-200 pt-4 text-xs text-gray-500">
+        Tip: Swipe sideways (or shift+mousewheel) to see all columns.
+      </div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 hidden">
+        <p class="font-semibold">Pick cameras to compare</p>
+        <p class="text-sm text-gray-600 mt-1">
+          Go back to results, select at least two cameras, then click “Compare.”
+        </p>
+
+        <div id="debugLine" class="mt-3 text-xs text-gray-500"></div>
+
+        <a
+          href="/results"
+          class="inline-flex mt-4 px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-900 transition"
+        >
+          Go to results
+        </a>
+      </div>
+
+      <!-- Comparison table -->
+      <!-- IMPORTANT: overflow-x-auto MUST be on this wrapper -->
+      <div id="compareWrap" class="mt-6 overflow-x-auto hidden">
+        <!-- This inner div must be wider than the viewport to enable scroll -->
+        <div id="compareGrid" class="rounded-2xl border border-gray-200"></div>
+      </div>
+    </div>
+  </div>
+
+  <style is:global>
+    /* Makes horizontal scroll feel nice on trackpads */
+    #compareWrap {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+
+    /* Lock the first column while horizontally scrolling */
+    .compare-sticky-col {
+      position: sticky;
+      left: 0;
+      z-index: 20;              /* above normal cells */
+      background: #f9fafb;      /* match gray-50 */
+      border-right: 1px solid #e5e7eb;
+    }
+    .compare-row:first-child .compare-sticky-col {
+      z-index: 30; /* header spec cell above everything */
+    }
+
+    /* =========================
+       Camera column separation
+       ========================= */
+
+    /* Vertical divider between camera columns */
+    .compare-cam-col {
+      border-left: 1px solid #e5e7eb; /* gray-200 */
+      background-clip: padding-box;
+    }
+
+    /* Subtle alternating column background (helps eye tracking) */
+    .compare-row > .compare-cam-col:nth-of-type(even) {
+      background-color: #fafafa;
+    }
+
+    /* =========================
+       Remove button association
+       ========================= */
+    .compare-cam-col button[data-remove-id] {
+      border: 1px solid #d1d5db; /* gray-300 */
+      background-color: #ffffff;
+    }
+    .compare-cam-col button[data-remove-id]:hover {
+      background-color: #fee2e2; /* red-100 */
+      border-color: #fecaca;     /* red-200 */
+      color: #991b1b;            /* red-800 */
+    }
+
+    /* ✅ IMPORTANT: prevent the white/gray cells from looking clickable on hover */
+    .compare-sticky-col:hover {
+      background: #f9fafb !important;
+    }
+    .compare-cam-col:hover {
+      background-color: inherit !important; /* keep your alternating bg, no hover highlight */
+    }
+  </style>
+
+  <script is:inline>
+    // ---------- helpers ----------
+    function fmtPrice(p) { return typeof p === "number" ? `$${p.toLocaleString()}` : "—"; }
+    function fmtIbis(v) { return typeof v === "boolean" ? (v ? "Yes" : "No") : "—"; }
+    function fmtNum(n, suffix="") { return typeof n === "number" ? `${n}${suffix}` : "—"; }
+    function fmtMount(m) { return m ? `${m} mount` : "—"; }
+    function esc(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+    function normalizeId(s) {
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .replaceAll("—", "-")
+        .replaceAll("–", "-")
+        .replaceAll(" ", "-");
+    }
+
+    function allCams() {
+      return Array.isArray(window.CAMERAS) ? window.CAMERAS : [];
+    }
+
+    function findCameraById(param) {
+      if (!param) return null;
+      const CAMS = allCams();
+
+      // exact
+      let cam = CAMS.find(c => c.id === param);
+      if (cam) return cam;
+
+      // normalized
+      const norm = normalizeId(param);
+      cam =
+        CAMS.find(c => normalizeId(c.id) === norm) ||
+        CAMS.find(c => normalizeId(`${c.brand}-${c.model}`) === norm);
+
+      return cam || null;
+    }
+
+    function loadCompareIds() {
+      try {
+        const arr = JSON.parse(localStorage.getItem("cc_compare") || "[]");
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCompareIds(ids) {
+      try {
+        localStorage.setItem("cc_compare", JSON.stringify(ids));
+      } catch {}
+    }
+
+    function unique(list) {
+      const seen = new Set();
+      return list.filter(x => {
+        const k = String(x || "");
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
+
+    // Accept:
+    //  - ?ids=sony-a7cii,canon-r8,fuji-x100vi
+    //  - legacy: ?a=...&b=...
+    function readIdsFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+
+      const idsParam = params.get("ids");
+      if (idsParam) {
+        return unique(idsParam.split(",").map(s => s.trim()).filter(Boolean));
+      }
+
+      const a = params.get("a");
+      const b = params.get("b");
+      const legacy = [a, b].filter(Boolean);
+      if (legacy.length) return unique(legacy);
+
+      return [];
+    }
+
+    function setUrlIds(ids) {
+      const clean = unique(ids);
+      const url = clean.length
+        ? `/compare?ids=${clean.map(encodeURIComponent).join(",")}`
+        : "/compare";
+      window.history.replaceState({}, "", url);
+      return url;
+    }
+
+    function showEmpty(debugText) {
+      document.getElementById("compareWrap")?.classList.add("hidden");
+      const empty = document.getElementById("emptyState");
+      empty?.classList.remove("hidden");
+      const dbg = document.getElementById("debugLine");
+      if (dbg) dbg.textContent = debugText || "";
+    }
+
+    function showCompare() {
+      document.getElementById("emptyState")?.classList.add("hidden");
+      document.getElementById("compareWrap")?.classList.remove("hidden");
+    }
+
+    // Build a row: first col = label, then N camera cols
+    function rowHtml(label, cams, renderCell) {
+      return `
+        <div class="compare-row grid" style="grid-template-columns: 220px repeat(${cams.length}, 260px);">
+          <div class="compare-sticky-col p-4 text-sm font-semibold text-gray-600 bg-gray-50 border-t border-gray-200">
+            ${esc(label)}
+          </div>
+          ${cams.map(cam => `
+            <div class="compare-cam-col p-4 border-t border-gray-200">
+              ${renderCell(cam)}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function headerHtml(cams) {
+      return `
+        <div class="compare-row grid" style="grid-template-columns: 220px repeat(${cams.length}, 260px);">
+          <div class="compare-sticky-col p-4 text-sm font-semibold text-gray-600 bg-gray-50">
+            Spec
+          </div>
+
+          ${cams.map(cam => `
+            <div class="compare-cam-col p-4 bg-gray-50">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="text-sm text-gray-500">${esc(cam.brand || "")}</p>
+                  <p class="font-semibold">${esc(cam.model || "")}</p>
+                  <p class="text-xs text-gray-500 mt-1">${esc(cam.id || "")}</p>
+                </div>
+
+                <button
+                  type="button"
+                  class="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  title="Remove"
+                  aria-label="Remove ${esc(cam.brand || "")} ${esc(cam.model || "")}"
+                  data-remove-id="${esc(cam.id || "")}"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderCompareTable(cams) {
+      const grid = document.getElementById("compareGrid");
+      if (!grid) return;
+
+      // ✅ force enough width so overflow-x works (this is what breaks scroll if missing)
+      const totalWidth = 220 + (cams.length * 260);
+      grid.style.minWidth = totalWidth + "px";
+
+      grid.innerHTML = `
+        ${headerHtml(cams)}
+        ${rowHtml("System", cams, (c) => esc(c.system || "—"))}
+        ${rowHtml("Sensor", cams, (c) => esc(c.sensor || "—"))}
+        ${rowHtml("Mount", cams, (c) => esc(fmtMount(c.mount)))}
+        ${rowHtml("Megapixels", cams, (c) => esc(fmtNum(c.mp, " MP")))}
+        ${rowHtml("IBIS", cams, (c) => esc(fmtIbis(c.ibis)))}
+        ${rowHtml("Weight (body)", cams, (c) => esc(fmtNum(c.weightGrams, "g")))}
+        ${rowHtml("Price", cams, (c) => esc(fmtPrice(c.price)))}
+      `;
+    }
+
+    function clearCompareEverywhere() {
+      saveCompareIds([]);
+      setUrlIds([]);
+      showEmpty("Debug: cleared");
+    }
+
+    function removeIdEverywhere(id) {
+      const current = unique(loadCompareIds());
+      const next = current.filter(x => x !== id);
+      saveCompareIds(next);
+      setUrlIds(next);
+      return next;
+    }
+
+    function getActiveCams() {
+      let ids = readIdsFromUrl();
+      if (!ids.length) ids = loadCompareIds();
+      ids = unique(ids);
+
+      const cams = ids.map(findCameraById).filter(Boolean);
+
+      // ✅ If URL/localStorage had bad IDs, sync back clean
+      const cleanIds = unique(cams.map(c => c.id));
+      saveCompareIds(cleanIds);
+      setUrlIds(cleanIds);
+
+      return { ids: cleanIds, cams };
+    }
+
+    function copyShare() {
+      const url = window.location.href;
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).catch(() => {});
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch {}
+        ta.remove();
+      }
+    }
+
+    function bootRender() {
+      const { ids, cams } = getActiveCams();
+
+      if (cams.length < 2) {
+        showEmpty("Some cameras couldn’t be loaded. Try re-selecting them from results.");
+        return;
+      }
+
+      showCompare();
+      renderCompareTable(cams);
+    }
+
+    // ---------- boot ----------
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        if (!allCams().length) {
+          showEmpty("Debug: window.CAMERAS missing/empty");
+          return;
+        }
+
+        bootRender();
+
+        document.getElementById("clearCompareTop")?.addEventListener("click", () => {
+          clearCompareEverywhere();
+        });
+
+        document.getElementById("copyShareLink")?.addEventListener("click", () => {
+          copyShare();
+        });
+
+        // remove buttons (event delegation)
+        document.addEventListener("click", (e) => {
+          const btn = e.target?.closest?.("[data-remove-id]");
+          if (!btn) return;
+
+          e.preventDefault();
+          const id = btn.getAttribute("data-remove-id");
+          if (!id) return;
+
+          const nextIds = removeIdEverywhere(id);
+
+          // re-render
+          if (nextIds.length < 2) {
+            showEmpty(`Debug: ids=${JSON.stringify(nextIds)} cams=0`);
+            return;
+          }
+          bootRender();
+        });
+      } catch (err) {
+        console.error("[compare] render failed:", err);
+        showEmpty("Debug: JS error — check console");
+      }
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,72 @@
+<header class="flex items-center justify-between">
+  <!-- MARKUP -->
+  <a
+    id="headerCompareLink"
+    href="/compare"
+    class="relative inline-flex items-center gap-1"
+  >
+    Compare
+    <span
+      id="ccCompareBadge"
+      class="hidden ml-2 inline-flex items-center justify-center rounded-full bg-black text-white text-[11px] leading-none px-2 py-1"
+      aria-label="Compare count"
+    ></span>
+  </a>
+</header>
+
+<!-- SCRIPT GOES BELOW THE MARKUP -->
+<script is:inline>
+  (function () {
+    const KEY = "cc_compare";
+
+    function safeLoad() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KEY) || "[]");
+        return Array.isArray(raw) ? raw.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function unique(list) {
+      const seen = new Set();
+      return (list || []).filter((x) => {
+        const k = String(x || "");
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
+
+    function updateHeaderCompare() {
+      const ids = unique(safeLoad());
+      const count = ids.length;
+
+      const badge = document.getElementById("ccCompareBadge");
+      if (!badge) return;
+
+      if (count > 0) {
+        badge.textContent = String(count);
+        badge.classList.remove("hidden");
+      } else {
+        badge.textContent = "";
+        badge.classList.add("hidden");
+      }
+    }
+
+    // Initial
+    updateHeaderCompare();
+
+    // When results.js dispatches updates
+    window.addEventListener("cc-compare-updated", updateHeaderCompare);
+
+    // If compare changes in another tab
+    window.addEventListener("storage", (e) => {
+      if (e.key === KEY) updateHeaderCompare();
+    });
+
+    // Astro transitions: re-run after page swap
+    document.addEventListener("astro:page-load", updateHeaderCompare);
+    document.addEventListener("astro:after-swap", updateHeaderCompare);
+  })();
+</script>

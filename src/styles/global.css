@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/* =========================
+   Global base
+   ========================= */
+:root {
+  color-scheme: light;
+  --accent: #b45b52; /* muted brick */
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+p {
+  line-height: 1.7;
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+/* =========================
+   Budget dual-range slider
+   ========================= */
+
+.budget-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.budget-fill {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 2.5rem;
+}
+
+.range::-webkit-slider-runnable-track { background: transparent; }
+.range::-moz-range-track { background: transparent; }
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #111827;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  cursor: pointer;
+}
+
+.range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #111827;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  cursor: pointer;
+}
+
+.range-min { z-index: 30; }
+.range-max { z-index: 40; }
+
+.range-max { pointer-events: none; }
+.range-max::-webkit-slider-thumb { pointer-events: auto; }
+.range-max::-moz-range-thumb { pointer-events: auto; }
+
+/* ---------- Unified slider system (single + dual) ---------- */
+:root{
+  --cc-track-h: 6px;
+  --cc-thumb: 18px;
+  --cc-track: #e5e7eb; /* gray-200 */
+  --cc-thumb-bg: #111827; /* gray-900 */
+  --cc-thumb-ring: #ffffff;
+}
+
+/* Wrapper gives us a consistent height */
+.cc-slider {
+  position: relative;
+  height: 2.5rem; /* room to grab thumb */
+}
+
+/* Background track */
+.cc-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: var(--cc-track-h);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--cc-track);
+}
+
+/* Filled portion (single slider uses width; dual uses left/right) */
+.cc-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: var(--cc-track-h);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--accent); /* your muted brick */
+  pointer-events: none;
+}
+
+/* Shared range input styling */
+.cc-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 2.5rem;
+}
+
+/* Hide the browser track (we draw our own) */
+.cc-range::-webkit-slider-runnable-track { background: transparent; }
+.cc-range::-moz-range-track { background: transparent; }
+
+/* Thumb */
+.cc-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--cc-thumb);
+  height: var(--cc-thumb);
+  border-radius: 999px;
+  background: var(--cc-thumb-bg);
+  border: 2px solid var(--cc-thumb-ring);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  cursor: pointer;
+}
+
+.cc-range::-moz-range-thumb {
+  width: var(--cc-thumb);
+  height: var(--cc-thumb);
+  border-radius: 999px;
+  background: var(--cc-thumb-bg);
+  border: 2px solid var(--cc-thumb-ring);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  cursor: pointer;
+}
