@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>About – Camera Central</title><!-- ✅ Canonical --><link rel="canonical" href="https://camera-central.com/about/"><!-- ✅ Basic SEO --><meta name="description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta name="robots" content="index,follow"><meta name="theme-color" content="#ffffff"><!-- ✅ OpenGraph --><meta property="og:site_name" content="Camera Central"><meta property="og:title" content="About – Camera Central"><meta property="og:description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta property="og:type" content="website"><meta property="og:url" content="https://camera-central.com/about/"><meta property="og:image" content="https://camera-central.com/cameracentralLOGO.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><!-- ✅ Twitter cards --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="About – Camera Central"><meta name="twitter:description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta name="twitter:image" content="https://camera-central.com/cameracentralLOGO.png"><!-- ✅ Favicon(s) --><link rel="icon" href="/favicon.ico" sizes="any"><!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> --><!-- ✅ Enables smooth page transitions --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.QW52Ox2j.js"></script><!-- ✅ Global click tracking (available on every page) --><script>
+      (function () {
+        const KEY = "cc_event_queue";
+        const MAX = 300;
+
+        function safeJsonParse(s, fallback) {
+          try { return JSON.parse(s); } catch { return fallback; }
+        }
+
+        function enqueue(evt) {
+          try {
+            const arr = safeJsonParse(localStorage.getItem(KEY) || "[]", []);
+            arr.push(evt);
+            while (arr.length > MAX) arr.shift();
+            localStorage.setItem(KEY, JSON.stringify(arr));
+          } catch {}
+        }
+
+        function trySend(evt) {
+          // Disabled for MVP (no backend endpoint yet)
+          return;
+        }
+
+        window.ccTrack = function (name, props) {
+          const evt = {
+            name: String(name || "event"),
+            props: props && typeof props === "object" ? props : {},
+            path: window.location.pathname,
+            url: window.location.href,
+            ref: document.referrer || "",
+            ts: Date.now(),
+          };
+
+          enqueue(evt);
+
+          // Dev-only logging
+          try {
+            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+              console.log("[ccTrack]", evt.name, evt.props);
+            }
+          } catch {}
+
+          // Future-proof hooks (only if added later)
+          try {
+            if (typeof window.plausible === "function") {
+              window.plausible(evt.name, { props: evt.props });
+            }
+          } catch {}
+
+          try {
+            if (typeof window.gtag === "function") {
+              window.gtag("event", evt.name, evt.props);
+            }
+          } catch {}
+
+          try {
+            if (Array.isArray(window.dataLayer)) {
+              window.dataLayer.push({ event: evt.name, ...evt.props });
+            }
+          } catch {}
+
+          trySend(evt);
+        };
+      })();
+    </script><link rel="stylesheet" href="/_astro/about.2WYdPzfV.css"></head> <body class="bg-white text-gray-900 antialiased"> <header class="w-full border-b border-gray-200 bg-white/90 backdrop-blur"> <div class="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between gap-4"> <!-- Left: brand --> <a href="/" class="font-semibold text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Camera Central
+</a> <!-- Right: desktop nav --> <nav class="hidden sm:flex items-center gap-4 text-sm text-gray-700"> <a href="/" class="hover:text-gray-900" style="cursor:pointer;">Home</a> <a href="/find" class="hover:text-gray-900" style="cursor:pointer;">Finder</a> <a href="/about" class="hover:text-gray-900" style="cursor:pointer;">About</a> <a href="/disclaimer" class="hover:text-gray-900" style="cursor:pointer;">Disclaimer</a> <a id="headerCompareLink" href="/compare" class="relative inline-flex items-center gap-1 font-medium text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Compare
+<span id="ccCompareBadge" class="hidden ml-1 rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none">
+0
+</span> </a> </nav> <!-- Mobile menu button --> <button id="ccMobileMenuBtn" type="button" class="sm:hidden inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 hover:bg-gray-50" aria-expanded="false" aria-controls="ccMobileMenu" style="cursor:pointer;">
+Menu <span aria-hidden="true" class="ml-2">☰</span> </button> </div> <!-- Mobile menu panel --> <div id="ccMobileMenu" class="sm:hidden hidden border-t border-gray-200 bg-white"> <nav class="mx-auto max-w-5xl px-6 py-3 flex flex-col gap-2 text-sm text-gray-700"> <a href="/" class="py-2 hover:text-gray-900" style="cursor:pointer;">Home</a> <a href="/find" class="py-2 hover:text-gray-900" style="cursor:pointer;">Finder</a> <a href="/about" class="py-2 hover:text-gray-900" style="cursor:pointer;">About</a> <a href="/disclaimer" class="py-2 hover:text-gray-900" style="cursor:pointer;">Disclaimer</a> <a href="/compare" class="py-2 inline-flex items-center gap-2 font-medium text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Compare
+<span id="ccCompareBadgeMobile" class="hidden rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none">
+0
+</span> </a> </nav> </div> </header> <!-- Local sync + mobile menu behavior --> <script>
+  (function () {
+    const KEY = "cc_compare";
+
+    function safeIds() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setBadgeCount(n) {
+      const b1 = document.getElementById("ccCompareBadge");
+      const b2 = document.getElementById("ccCompareBadgeMobile");
+
+      [b1, b2].forEach((badge) => {
+        if (!badge) return;
+        if (!n) {
+          badge.classList.add("hidden");
+          badge.textContent = "0";
+        } else {
+          badge.classList.remove("hidden");
+          badge.textContent = String(n);
+        }
+      });
+    }
+
+    // Initial
+    setBadgeCount(safeIds().length);
+
+    // Updates from results.js (and others)
+    window.addEventListener("cc-compare-updated", (e) => {
+      const ids = e?.detail?.ids;
+      if (Array.isArray(ids)) setBadgeCount(ids.filter(Boolean).length);
+      else setBadgeCount(safeIds().length);
+    });
+
+    // Other tabs
+    window.addEventListener("storage", (e) => {
+      if (e.key === KEY) setBadgeCount(safeIds().length);
+    });
+
+    // Mobile menu toggle
+    const btn = document.getElementById("ccMobileMenuBtn");
+    const panel = document.getElementById("ccMobileMenu");
+
+    function closeMenu() {
+      if (!btn || !panel) return;
+      panel.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMenu() {
+      if (!btn || !panel) return;
+      const isOpen = !panel.classList.contains("hidden");
+      panel.classList.toggle("hidden");
+      btn.setAttribute("aria-expanded", String(!isOpen));
+    }
+
+    btn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleMenu();
+    });
+
+    // Close mobile menu after clicking a link
+    panel?.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href]");
+      if (a) closeMenu();
+    });
+
+    // Close menu after Astro page swaps (prevents "stuck open" feel)
+    document.addEventListener("astro:after-swap", closeMenu);
+    document.addEventListener("astro:page-load", closeMenu);
+  })();
+</script> <main class="min-h-screen bg-gradient-to-b from-gray-50 to-white"> <div class="max-w-5xl mx-auto px-6 py-12">  <div class="max-w-2xl space-y-6"> <h1 class="text-4xl font-semibold tracking-tight">About</h1> <p class="text-gray-700 leading-relaxed">
+Camera Central helps you choose camera gear without drowning in specs.
+      Answer a few questions, get 1–3 recommendations, and understand the tradeoffs.
+</p> <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-3"> <h2 class="text-lg font-semibold">My philosophy</h2> <ul class="list-disc pl-5 text-gray-700 space-y-2"> <li>Start with your use case, not a spec sheet.</li> <li>Recommend a small shortlist, not 30 options.</li> <li>Explain what you gain and what you give up.</li> </ul> </div> </div>  </div> </main> <!-- ✅ Global compare badge sync (works across transitions) --> <script>
+      (function () {
+        const KEY = "cc_compare";
+
+        function safeLoadIds() {
+          try {
+            const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+            return Array.isArray(arr) ? arr.filter(Boolean) : [];
+          } catch {
+            return [];
+          }
+        }
+
+        function unique(list) {
+          const seen = new Set();
+          return (list || []).filter((x) => {
+            const k = String(x || "");
+            if (!k || seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+        }
+
+        function setBadge(count) {
+          const badge = document.getElementById("ccCompareBadge");
+          if (!badge) return;
+
+          if (!count) {
+            badge.textContent = "";
+            badge.classList.add("hidden");
+            return;
+          }
+
+          badge.textContent = String(count);
+          badge.classList.remove("hidden");
+        }
+
+        function syncFromStorage() {
+          const ids = unique(safeLoadIds());
+          setBadge(ids.length);
+        }
+
+        syncFromStorage();
+
+        window.addEventListener("cc-compare-updated", (e) => {
+          const ids = e?.detail?.ids;
+          if (Array.isArray(ids)) setBadge(unique(ids).length);
+          else syncFromStorage();
+        });
+
+        window.addEventListener("storage", (e) => {
+          if (e.key === KEY) syncFromStorage();
+        });
+
+        document.addEventListener("astro:after-swap", syncFromStorage);
+        document.addEventListener("astro:page-load", syncFromStorage);
+      })();
+    </script> <!-- ✅ Vercel Analytics (put near end of body) --> <vercel-analytics data-props="{}" data-params="{}" data-pathname="/about/"></vercel-analytics> <script type="module">var f="@vercel/analytics",l="1.6.1",w=()=>{window.va||(window.va=function(...r){(window.vaq=window.vaq||[]).push(r)})};function d(){return typeof window<"u"}function u(){try{const e="production"}catch{}return"production"}function v(e="auto"){if(e==="auto"){window.vam=u();return}window.vam=e}function m(){return(d()?window.vam:u())||"production"}function c(){return m()==="development"}function b(e,r){if(!e||!r)return e;let n=e;try{const t=Object.entries(r);for(const[a,i]of t)if(!Array.isArray(i)){const o=s(i);o.test(n)&&(n=n.replace(o,`/[${a}]`))}for(const[a,i]of t)if(Array.isArray(i)){const o=s(i.join("/"));o.test(n)&&(n=n.replace(o,`/[...${a}]`))}return n}catch{return e}}function s(e){return new RegExp(`/${h(e)}(?=[/?#]|$)`)}function h(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}function y(e){return e.scriptSrc?e.scriptSrc:c()?"https://va.vercel-scripts.com/v1/script.debug.js":e.basePath?`${e.basePath}/insights/script.js`:"/_vercel/insights/script.js"}function g(e={debug:!0}){var r;if(!d())return;v(e.mode),w(),e.beforeSend&&((r=window.va)==null||r.call(window,"beforeSend",e.beforeSend));const n=y(e);if(document.head.querySelector(`script[src*="${n}"]`))return;const t=document.createElement("script");t.src=n,t.defer=!0,t.dataset.sdkn=f+(e.framework?`/${e.framework}`:""),t.dataset.sdkv=l,e.disableAutoTrack&&(t.dataset.disableAutoTrack="1"),e.endpoint?t.dataset.endpoint=e.endpoint:e.basePath&&(t.dataset.endpoint=`${e.basePath}/insights`),e.dsn&&(t.dataset.dsn=e.dsn),t.onerror=()=>{const a=c()?"Please check if any ad blockers are enabled and try again.":"Be sure to enable Web Analytics for your project and deploy again. See https://vercel.com/docs/analytics/quickstart for more information.";console.log(`[Vercel Web Analytics] Failed to load script from ${n}. ${a}`)},c()&&e.debug===!1&&(t.dataset.debug="false"),document.head.appendChild(t)}function p({route:e,path:r}){var n;(n=window.va)==null||n.call(window,"pageview",{route:e,path:r})}function k(){try{return}catch{}}customElements.define("vercel-analytics",class extends HTMLElement{constructor(){super();try{const r=JSON.parse(this.dataset.props??"{}"),n=JSON.parse(this.dataset.params??"{}");g({...r,disableAutoTrack:!0,framework:"astro",basePath:k(),beforeSend:window.webAnalyticsBeforeSend});const t=this.dataset.pathname;p({route:b(t??"",n),path:t})}catch(r){throw new Error(`Failed to parse WebAnalytics properties: ${r}`)}}});</script> </body></html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Compare – Camera Central</title><!-- ✅ Canonical --><link rel="canonical" href="https://camera-central.com/compare/"><!-- ✅ Basic SEO --><meta name="description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta name="robots" content="index,follow"><meta name="theme-color" content="#ffffff"><!-- ✅ OpenGraph --><meta property="og:site_name" content="Camera Central"><meta property="og:title" content="Compare – Camera Central"><meta property="og:description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta property="og:type" content="website"><meta property="og:url" content="https://camera-central.com/compare/"><meta property="og:image" content="https://camera-central.com/cameracentralLOGO.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><!-- ✅ Twitter cards --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Compare – Camera Central"><meta name="twitter:description" content="Find the right camera fast. Personalized picks and side-by-side compare."><meta name="twitter:image" content="https://camera-central.com/cameracentralLOGO.png"><!-- ✅ Favicon(s) --><link rel="icon" href="/favicon.ico" sizes="any"><!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> --><!-- ✅ Enables smooth page transitions --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.QW52Ox2j.js"></script><!-- ✅ Global click tracking (available on every page) --><script>
+      (function () {
+        const KEY = "cc_event_queue";
+        const MAX = 300;
+
+        function safeJsonParse(s, fallback) {
+          try { return JSON.parse(s); } catch { return fallback; }
+        }
+
+        function enqueue(evt) {
+          try {
+            const arr = safeJsonParse(localStorage.getItem(KEY) || "[]", []);
+            arr.push(evt);
+            while (arr.length > MAX) arr.shift();
+            localStorage.setItem(KEY, JSON.stringify(arr));
+          } catch {}
+        }
+
+        function trySend(evt) {
+          // Disabled for MVP (no backend endpoint yet)
+          return;
+        }
+
+        window.ccTrack = function (name, props) {
+          const evt = {
+            name: String(name || "event"),
+            props: props && typeof props === "object" ? props : {},
+            path: window.location.pathname,
+            url: window.location.href,
+            ref: document.referrer || "",
+            ts: Date.now(),
+          };
+
+          enqueue(evt);
+
+          // Dev-only logging
+          try {
+            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+              console.log("[ccTrack]", evt.name, evt.props);
+            }
+          } catch {}
+
+          // Future-proof hooks (only if added later)
+          try {
+            if (typeof window.plausible === "function") {
+              window.plausible(evt.name, { props: evt.props });
+            }
+          } catch {}
+
+          try {
+            if (typeof window.gtag === "function") {
+              window.gtag("event", evt.name, evt.props);
+            }
+          } catch {}
+
+          try {
+            if (Array.isArray(window.dataLayer)) {
+              window.dataLayer.push({ event: evt.name, ...evt.props });
+            }
+          } catch {}
+
+          trySend(evt);
+        };
+      })();
+    </script><link rel="stylesheet" href="/_astro/about.2WYdPzfV.css">
+<style>#compareWrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}.compare-sticky-col{position:sticky;left:0;z-index:20;background:#f9fafb;border-right:1px solid #e5e7eb}.compare-row:first-child .compare-sticky-col{z-index:30}.compare-cam-col{border-left:1px solid #e5e7eb;background-clip:padding-box}.compare-row>.compare-cam-col:nth-of-type(2n){background-color:#fafafa}.compare-cam-col button[data-remove-id]{border:1px solid #d1d5db;background-color:#fff}.compare-cam-col button[data-remove-id]:hover{background-color:#fee2e2;border-color:#fecaca;color:#991b1b}.compare-sticky-col:hover{background:#f9fafb!important}.compare-cam-col:hover{background-color:inherit!important}
+</style></head> <body class="bg-white text-gray-900 antialiased"> <header class="w-full border-b border-gray-200 bg-white/90 backdrop-blur"> <div class="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between gap-4"> <!-- Left: brand --> <a href="/" class="font-semibold text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Camera Central
+</a> <!-- Right: desktop nav --> <nav class="hidden sm:flex items-center gap-4 text-sm text-gray-700"> <a href="/" class="hover:text-gray-900" style="cursor:pointer;">Home</a> <a href="/find" class="hover:text-gray-900" style="cursor:pointer;">Finder</a> <a href="/about" class="hover:text-gray-900" style="cursor:pointer;">About</a> <a href="/disclaimer" class="hover:text-gray-900" style="cursor:pointer;">Disclaimer</a> <a id="headerCompareLink" href="/compare" class="relative inline-flex items-center gap-1 font-medium text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Compare
+<span id="ccCompareBadge" class="hidden ml-1 rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none">
+0
+</span> </a> </nav> <!-- Mobile menu button --> <button id="ccMobileMenuBtn" type="button" class="sm:hidden inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 hover:bg-gray-50" aria-expanded="false" aria-controls="ccMobileMenu" style="cursor:pointer;">
+Menu <span aria-hidden="true" class="ml-2">☰</span> </button> </div> <!-- Mobile menu panel --> <div id="ccMobileMenu" class="sm:hidden hidden border-t border-gray-200 bg-white"> <nav class="mx-auto max-w-5xl px-6 py-3 flex flex-col gap-2 text-sm text-gray-700"> <a href="/" class="py-2 hover:text-gray-900" style="cursor:pointer;">Home</a> <a href="/find" class="py-2 hover:text-gray-900" style="cursor:pointer;">Finder</a> <a href="/about" class="py-2 hover:text-gray-900" style="cursor:pointer;">About</a> <a href="/disclaimer" class="py-2 hover:text-gray-900" style="cursor:pointer;">Disclaimer</a> <a href="/compare" class="py-2 inline-flex items-center gap-2 font-medium text-gray-900 hover:opacity-80" style="cursor:pointer;">
+Compare
+<span id="ccCompareBadgeMobile" class="hidden rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none">
+0
+</span> </a> </nav> </div> </header> <!-- Local sync + mobile menu behavior --> <script>
+  (function () {
+    const KEY = "cc_compare";
+
+    function safeIds() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setBadgeCount(n) {
+      const b1 = document.getElementById("ccCompareBadge");
+      const b2 = document.getElementById("ccCompareBadgeMobile");
+
+      [b1, b2].forEach((badge) => {
+        if (!badge) return;
+        if (!n) {
+          badge.classList.add("hidden");
+          badge.textContent = "0";
+        } else {
+          badge.classList.remove("hidden");
+          badge.textContent = String(n);
+        }
+      });
+    }
+
+    // Initial
+    setBadgeCount(safeIds().length);
+
+    // Updates from results.js (and others)
+    window.addEventListener("cc-compare-updated", (e) => {
+      const ids = e?.detail?.ids;
+      if (Array.isArray(ids)) setBadgeCount(ids.filter(Boolean).length);
+      else setBadgeCount(safeIds().length);
+    });
+
+    // Other tabs
+    window.addEventListener("storage", (e) => {
+      if (e.key === KEY) setBadgeCount(safeIds().length);
+    });
+
+    // Mobile menu toggle
+    const btn = document.getElementById("ccMobileMenuBtn");
+    const panel = document.getElementById("ccMobileMenu");
+
+    function closeMenu() {
+      if (!btn || !panel) return;
+      panel.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMenu() {
+      if (!btn || !panel) return;
+      const isOpen = !panel.classList.contains("hidden");
+      panel.classList.toggle("hidden");
+      btn.setAttribute("aria-expanded", String(!isOpen));
+    }
+
+    btn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleMenu();
+    });
+
+    // Close mobile menu after clicking a link
+    panel?.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href]");
+      if (a) closeMenu();
+    });
+
+    // Close menu after Astro page swaps (prevents "stuck open" feel)
+    document.addEventListener("astro:after-swap", closeMenu);
+    document.addEventListener("astro:page-load", closeMenu);
+  })();
+</script> <main class="min-h-screen bg-gradient-to-b from-gray-50 to-white"> <div class="max-w-5xl mx-auto px-6 py-12">   <script>(function(){const CAMERAS = [{"id":"canon-r8","slug":"canon-eos-r8","brand":"Canon","model":"EOS R8","system":"Mirrorless","mount":"RF","sensor":"Full Frame","isInterchangeableLens":true,"mp":24,"ibis":false,"weightGrams":461,"price":1699,"strengths":["Lightweight","Great image quality","Strong autofocus"],"tradeoffs":["No IBIS","Smaller battery"],"priceTier":"mid","weightClass":"light","lowLight":4,"travel":5,"landscape":4,"beginnerFriendly":4,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Canon%20EOS%20R8&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Canon%20EOS%20R8","used":"https://www.mpb.com/en-us/search?q=Canon%20EOS%20R8"}},{"id":"canon-r6m2","slug":"canon-eos-r6-mark-ii","brand":"Canon","model":"EOS R6 Mark II","system":"Mirrorless","mount":"RF","sensor":"Full Frame","mp":24,"ibis":true,"weightGrams":670,"price":1999,"strengths":["IBIS","Excellent autofocus","Great low light"],"tradeoffs":["More expensive","Bigger than R8"],"priceTier":"high","weightClass":"medium","lowLight":5,"travel":4,"landscape":4,"beginnerFriendly":4,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Canon%20EOS%20R6%20Mark%20II&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Canon%20EOS%20R6%20Mark%20II","used":"https://www.mpb.com/en-us/search?q=Canon%20EOS%20R6%20Mark%20II"}},{"id":"canon-r5","slug":"canon-eos-r5","brand":"Canon","model":"EOS R5","system":"Mirrorless","mount":"RF","sensor":"Full Frame","mp":45,"ibis":true,"weightGrams":738,"price":3499,"strengths":["High resolution","IBIS","Pro build"],"tradeoffs":["Expensive","Overkill for many"],"priceTier":"pro","weightClass":"medium","lowLight":5,"travel":3,"landscape":5,"beginnerFriendly":3,"video":5,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Canon%20EOS%20R5&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Canon%20EOS%20R5","used":"https://www.mpb.com/en-us/search?q=Canon%20EOS%20R5"}},{"id":"canon-rp","slug":"canon-eos-rp","brand":"Canon","model":"EOS RP","system":"Mirrorless","mount":"RF","sensor":"Full Frame","mp":26,"ibis":false,"weightGrams":485,"price":999,"strengths":["Budget full frame","Light"],"tradeoffs":["Older autofocus","Weaker video"],"priceTier":"budget","weightClass":"light","lowLight":3,"travel":4,"landscape":3,"beginnerFriendly":4,"video":2,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Canon%20EOS%20RP&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Canon%20EOS%20RP","used":"https://www.mpb.com/en-us/search?q=Canon%20EOS%20RP"}},{"id":"sony-a7iv","slug":"sony-a7-iv","brand":"Sony","model":"a7 IV","system":"Mirrorless","mount":"E","sensor":"Full Frame","mp":33,"ibis":true,"weightGrams":658,"price":2499,"strengths":["All-rounder","Strong autofocus","Great video"],"tradeoffs":["Menus","More expensive lenses"],"priceTier":"high","weightClass":"medium","lowLight":4,"travel":4,"landscape":4,"beginnerFriendly":3,"video":5,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Sony%20a7%20IV&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Sony%20a7%20IV","used":"https://www.mpb.com/en-us/search?q=Sony%20a7%20IV"}},{"id":"sony-a7cii","slug":"sony-a7c-ii","brand":"Sony","model":"a7C II","system":"Mirrorless","mount":"E","sensor":"Full Frame","mp":33,"ibis":true,"weightGrams":514,"price":2199,"strengths":["Compact","Modern AF","Great for travel"],"tradeoffs":["Small grip","Less pro ergonomics"],"priceTier":"high","weightClass":"light","lowLight":4,"travel":5,"landscape":4,"beginnerFriendly":4,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Sony%20a7C%20II&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Sony%20a7C%20II","used":"https://www.mpb.com/en-us/search?q=Sony%20a7C%20II"}},{"id":"sony-a7iii","slug":"sony-a7-iii","brand":"Sony","model":"a7 III","system":"Mirrorless","mount":"E","sensor":"Full Frame","mp":24,"ibis":true,"weightGrams":650,"price":1999,"strengths":["Great used value","Still excellent photos"],"tradeoffs":["Older UI","Older video features"],"priceTier":"mid","weightClass":"medium","lowLight":4,"travel":4,"landscape":4,"beginnerFriendly":3,"video":3,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Sony%20a7%20III&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Sony%20a7%20III","used":"https://www.mpb.com/en-us/search?q=Sony%20a7%20III"}},{"id":"nikon-z6ii","slug":"nikon-z6-ii","brand":"Nikon","model":"Z6 II","system":"Mirrorless","mount":"Z","sensor":"Full Frame","mp":24,"ibis":true,"weightGrams":705,"price":1999,"strengths":["Great handling","Nice colors","Solid all-rounder"],"tradeoffs":["AF not top-tier vs Sony/Canon"],"priceTier":"high","weightClass":"medium","lowLight":4,"travel":4,"landscape":4,"beginnerFriendly":4,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Nikon%20Z6%20II&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Nikon%20Z6%20II","used":"https://www.mpb.com/en-us/search?q=Nikon%20Z6%20II"}},{"id":"nikon-zf","slug":"nikon-zf","brand":"Nikon","model":"Zf","system":"Mirrorless","mount":"Z","sensor":"Full Frame","mp":24,"ibis":true,"weightGrams":710,"price":1999,"strengths":["IBIS","Great image quality","Retro design"],"tradeoffs":["Heavier","Style may not be for everyone"],"priceTier":"high","weightClass":"medium","lowLight":5,"travel":3,"landscape":4,"beginnerFriendly":3,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Nikon%20Zf&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Nikon%20Zf","used":"https://www.mpb.com/en-us/search?q=Nikon%20Zf"}},{"id":"fuji-xt5","slug":"fujifilm-x-t5","brand":"Fujifilm","model":"X-T5","system":"Mirrorless","mount":"X","sensor":"APS-C","mp":40,"ibis":true,"weightGrams":557,"price":1699,"strengths":["Light kit","Great colors","High resolution for APS-C"],"tradeoffs":["Worse low light than full frame"],"priceTier":"high","weightClass":"light","lowLight":3,"travel":5,"landscape":5,"beginnerFriendly":3,"video":3,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Fujifilm%20X-T5&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Fujifilm%20X-T5","used":"https://www.mpb.com/en-us/search?q=Fujifilm%20X-T5"}},{"id":"fuji-xs20","slug":"fujifilm-x-s20","brand":"Fujifilm","model":"X-S20","system":"Mirrorless","mount":"X","sensor":"APS-C","mp":26,"ibis":true,"weightGrams":491,"price":1299,"strengths":["Great travel/video hybrid","Lightweight"],"tradeoffs":["Not as photo-focused as X-T5"],"priceTier":"mid","weightClass":"light","lowLight":3,"travel":5,"landscape":4,"beginnerFriendly":4,"video":4,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Fujifilm%20X-S20&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Fujifilm%20X-S20","used":"https://www.mpb.com/en-us/search?q=Fujifilm%20X-S20"}},{"id":"panasonic-s5ii","slug":"panasonic-s5-ii","brand":"Panasonic","model":"S5 II","system":"Mirrorless","mount":"L","sensor":"Full Frame","mp":24,"ibis":true,"weightGrams":740,"price":1999,"strengths":["Great video","IBIS","Good value"],"tradeoffs":["AF for fast action not best-in-class"],"priceTier":"high","weightClass":"medium","lowLight":4,"travel":4,"landscape":4,"beginnerFriendly":4,"video":5,"buyLinks":{"bh":"https://www.bhphotovideo.com/c/search?Ntt=Panasonic%20S5%20II&N=0&InitialSearch=yes&sts=ma","amazon":"https://www.amazon.com/s?k=Panasonic%20S5%20II","used":"https://www.mpb.com/en-us/search?q=Panasonic%20S5%20II"}}];
+
+    window.CAMERAS = CAMERAS;
+  })();</script> <div class="w-full max-w-6xl mx-auto space-y-6"> <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-8"> <h1 class="text-3xl font-semibold tracking-tight">Compare</h1> <p class="text-gray-600 mt-2">Side-by-side specs to help you choose confidently.</p> <div class="mt-4 flex items-center justify-between gap-3 flex-wrap"> <a class="text-sm text-gray-600 underline" href="/results">← Back to results</a> <div class="flex items-center gap-2"> <button id="copyShareLink" type="button" class="px-3 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm cursor-pointer">
+Copy share link
+</button> <button id="clearCompareTop" type="button" class="px-3 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm cursor-pointer">
+Clear compare
+</button> </div> </div> <div class="mt-5 border-t border-gray-200 pt-4 text-xs text-gray-500">
+Tip: Swipe sideways (or shift+mousewheel) to see all columns.
+</div> <!-- Empty state --> <div id="emptyState" class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 hidden"> <p class="font-semibold">Pick cameras to compare</p> <p class="text-sm text-gray-600 mt-1">
+Go back to results, select at least two cameras, then click “Compare.”
+</p> <div id="debugLine" class="mt-3 text-xs text-gray-500"></div> <a href="/results" class="inline-flex mt-4 px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-900 transition">
+Go to results
+</a> </div> <!-- Comparison table --> <!-- IMPORTANT: overflow-x-auto MUST be on this wrapper --> <div id="compareWrap" class="mt-6 overflow-x-auto hidden"> <!-- This inner div must be wider than the viewport to enable scroll --> <div id="compareGrid" class="rounded-2xl border border-gray-200"></div> </div> </div> </div>  <script>
+    // ---------- helpers ----------
+    function fmtPrice(p) { return typeof p === "number" ? `$${p.toLocaleString()}` : "—"; }
+    function fmtIbis(v) { return typeof v === "boolean" ? (v ? "Yes" : "No") : "—"; }
+    function fmtNum(n, suffix="") { return typeof n === "number" ? `${n}${suffix}` : "—"; }
+    function fmtMount(m) { return m ? `${m} mount` : "—"; }
+    function esc(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+    function normalizeId(s) {
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .replaceAll("—", "-")
+        .replaceAll("–", "-")
+        .replaceAll(" ", "-");
+    }
+
+    function allCams() {
+      return Array.isArray(window.CAMERAS) ? window.CAMERAS : [];
+    }
+
+    function findCameraById(param) {
+      if (!param) return null;
+      const CAMS = allCams();
+
+      // exact
+      let cam = CAMS.find(c => c.id === param);
+      if (cam) return cam;
+
+      // normalized
+      const norm = normalizeId(param);
+      cam =
+        CAMS.find(c => normalizeId(c.id) === norm) ||
+        CAMS.find(c => normalizeId(`${c.brand}-${c.model}`) === norm);
+
+      return cam || null;
+    }
+
+    function loadCompareIds() {
+      try {
+        const arr = JSON.parse(localStorage.getItem("cc_compare") || "[]");
+        return Array.isArray(arr) ? arr.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCompareIds(ids) {
+      try {
+        localStorage.setItem("cc_compare", JSON.stringify(ids));
+      } catch {}
+    }
+
+    function unique(list) {
+      const seen = new Set();
+      return list.filter(x => {
+        const k = String(x || "");
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
+
+    // Accept:
+    //  - ?ids=sony-a7cii,canon-r8,fuji-x100vi
+    //  - legacy: ?a=...&b=...
+    function readIdsFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+
+      const idsParam = params.get("ids");
+      if (idsParam) {
+        return unique(idsParam.split(",").map(s => s.trim()).filter(Boolean));
+      }
+
+      const a = params.get("a");
+      const b = params.get("b");
+      const legacy = [a, b].filter(Boolean);
+      if (legacy.length) return unique(legacy);
+
+      return [];
+    }
+
+    function setUrlIds(ids) {
+      const clean = unique(ids);
+      const url = clean.length
+        ? `/compare?ids=${clean.map(encodeURIComponent).join(",")}`
+        : "/compare";
+      window.history.replaceState({}, "", url);
+      return url;
+    }
+
+    function showEmpty(debugText) {
+      document.getElementById("compareWrap")?.classList.add("hidden");
+      const empty = document.getElementById("emptyState");
+      empty?.classList.remove("hidden");
+      const dbg = document.getElementById("debugLine");
+      if (dbg) dbg.textContent = debugText || "";
+    }
+
+    function showCompare() {
+      document.getElementById("emptyState")?.classList.add("hidden");
+      document.getElementById("compareWrap")?.classList.remove("hidden");
+    }
+
+    // Build a row: first col = label, then N camera cols
+    function rowHtml(label, cams, renderCell) {
+      return `
+        <div class="compare-row grid" style="grid-template-columns: 220px repeat(${cams.length}, 260px);">
+          <div class="compare-sticky-col p-4 text-sm font-semibold text-gray-600 bg-gray-50 border-t border-gray-200">
+            ${esc(label)}
+          </div>
+          ${cams.map(cam => `
+            <div class="compare-cam-col p-4 border-t border-gray-200">
+              ${renderCell(cam)}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function headerHtml(cams) {
+      return `
+        <div class="compare-row grid" style="grid-template-columns: 220px repeat(${cams.length}, 260px);">
+          <div class="compare-sticky-col p-4 text-sm font-semibold text-gray-600 bg-gray-50">
+            Spec
+          </div>
+
+          ${cams.map(cam => `
+            <div class="compare-cam-col p-4 bg-gray-50">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="text-sm text-gray-500">${esc(cam.brand || "")}</p>
+                  <p class="font-semibold">${esc(cam.model || "")}</p>
+                  <p class="text-xs text-gray-500 mt-1">${esc(cam.id || "")}</p>
+                </div>
+
+                <button
+                  type="button"
+                  class="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  title="Remove"
+                  aria-label="Remove ${esc(cam.brand || "")} ${esc(cam.model || "")}"
+                  data-remove-id="${esc(cam.id || "")}"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderCompareTable(cams) {
+      const grid = document.getElementById("compareGrid");
+      if (!grid) return;
+
+      // ✅ force enough width so overflow-x works (this is what breaks scroll if missing)
+      const totalWidth = 220 + (cams.length * 260);
+      grid.style.minWidth = totalWidth + "px";
+
+      grid.innerHTML = `
+        ${headerHtml(cams)}
+        ${rowHtml("System", cams, (c) => esc(c.system || "—"))}
+        ${rowHtml("Sensor", cams, (c) => esc(c.sensor || "—"))}
+        ${rowHtml("Mount", cams, (c) => esc(fmtMount(c.mount)))}
+        ${rowHtml("Megapixels", cams, (c) => esc(fmtNum(c.mp, " MP")))}
+        ${rowHtml("IBIS", cams, (c) => esc(fmtIbis(c.ibis)))}
+        ${rowHtml("Weight (body)", cams, (c) => esc(fmtNum(c.weightGrams, "g")))}
+        ${rowHtml("Price", cams, (c) => esc(fmtPrice(c.price)))}
+      `;
+    }
+
+    function clearCompareEverywhere() {
+      saveCompareIds([]);
+      setUrlIds([]);
+      showEmpty("Debug: cleared");
+    }
+
+    function removeIdEverywhere(id) {
+      const current = unique(loadCompareIds());
+      const next = current.filter(x => x !== id);
+      saveCompareIds(next);
+      setUrlIds(next);
+      return next;
+    }
+
+    function getActiveCams() {
+      let ids = readIdsFromUrl();
+      if (!ids.length) ids = loadCompareIds();
+      ids = unique(ids);
+
+      const cams = ids.map(findCameraById).filter(Boolean);
+
+      // ✅ If URL/localStorage had bad IDs, sync back clean
+      const cleanIds = unique(cams.map(c => c.id));
+      saveCompareIds(cleanIds);
+      setUrlIds(cleanIds);
+
+      return { ids: cleanIds, cams };
+    }
+
+    function copyShare() {
+      const url = window.location.href;
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).catch(() => {});
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch {}
+        ta.remove();
+      }
+    }
+
+    function bootRender() {
+      const { ids, cams } = getActiveCams();
+
+      if (cams.length < 2) {
+        showEmpty("Some cameras couldn’t be loaded. Try re-selecting them from results.");
+        return;
+      }
+
+      showCompare();
+      renderCompareTable(cams);
+    }
+
+    // ---------- boot ----------
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        if (!allCams().length) {
+          showEmpty("Debug: window.CAMERAS missing/empty");
+          return;
+        }
+
+        bootRender();
+
+        document.getElementById("clearCompareTop")?.addEventListener("click", () => {
+          clearCompareEverywhere();
+        });
+
+        document.getElementById("copyShareLink")?.addEventListener("click", () => {
+          copyShare();
+        });
+
+        // remove buttons (event delegation)
+        document.addEventListener("click", (e) => {
+          const btn = e.target?.closest?.("[data-remove-id]");
+          if (!btn) return;
+
+          e.preventDefault();
+          const id = btn.getAttribute("data-remove-id");
+          if (!id) return;
+
+          const nextIds = removeIdEverywhere(id);
+
+          // re-render
+          if (nextIds.length < 2) {
+            showEmpty(`Debug: ids=${JSON.stringify(nextIds)} cams=0`);
+            return;
+          }
+          bootRender();
+        });
+      } catch (err) {
+        console.error("[compare] render failed:", err);
+        showEmpty("Debug: JS error — check console");
+      }
+    });
+  </script>  </div> </main> <!-- ✅ Global compare badge sync (works across transitions) --> <script>
+      (function () {
+        const KEY = "cc_compare";
+
+        function safeLoadIds() {
+          try {
+            const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
+            return Array.isArray(arr) ? arr.filter(Boolean) : [];
+          } catch {
+            return [];
+          }
+        }
+
+        function unique(list) {
+          const seen = new Set();
+          return (list || []).filter((x) => {
+            const k = String(x || "");
+            if (!k || seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+        }
+
+        function setBadge(count) {
+          const badge = document.getElementById("ccCompareBadge");
+          if (!badge) return;
+
+          if (!count) {
+            badge.textContent = "";
+            badge.classList.add("hidden");
+            return;
+          }
+
+          badge.textContent = String(count);
+          badge.classList.remove("hidden");
+        }
+
+        function syncFromStorage() {
+          const ids = unique(safeLoadIds());
+          setBadge(ids.length);
+        }
+
+        syncFromStorage();
+
+        window.addEventListener("cc-compare-updated", (e) => {
+          const ids = e?.detail?.ids;
+          if (Array.isArray(ids)) setBadge(unique(ids).length);
+          else syncFromStorage();
+        });
+
+        window.addEventListener("storage", (e) => {
+          if (e.key === KEY) syncFromStorage();
+        });
+
+        document.addEventListener("astro:after-swap", syncFromStorage);
+        document.addEventListener("astro:page-load", syncFromStorage);
+      })();
+    </script> <!-- ✅ Vercel Analytics (put near end of body) --> <vercel-analytics data-props="{}" data-params="{}" data-pathname="/compare/"></vercel-analytics> <script type="module">var f="@vercel/analytics",l="1.6.1",w=()=>{window.va||(window.va=function(...r){(window.vaq=window.vaq||[]).push(r)})};function d(){return typeof window<"u"}function u(){try{const e="production"}catch{}return"production"}function v(e="auto"){if(e==="auto"){window.vam=u();return}window.vam=e}function m(){return(d()?window.vam:u())||"production"}function c(){return m()==="development"}function b(e,r){if(!e||!r)return e;let n=e;try{const t=Object.entries(r);for(const[a,i]of t)if(!Array.isArray(i)){const o=s(i);o.test(n)&&(n=n.replace(o,`/[${a}]`))}for(const[a,i]of t)if(Array.isArray(i)){const o=s(i.join("/"));o.test(n)&&(n=n.replace(o,`/[...${a}]`))}return n}catch{return e}}function s(e){return new RegExp(`/${h(e)}(?=[/?#]|$)`)}function h(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}function y(e){return e.scriptSrc?e.scriptSrc:c()?"https://va.vercel-scripts.com/v1/script.debug.js":e.basePath?`${e.basePath}/insights/script.js`:"/_vercel/insights/script.js"}function g(e={debug:!0}){var r;if(!d())return;v(e.mode),w(),e.beforeSend&&((r=window.va)==null||r.call(window,"beforeSend",e.beforeSend));const n=y(e);if(document.head.querySelector(`script[src*="${n}"]`))return;const t=document.createElement("script");t.src=n,t.defer=!0,t.dataset.sdkn=f+(e.framework?`/${e.framework}`:""),t.dataset.sdkv=l,e.disableAutoTrack&&(t.dataset.disableAutoTrack="1"),e.endpoint?t.dataset.endpoint=e.endpoint:e.basePath&&(t.dataset.endpoint=`${e.basePath}/insights`),e.dsn&&(t.dataset.dsn=e.dsn),t.onerror=()=>{const a=c()?"Please check if any ad blockers are enabled and try again.":"Be sure to enable Web Analytics for your project and deploy again. See https://vercel.com/docs/analytics/quickstart for more information.";console.log(`[Vercel Web Analytics] Failed to load script from ${n}. ${a}`)},c()&&e.debug===!1&&(t.dataset.debug="false"),document.head.appendChild(t)}function p({route:e,path:r}){var n;(n=window.va)==null||n.call(window,"pageview",{route:e,path:r})}function k(){try{return}catch{}}customElements.define("vercel-analytics",class extends HTMLElement{constructor(){super();try{const r=JSON.parse(this.dataset.props??"{}"),n=JSON.parse(this.dataset.params??"{}");g({...r,disableAutoTrack:!0,framework:"astro",basePath:k(),beforeSend:window.webAnalyticsBeforeSend});const t=this.dataset.pathname;p({route:b(t??"",n),path:t})}catch(r){throw new Error(`Failed to parse WebAnalytics properties: ${r}`)}}});</script> </body></html>
