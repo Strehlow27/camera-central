@@ -3,7 +3,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { CAMERAS } from "../data/cameras.js";
 ---
 
-<BaseLayout title="Results – Camera Central">
+<BaseLayout
+  title="Your Camera Recommendation – Camera Central"
+  description="See your personalized camera recommendations based on your budget, portability needs, and photo or video priorities."
+>
   <div class="w-full max-w-2xl mx-auto space-y-6">
     <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
       <h1 class="text-3xl font-semibold tracking-tight mb-2">Your recommendation</h1>
@@ -30,6 +33,7 @@ import { CAMERAS } from "../data/cameras.js";
           <span id="tuneChevron" class="text-gray-500">▾</span>
         </button>
       </div>
+
 
       <!-- Refine panel -->
       <div

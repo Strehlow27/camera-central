@@ -3,7 +3,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import FindFlow from "../components/FindFlow.astro";
 ---
 
-<BaseLayout title="Find My Camera – Camera Central" tight>
+<BaseLayout
+  title="Find My Camera – Camera Central"
+  description="Answer a few quick questions to get a personalized camera recommendation for travel and landscape photography."
+  tight
+>
   <div class="pt-4">
     {/* One shared container controls width for BOTH header + card */}
     <div class="w-full max-w-2xl mx-auto space-y-6">
@@ -14,7 +18,6 @@ import FindFlow from "../components/FindFlow.astro";
         </p>
       </header>
 
-      {/* No flex wrapper here — keep it consistent */}
       <FindFlow />
     </div>
   </div>

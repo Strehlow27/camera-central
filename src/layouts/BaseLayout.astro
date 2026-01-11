@@ -2,8 +2,25 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import { ClientRouter } from "astro:transitions";
-import Analytics from '@vercel/analytics/astro'
-const { title = "Camera Central" } = Astro.props;
+import { Analytics } from "@vercel/analytics/astro";
+
+const {
+  title = "Camera Central",
+  description = "Find the right camera fast. Personalized picks and side-by-side compare.",
+
+  // ✅ Put an actual file at /public/cameracentralLOGO.png (recommended: 1200x630)
+  ogImage = "/cameracentralLOGO.png",
+
+  // Optional: set these later if you make a Twitter/X account
+  twitterSite = "",    // e.g. "@cameracentral"
+  twitterCreator = "", // e.g. "@benstrehlow"
+
+  tight = false,
+} = Astro.props;
+
+const origin = (Astro.site ?? Astro.url.origin);
+const canonicalUrl = new URL(Astro.url.pathname, origin).toString();
+const ogImageUrl = new URL(ogImage, origin).toString();
 ---
 
 <!DOCTYPE html>
@@ -13,21 +30,34 @@ const { title = "Camera Central" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
 
-    <!-- ✅ Basic SEO (MVP-safe) -->
-    <meta name="description" content="Find the right camera fast. Personalized picks and side-by-side compare." />
+    <!-- ✅ Canonical -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- ✅ Basic SEO -->
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#ffffff" />
 
-    <!-- ✅ Social share preview (safe defaults) -->
+    <!-- ✅ OpenGraph -->
+    <meta property="og:site_name" content="Camera Central" />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content="Find the right camera fast. Personalized picks and side-by-side compare." />
+    <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-    <!-- ✅ Favicon(s)
-         Put favicon.ico in /public/favicon.ico (required)
-         Only include the SVG line if you ACTUALLY have /public/favicon.svg
-    -->
+    <!-- ✅ Twitter cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    {twitterSite && <meta name="twitter:site" content={twitterSite} />}
+    {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
+
+    <!-- ✅ Favicon(s) -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <!-- If you don’t have favicon.svg yet, KEEP THIS COMMENTED OUT -->
     <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> -->
 
     <!-- ✅ Enables smooth page transitions -->
@@ -57,7 +87,6 @@ const { title = "Camera Central" } = Astro.props;
           return;
         }
 
-        // Expose globally
         window.ccTrack = function (name, props) {
           const evt = {
             name: String(name || "event"),
@@ -68,17 +97,16 @@ const { title = "Camera Central" } = Astro.props;
             ts: Date.now(),
           };
 
-          // Always store locally
           enqueue(evt);
 
-          // Dev-only console logging (keeps prod clean)
+          // Dev-only logging
           try {
             if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
               console.log("[ccTrack]", evt.name, evt.props);
             }
           } catch {}
 
-          // Future-proof: if you add analytics later, this starts sending
+          // Future-proof hooks (only if added later)
           try {
             if (typeof window.plausible === "function") {
               window.plausible(evt.name, { props: evt.props });
@@ -97,7 +125,6 @@ const { title = "Camera Central" } = Astro.props;
             }
           } catch {}
 
-          // Optional beacon send
           trySend(evt);
         };
       })();
@@ -105,11 +132,10 @@ const { title = "Camera Central" } = Astro.props;
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
-    <!-- ✅ Persist header across transitions (prevents flicker + keeps state) -->
     <SiteHeader transition:persist />
 
     <main class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div class={`max-w-5xl mx-auto px-6 ${Astro.props.tight ? "py-6" : "py-12"}`}>
+      <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
         <slot />
       </div>
     </main>
@@ -157,26 +183,24 @@ const { title = "Camera Central" } = Astro.props;
           setBadge(ids.length);
         }
 
-        // Initial sync
         syncFromStorage();
 
-        // Sync when results.js dispatches compare updates
         window.addEventListener("cc-compare-updated", (e) => {
           const ids = e?.detail?.ids;
           if (Array.isArray(ids)) setBadge(unique(ids).length);
           else syncFromStorage();
         });
 
-        // Sync if localStorage changes (other tabs)
         window.addEventListener("storage", (e) => {
           if (e.key === KEY) syncFromStorage();
         });
 
-        // Sync after Astro swaps pages (transitions)
         document.addEventListener("astro:after-swap", syncFromStorage);
         document.addEventListener("astro:page-load", syncFromStorage);
       })();
     </script>
+
+    <!-- ✅ Vercel Analytics (put near end of body) -->
     <Analytics />
   </body>
 </html>
