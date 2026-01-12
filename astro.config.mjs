@@ -2,16 +2,17 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import vercel from "@astrojs/vercel/static";
+import vercel from "@astrojs/vercel";
 
 export default defineConfig({
-  site: "https://camera-central.com",
+  site: "https://camera-central-n2fthrzut-strehlow27s-projects.vercel.app",
+  output: "static",
+
+  adapter: vercel(),
 
   integrations: [
     sitemap(),
   ],
-
-  adapter: vercel(),
 
   vite: {
     plugins: [tailwindcss()],
