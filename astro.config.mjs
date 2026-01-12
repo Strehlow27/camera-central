@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 import vercel from "@astrojs/vercel";
 
 export default defineConfig({
-  site: "https://camera-central-n2fthrzut-strehlow27s-projects.vercel.app",
+  site: "https://camera-central.com",
   output: "static",
 
   adapter: vercel(),
