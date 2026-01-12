@@ -65,6 +65,15 @@
       if (flowRoot.dataset.ccInit === "1") return;
       flowRoot.dataset.ccInit = "1";
 
+      // ---- tiny helper: safe analytics call
+      function track(name, props) {
+        try {
+          if (typeof window.ccTrack === "function") {
+            window.ccTrack(name, props || {});
+          }
+        } catch {}
+      }
+
       const questions = [
         {
           id: "genre",
@@ -118,11 +127,26 @@
       let idx = 0;
       const answers = {};
 
+      // ---- analytics: page view (once per init)
+      track("find_view", { questionCount: questions.length });
+
       // Load saved in-progress answers (if any)
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
         try {
-          Object.assign(answers, JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === "object") {
+            Object.assign(answers, parsed);
+
+            // Resume at the first unanswered question
+            const firstUnanswered = questions.findIndex((q) => !answers[q.id]);
+            idx = firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
+
+            track("find_resume", {
+              answeredCount: Object.keys(answers).length,
+              resumeIndex: idx,
+            });
+          }
         } catch {}
       }
 
@@ -150,6 +174,10 @@
         return;
       }
 
+      // ---- analytics guards to avoid spam
+      let hasStarted = false;
+      let lastQuestionId = null;
+
       function updateProgressUI() {
         const pct = Math.round(((idx + 1) / questions.length) * 100);
         bar.style.width = `${pct}%`;
@@ -171,16 +199,33 @@
 
         try { sessionStorage.removeItem(SESSION_KEY); } catch {}
 
+        // ---- analytics: completion (send before navigating)
+        track("find_complete", {
+          questionCount: questions.length,
+          answeredCount: Object.keys(answers).length,
+          answers,
+        });
+
         window.location.href = "/results";
       }
 
       function render() {
         const q = questions[idx];
+
         progress.textContent = `Question ${idx + 1} of ${questions.length}`;
         question.textContent = q.q;
         helper.textContent = q.helper || "";
 
         updateProgressUI();
+
+        // ---- analytics: question view (only when question changes)
+        if (q.id !== lastQuestionId) {
+          lastQuestionId = q.id;
+          track("find_question_view", {
+            index: idx,
+            id: q.id,
+          });
+        }
 
         optionsWrap.innerHTML = "";
         const selected = answers[q.id];
@@ -199,8 +244,21 @@
           btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
 
           btn.addEventListener("click", () => {
+            // ---- analytics: quiz "start" = first interaction
+            if (!hasStarted) {
+              hasStarted = true;
+              track("find_start", { firstQuestionId: q.id });
+            }
+
             answers[q.id] = opt;
             saveProgress();
+
+            track("find_answer_select", {
+              questionId: q.id,
+              value: opt,
+              index: idx,
+            });
+
             nextBtn.disabled = false;
             render();
           });
@@ -214,11 +272,14 @@
       }
 
       backBtn.addEventListener("click", () => {
+        track("find_back", { fromIndex: idx });
         if (idx > 0) idx--;
         render();
       });
 
       nextBtn.addEventListener("click", () => {
+        track("find_next", { fromIndex: idx });
+
         if (idx < questions.length - 1) {
           idx++;
           render();
