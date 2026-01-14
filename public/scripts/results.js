@@ -668,14 +668,21 @@ function bigCardHtml(c, i, isSelected) {
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
         <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
-        <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(c.model)}</h2>
+        <h2 class="text-xl font-semibold">
+          ${escapeHtml(c.brand)} ${escapeHtml(c.model)}
+          ${
+            c.discontinued
+              ? `<span class="ml-2 inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-semibold text-gray-700">Discontinued</span>`
+              : ""
+          }
+        </h2>
 
         <p class="text-sm text-gray-600">
           ${systemTxt} • ${sensorTxt} • ${mountTxt} mount
         </p>
 
         <p class="mt-1 text-sm text-gray-500">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
+          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)} • ${escapeHtml(String(c.year || "—"))}
         </p>
       </div>
 
@@ -726,7 +733,7 @@ function compactRowHtml(camera, score, isSelected) {
           <span class="text-xs text-gray-500">Score: ${Number(score).toFixed(1)}</span>
         </div>
         <p class="text-xs text-gray-500 mt-1 truncate">
-          ${sensorTxt} • ${mpTxt} • IBIS: ${ibisTxt} • ${priceTxt}
+          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)} • ${escapeHtml(String(c.year || "—"))}
         </p>
       </div>
 
