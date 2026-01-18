@@ -14,6 +14,35 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+// ---------- B&H affiliate config ----------
+const BH = {
+  BI: import.meta.env?.PUBLIC_BH_BI || "23954",
+  KBID: import.meta.env?.PUBLIC_BH_KBID || "29391",
+};
+
+/**
+ * Build a B&H affiliate URL with optional SID
+ */
+function withBHAffiliate(url, sid = "") {
+  try {
+    const u = new URL(url);
+
+    u.searchParams.set("BI", BH.BI);
+    u.searchParams.set("KBID", BH.KBID);
+
+    if (sid) {
+      u.searchParams.set("SID", sid);
+    } else {
+      u.searchParams.delete("SID");
+    }
+
+    return u.toString();
+  } catch {
+    // Fallback: if URL parsing fails, return original
+    return url;
+  }
+}
+
 /**
  * ✅ Safe tracker wrapper
  * - Uses BaseLayout's window.ccTrack if present
@@ -57,7 +86,13 @@ function getBuyLinks(camera) {
 }
 
 function buyMenuHtml(camera) {
-  const { bh, amazon, used } = getBuyLinks(camera);
+  const { bh: rawBh, amazon, used } = getBuyLinks(camera);
+
+  // Build a useful SID
+  const sid = `results_${camera.id}_menu`;
+
+  // Apply B&H affiliate tracking
+  const bh = withBHAffiliate(rawBh, sid);
 
   const items = [
     { label: "B&H Photo", key: "bh", url: bh },
