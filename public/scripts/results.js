@@ -427,14 +427,46 @@ function scoreCamera(camera, answers, weights) {
   return score;
 }
 
+function normalizeCameraTypeAnswer(raw) {
+  // Backward compatible: old quizzes won’t have cameraType saved
+  const v = (raw || "").trim();
+
+  if (v === "Detachable-lens camera") return "detachable";
+  if (v === "Fixed-lens digital camera") return "fixed";
+
+  // "Not sure / show me both" OR missing OR unknown => no filtering
+  return "both";
+}
+
 function getScoredList(answers, weights) {
   const minB = weights?.budgetMin ?? DEFAULT_WEIGHTS.budgetMin;
   const maxB = weights?.budgetMax ?? DEFAULT_WEIGHTS.budgetMax;
 
+  const typePref = normalizeCameraTypeAnswer(answers?.cameraType);
+
   return CAMERAS
     .filter((c) => {
-      if (typeof c.price !== "number") return true;
-      return c.price >= minB && c.price <= maxB;
+      // 1) Budget filter (existing)
+      if (typeof c.price === "number") {
+        if (c.price < minB || c.price > maxB) return false;
+      }
+
+      // 2) Camera type filter (NEW)
+      // Expecting camera.js to provide c.cameraType ("detachable" | "fixed")
+      // Backward compatible: if a camera is missing cameraType, infer from isInterchangeableLens/system
+      if (typePref !== "both") {
+        const inferred =
+          c.cameraType ||
+          (c.isInterchangeableLens === false
+            ? "fixed"
+            : c.system === "Compact"
+            ? "fixed"
+            : "detachable");
+
+        if (inferred !== typePref) return false;
+      }
+
+      return true;
     })
     .map((camera) => ({ camera, score: scoreCamera(camera, answers, weights) }))
     .sort((a, b) => b.score - a.score);
@@ -831,6 +863,14 @@ function render() {
   saveWeights(seeded);
 
   const scored = getScoredList(answers, seeded);
+  const typePref = normalizeCameraTypeAnswer(answers?.cameraType);
+  const typeNote =
+    typePref === "detachable"
+      ? "You selected a detachable-lens camera, so we filtered out fixed-lens compacts."
+      : typePref === "fixed"
+      ? "You selected a fixed-lens digital camera, so we filtered out detachable-lens bodies."
+      : "";
+
   const compareSelected = sanitizeCompare();
 
   const top3 = scored.slice(0, 3).map((x) => x.camera);
@@ -844,6 +884,7 @@ function render() {
         <span class="font-semibold text-gray-900">Why these were recommended:</span>
         We scored cameras based on your answers (genre, portability, low-light, video) and your refine sliders.
         Your budget range filters out bodies outside $${seeded.budgetMin}–$${seeded.budgetMax}.
+        ${typeNote ? `<span class="block mt-2">${escapeHtml(typeNote)}</span>` : ""}
       </p>
     </div>
 

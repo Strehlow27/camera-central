@@ -1,4 +1,4 @@
-
+// camera.js
 
 const bh = (q) =>
   `https://www.bhphotovideo.com/c/search?Ntt=${encodeURIComponent(
@@ -6,13 +6,28 @@ const bh = (q) =>
   )}&N=0&InitialSearch=yes&sts=ma`;
 
 const amz = (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`;
-const mpb = (q) => `https://www.mpb.com/en-us/search?q=${encodeURIComponent(q)}`;
+const mpb = (q) =>
+  `https://www.mpb.com/en-us/search?q=${encodeURIComponent(q)}`;
 
-export const CAMERAS = [
+// --- normalize fields so scoring can rely on them later ---
+function normalizeCamera(cam) {
+  const isIL =
+    typeof cam.isInterchangeableLens === "boolean"
+      ? cam.isInterchangeableLens
+      : cam.system === "Mirrorless" || cam.system === "DSLR";
+
+  return {
+    ...cam,
+    isInterchangeableLens: isIL,
+    cameraType: isIL ? "detachable" : "fixed",
+  };
+}
+
+const RAW_CAMERAS = [
   // =========================
   // Canon
   // =========================
-  //hi
+
   // ---- APS-C (Entry / Travel) ----
   {
     id: "canon-r50",
@@ -44,7 +59,11 @@ export const CAMERAS = [
     beginnerFriendly: 5,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R50"), amazon: amz("Canon EOS R50"), used: mpb("Canon EOS R50") },
+    buyLinks: {
+      bh: bh("Canon EOS R50"),
+      amazon: amz("Canon EOS R50"),
+      used: mpb("Canon EOS R50"),
+    },
   },
 
   {
@@ -76,7 +95,11 @@ export const CAMERAS = [
     beginnerFriendly: 5,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R10"), amazon: amz("Canon EOS R10"), used: mpb("Canon EOS R10") },
+    buyLinks: {
+      bh: bh("Canon EOS R10"),
+      amazon: amz("Canon EOS R10"),
+      used: mpb("Canon EOS R10"),
+    },
   },
 
   {
@@ -108,7 +131,11 @@ export const CAMERAS = [
     beginnerFriendly: 3,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R7"), amazon: amz("Canon EOS R7"), used: mpb("Canon EOS R7") },
+    buyLinks: {
+      bh: bh("Canon EOS R7"),
+      amazon: amz("Canon EOS R7"),
+      used: mpb("Canon EOS R7"),
+    },
   },
 
   // ---- Full Frame (Budget → Mid) ----
@@ -141,7 +168,11 @@ export const CAMERAS = [
     beginnerFriendly: 4,
     video: 2,
 
-    buyLinks: { bh: bh("Canon EOS RP"), amazon: amz("Canon EOS RP"), used: mpb("Canon EOS RP") },
+    buyLinks: {
+      bh: bh("Canon EOS RP"),
+      amazon: amz("Canon EOS RP"),
+      used: mpb("Canon EOS RP"),
+    },
   },
 
   {
@@ -173,7 +204,11 @@ export const CAMERAS = [
     beginnerFriendly: 4,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R8"), amazon: amz("Canon EOS R8"), used: mpb("Canon EOS R8") },
+    buyLinks: {
+      bh: bh("Canon EOS R8"),
+      amazon: amz("Canon EOS R8"),
+      used: mpb("Canon EOS R8"),
+    },
   },
 
   {
@@ -205,7 +240,11 @@ export const CAMERAS = [
     beginnerFriendly: 3,
     video: 3,
 
-    buyLinks: { bh: bh("Canon EOS R"), amazon: amz("Canon EOS R"), used: mpb("Canon EOS R") },
+    buyLinks: {
+      bh: bh("Canon EOS R"),
+      amazon: amz("Canon EOS R"),
+      used: mpb("Canon EOS R"),
+    },
   },
 
   // ---- Full Frame (Enthusiast / Pro) ----
@@ -238,7 +277,11 @@ export const CAMERAS = [
     beginnerFriendly: 4,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R6"), amazon: amz("Canon EOS R6"), used: mpb("Canon EOS R6") },
+    buyLinks: {
+      bh: bh("Canon EOS R6"),
+      amazon: amz("Canon EOS R6"),
+      used: mpb("Canon EOS R6"),
+    },
   },
 
   {
@@ -270,7 +313,11 @@ export const CAMERAS = [
     beginnerFriendly: 4,
     video: 4,
 
-    buyLinks: { bh: bh("Canon EOS R6 Mark II"), amazon: amz("Canon EOS R6 Mark II"), used: mpb("Canon EOS R6 Mark II") },
+    buyLinks: {
+      bh: bh("Canon EOS R6 Mark II"),
+      amazon: amz("Canon EOS R6 Mark II"),
+      used: mpb("Canon EOS R6 Mark II"),
+    },
   },
 
   {
@@ -302,7 +349,11 @@ export const CAMERAS = [
     beginnerFriendly: 3,
     video: 5,
 
-    buyLinks: { bh: bh("Canon EOS R5"), amazon: amz("Canon EOS R5"), used: mpb("Canon EOS R5") },
+    buyLinks: {
+      bh: bh("Canon EOS R5"),
+      amazon: amz("Canon EOS R5"),
+      used: mpb("Canon EOS R5"),
+    },
   },
 
   {
@@ -334,7 +385,11 @@ export const CAMERAS = [
     beginnerFriendly: 2,
     video: 5,
 
-    buyLinks: { bh: bh("Canon EOS R3"), amazon: amz("Canon EOS R3"), used: mpb("Canon EOS R3") },
+    buyLinks: {
+      bh: bh("Canon EOS R3"),
+      amazon: amz("Canon EOS R3"),
+      used: mpb("Canon EOS R3"),
+    },
   },
 
   // ---- Legacy / Used Market ----
@@ -367,7 +422,11 @@ export const CAMERAS = [
     beginnerFriendly: 3,
     video: 3,
 
-    buyLinks: { bh: bh("Canon EOS 90D"), amazon: amz("Canon EOS 90D"), used: mpb("Canon EOS 90D") },
+    buyLinks: {
+      bh: bh("Canon EOS 90D"),
+      amazon: amz("Canon EOS 90D"),
+      used: mpb("Canon EOS 90D"),
+    },
   },
 
   {
@@ -399,7 +458,11 @@ export const CAMERAS = [
     beginnerFriendly: 4,
     video: 3,
 
-    buyLinks: { bh: bh("Canon EOS M6 Mark II"), amazon: amz("Canon EOS M6 Mark II"), used: mpb("Canon EOS M6 Mark II") },
+    buyLinks: {
+      bh: bh("Canon EOS M6 Mark II"),
+      amazon: amz("Canon EOS M6 Mark II"),
+      used: mpb("Canon EOS M6 Mark II"),
+    },
   },
 
   // =========================
@@ -1140,7 +1203,6 @@ export const CAMERAS = [
       used: mpb("Nikon Z8"),
     },
   },
-
 
   // =========================
   // Fujifilm
@@ -1909,7 +1971,11 @@ export const CAMERAS = [
     weightGrams: 422,
     price: 1899,
 
-    strengths: ["Tiny full frame body", "Great for travel minimalists", "Cinema-style workflows"],
+    strengths: [
+      "Tiny full frame body",
+      "Great for travel minimalists",
+      "Cinema-style workflows",
+    ],
     tradeoffs: ["No IBIS", "Weird ergonomics without rig"],
 
     priceTier: "high",
@@ -1945,7 +2011,11 @@ export const CAMERAS = [
     weightGrams: 427,
     price: 2499,
 
-    strengths: ["High resolution in tiny body", "Great detail for landscapes", "Unique minimalist setup"],
+    strengths: [
+      "High resolution in tiny body",
+      "Great detail for landscapes",
+      "Unique minimalist setup",
+    ],
     tradeoffs: ["No IBIS", "Not beginner-friendly ergonomics"],
 
     priceTier: "high",
@@ -1964,6 +2034,194 @@ export const CAMERAS = [
     },
   },
 
+  // =========================
+  // Fixed-lens Digital Cameras (Compacts)
+  // =========================
+  {
+    id: "sony-rx100-vii",
+    slug: "sony-rx100-vii",
+    brand: "Sony",
+    model: "RX100 VII",
+    year: 2019,
+    discontinued: false,
+
+    system: "Compact",
+    mount: "Fixed Lens",
+    sensor: "1-inch",
+    isInterchangeableLens: false,
+
+    mp: 20,
+    ibis: false, // lens stabilization, not IBIS
+    weightGrams: 302,
+    price: 1299,
+
+    strengths: ["Tiny", "Fast autofocus", "Great all-in-one travel zoom"],
+    tradeoffs: ["Expensive for a compact", "Not amazing in very low light"],
+
+    priceTier: "high",
+    weightClass: "very light",
+
+    lowLight: 3,
+    travel: 5,
+    landscape: 3,
+    beginnerFriendly: 5,
+    video: 4,
+
+    buyLinks: {
+      bh: bh("Sony RX100 VII"),
+      amazon: amz("Sony RX100 VII"),
+      used: mpb("Sony RX100 VII"),
+    },
+  },
+
+  {
+    id: "sony-zv1",
+    slug: "sony-zv-1",
+    brand: "Sony",
+    model: "ZV-1",
+    year: 2020,
+    discontinued: false,
+
+    system: "Compact",
+    mount: "Fixed Lens",
+    sensor: "1-inch",
+    isInterchangeableLens: false,
+
+    mp: 20,
+    ibis: false,
+    weightGrams: 294,
+    price: 749,
+
+    strengths: ["Great for video + travel", "Compact", "Easy to use"],
+    tradeoffs: ["Not a long zoom", "Still limited low light vs bigger sensors"],
+
+    priceTier: "budget",
+    weightClass: "very light",
+
+    lowLight: 3,
+    travel: 5,
+    landscape: 2,
+    beginnerFriendly: 5,
+    video: 5,
+
+    buyLinks: {
+      bh: bh("Sony ZV-1"),
+      amazon: amz("Sony ZV-1"),
+      used: mpb("Sony ZV-1"),
+    },
+  },
+
+  {
+    id: "canon-g7x-mark-iii",
+    slug: "canon-powershot-g7-x-mark-iii",
+    brand: "Canon",
+    model: "PowerShot G7 X Mark III",
+    year: 2019,
+    discontinued: false,
+
+    system: "Compact",
+    mount: "Fixed Lens",
+    sensor: "1-inch",
+    isInterchangeableLens: false,
+
+    mp: 20,
+    ibis: false,
+    weightGrams: 304,
+    price: 749,
+
+    strengths: ["Pocketable", "Good travel lifestyle camera", "Simple + popular"],
+    tradeoffs: ["AF not as strong as latest Sony", "Not a long zoom"],
+
+    priceTier: "budget",
+    weightClass: "very light",
+
+    lowLight: 3,
+    travel: 5,
+    landscape: 2,
+    beginnerFriendly: 5,
+    video: 4,
+
+    buyLinks: {
+      bh: bh("Canon G7 X Mark III"),
+      amazon: amz("Canon G7 X Mark III"),
+      used: mpb("Canon G7 X Mark III"),
+    },
+  },
+
+  {
+    id: "ricoh-gr-iii",
+    slug: "ricoh-gr-iii",
+    brand: "Ricoh",
+    model: "GR III",
+    year: 2019,
+    discontinued: false,
+
+    system: "Compact",
+    mount: "Fixed Lens",
+    sensor: "APS-C",
+    isInterchangeableLens: false,
+
+    mp: 24,
+    ibis: true, // GR III has in-body stabilization
+    weightGrams: 257,
+    price: 969,
+
+    strengths: ["Insanely pocketable", "Sharp APS-C images", "Perfect street/travel vibe"],
+    tradeoffs: ["Fixed prime lens (no zoom)", "Not ideal for wildlife"],
+
+    priceTier: "mid",
+    weightClass: "very light",
+
+    lowLight: 3,
+    travel: 5,
+    landscape: 3,
+    beginnerFriendly: 4,
+    video: 2,
+
+    buyLinks: {
+      bh: bh("Ricoh GR III"),
+      amazon: amz("Ricoh GR III"),
+      used: mpb("Ricoh GR III"),
+    },
+  },
+
+  {
+    id: "fuji-x100v",
+    slug: "fujifilm-x100v",
+    brand: "Fujifilm",
+    model: "X100V",
+    year: 2020,
+    discontinued: true,
+
+    system: "Compact",
+    mount: "Fixed Lens",
+    sensor: "APS-C",
+    isInterchangeableLens: false,
+
+    mp: 26,
+    ibis: false,
+    weightGrams: 478,
+    price: 1399,
+
+    strengths: ["Iconic travel look", "Sharp images", "Great for street + landscapes"],
+    tradeoffs: ["Fixed prime lens", "Often overpriced/limited availability"],
+
+    priceTier: "high",
+    weightClass: "light",
+
+    lowLight: 3,
+    travel: 5,
+    landscape: 4,
+    beginnerFriendly: 4,
+    video: 3,
+
+    buyLinks: {
+      bh: bh("Fujifilm X100V"),
+      amazon: amz("Fujifilm X100V"),
+      used: mpb("Fujifilm X100V"),
+    },
+  },
 ];
 
+export const CAMERAS = RAW_CAMERAS.map(normalizeCamera);
 export default CAMERAS;
