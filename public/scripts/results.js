@@ -872,7 +872,7 @@ function render() {
 
     <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
       <p class="text-xs text-gray-500">
-        Disclosure: Buying links currently go to retailers (non-affiliate). In the future, some links may become affiliate links at no extra cost to you.
+        Disclosure: “Some links are affiliate links. If you buy through them, we may earn a small commission at no extra cost to you.”
       </p>
     </div>
   `;
