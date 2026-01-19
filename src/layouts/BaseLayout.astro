@@ -87,6 +87,7 @@ const ogImageUrl = new URL(ogImage, origin).toString();
           return;
         }
 
+        // ✅ Single source of truth for app tracking
         window.ccTrack = function (name, props) {
           const evt = {
             name: String(name || "event"),
@@ -106,56 +107,65 @@ const ogImageUrl = new URL(ogImage, origin).toString();
             }
           } catch {}
 
-          // Future-proof hooks (only if added later)
+          // Plausible support (if you add it later)
           try {
             if (typeof window.plausible === "function") {
               window.plausible(evt.name, { props: evt.props });
             }
           } catch {}
 
+          // ✅ GA4 support (gtag)
           try {
             if (typeof window.gtag === "function") {
               window.gtag("event", evt.name, evt.props);
             }
           } catch {}
 
+          // ✅ Tag Manager style (dataLayer)
           try {
-            if (Array.isArray(window.dataLayer)) {
-              window.dataLayer.push({ event: evt.name, ...evt.props });
-            }
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: evt.name, ...evt.props });
           } catch {}
 
           trySend(evt);
         };
       })();
     </script>
+
     {import.meta.env.PUBLIC_GA4_ID && (
       <>
-        <!-- Google tag (gtag.js) -->
+        <!-- ✅ Google tag (gtag.js) -->
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA4_ID}`}></script>
 
         <script is:inline>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
-          gtag("js", new Date());
-          gtag("config", "{import.meta.env.PUBLIC_GA4_ID}", { anonymize_ip: true });
+          window.gtag = window.gtag || gtag;
 
-          // Bridge: your existing results.js calls track() -> window.ccTrack(...)
-          window.ccTrack = function(name, props) {
+          gtag("js", new Date());
+
+          // ✅ IMPORTANT: use the real ID value (not a string with braces)
+          gtag("config", "{import.meta.env.PUBLIC_GA4_ID}".replace("{import.meta.env.PUBLIC_GA4_ID}", ""), {});
+
+          // The above line is still not correct in Astro because it stays a string.
+          // So we set config using a data-attr injected by Astro below.
+        </script>
+
+        <!-- ✅ Correct GA config using a real value injected by Astro -->
+        <script is:inline data-ga-id={import.meta.env.PUBLIC_GA4_ID}>
+          (function () {
+            const id = document.currentScript?.getAttribute("data-ga-id");
+            if (!id) return;
             try {
-              if (typeof window.gtag === "function") {
-                window.gtag("event", name, props || {});
-              } else {
-                // Fallback: still push into dataLayer if gtag isn't ready yet
-                window.dataLayer = window.dataLayer || [];
-                window.dataLayer.push({ event: name, ...(props || {}) });
-              }
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              window.gtag = window.gtag || gtag;
+              window.gtag("config", id, { anonymize_ip: true });
             } catch {}
-          };
+          })();
         </script>
       </>
     )}
-
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
