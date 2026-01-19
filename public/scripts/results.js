@@ -1,5 +1,5 @@
 // public/scripts/results.js
-console.log("RESULTS.JS LOADED ✅ v1005");
+console.log("RESULTS.JS LOADED ✅ v1006");
 
 function $(id) {
   return document.getElementById(id);
@@ -14,6 +14,36 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+// ---------- B&H affiliate config ----------
+// NOTE: public/ scripts are not reliably Vite-bundled, so don't use import.meta.env here.
+const BH = {
+  BI: (window.CC_BH && window.CC_BH.BI) || "23954",
+  KBID: (window.CC_BH && window.CC_BH.KBID) || "29391",
+};
+
+/**
+ * Build a B&H affiliate URL with optional SID
+ */
+function withBHAffiliate(url, sid = "") {
+  try {
+    const u = new URL(url);
+
+    u.searchParams.set("BI", BH.BI);
+    u.searchParams.set("KBID", BH.KBID);
+
+    if (sid) {
+      u.searchParams.set("SID", sid);
+    } else {
+      u.searchParams.delete("SID");
+    }
+
+    return u.toString();
+  } catch {
+    // Fallback: if URL parsing fails, return original
+    return url;
+  }
+}
+
 /**
  * ✅ Safe tracker wrapper
  * - Uses BaseLayout's window.ccTrack if present
@@ -24,45 +54,16 @@ function track(name, props = {}) {
     if (typeof window.ccTrack === "function") {
       window.ccTrack(name, props);
     } else {
-      // Helpful in dev if BaseLayout script didn't load for some reason
+      // Still helpful in dev if BaseLayout script didn't load for some reason
       console.log("[track:fallback]", name, props);
     }
   } catch {}
 }
 
-// --- small throttle helper (prevents spamming events while dragging sliders)
-function throttle(fn, waitMs = 250) {
-  let last = 0;
-  let timer = null;
-  let lastArgs = null;
-
-  return function throttled(...args) {
-    const now = Date.now();
-    lastArgs = args;
-
-    const remaining = waitMs - (now - last);
-    if (remaining <= 0) {
-      last = now;
-      if (timer) {
-        clearTimeout(timer);
-        timer = null;
-      }
-      fn.apply(this, args);
-      return;
-    }
-
-    if (!timer) {
-      timer = setTimeout(() => {
-        timer = null;
-        last = Date.now();
-        fn.apply(this, lastArgs);
-      }, remaining);
-    }
-  };
-}
-
 function bhSearchUrl(camera) {
-  const q = encodeURIComponent(`${camera.brand || ""} ${camera.model || ""}`.trim());
+  const q = encodeURIComponent(
+    `${camera.brand || ""} ${camera.model || ""}`.trim()
+  );
   return `https://www.bhphotovideo.com/c/search?Ntt=${q}&N=0&InitialSearch=yes&sts=ma`;
 }
 
@@ -86,7 +87,13 @@ function getBuyLinks(camera) {
 }
 
 function buyMenuHtml(camera) {
-  const { bh, amazon, used } = getBuyLinks(camera);
+  const { bh: rawBh, amazon, used } = getBuyLinks(camera);
+
+  // Build a useful SID
+  const sid = `results_${camera.id}_menu`;
+
+  // Apply B&H affiliate tracking
+  const bh = withBHAffiliate(rawBh, sid);
 
   const items = [
     { label: "B&H Photo", key: "bh", url: bh },
@@ -94,8 +101,11 @@ function buyMenuHtml(camera) {
     ...(used ? [{ label: "Used (MPB)", key: "used", url: used }] : []),
   ];
 
+  // ✅ Add data-camera-id so we know which camera's menu was used
   return `
-    <div class="relative inline-flex" data-buy-wrap="1" data-camera-id="${escapeHtml(camera.id)}">
+    <div class="relative inline-flex" data-buy-wrap="1" data-camera-id="${escapeHtml(
+      camera.id
+    )}">
       <button
         type="button"
         data-buy-btn="1"
@@ -136,8 +146,12 @@ function buyMenuHtml(camera) {
 
 // Close any open buy menus
 function closeAllBuyMenus() {
-  document.querySelectorAll("[data-buy-menu]").forEach((m) => m.classList.add("hidden"));
-  document.querySelectorAll("[data-buy-btn]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+  document
+    .querySelectorAll("[data-buy-menu]")
+    .forEach((m) => m.classList.add("hidden"));
+  document
+    .querySelectorAll("[data-buy-btn]")
+    .forEach((b) => b.setAttribute("aria-expanded", "false"));
 }
 
 // ---------- ready helper ----------
@@ -202,7 +216,9 @@ function loadAnswers() {
     if (raw) return JSON.parse(raw);
   } catch {}
 
-  const urlAnswers = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+  const urlAnswers = Object.fromEntries(
+    new URLSearchParams(window.location.search).entries()
+  );
   if (Object.keys(urlAnswers).length) {
     try {
       localStorage.setItem(ANSWERS_KEY, JSON.stringify(urlAnswers));
@@ -223,8 +239,18 @@ function loadWeights() {
       photo: clampInt(saved.photo, 0, 5, DEFAULT_WEIGHTS.photo),
       port: clampInt(saved.port, 0, 5, DEFAULT_WEIGHTS.port),
       video: clampInt(saved.video, 0, 5, DEFAULT_WEIGHTS.video),
-      budgetMin: clampInt(saved.budgetMin, BUDGET_MIN, BUDGET_MAX, DEFAULT_WEIGHTS.budgetMin),
-      budgetMax: clampInt(saved.budgetMax, BUDGET_MIN, BUDGET_MAX, DEFAULT_WEIGHTS.budgetMax),
+      budgetMin: clampInt(
+        saved.budgetMin,
+        BUDGET_MIN,
+        BUDGET_MAX,
+        DEFAULT_WEIGHTS.budgetMin
+      ),
+      budgetMax: clampInt(
+        saved.budgetMax,
+        BUDGET_MIN,
+        BUDGET_MAX,
+        DEFAULT_WEIGHTS.budgetMax
+      ),
     };
 
     if (w.budgetMin > w.budgetMax) {
@@ -248,7 +274,9 @@ function saveWeights(w) {
 // --------------------
 function emitCompareUpdated(ids) {
   try {
-    window.dispatchEvent(new CustomEvent("cc-compare-updated", { detail: { ids } }));
+    window.dispatchEvent(
+      new CustomEvent("cc-compare-updated", { detail: { ids } })
+    );
   } catch {}
 }
 
@@ -268,6 +296,44 @@ function saveCompare(ids) {
   } catch {}
 }
 
+function toggleCompareId(id) {
+  let ids = loadCompare();
+
+  const wasSelected = ids.includes(id);
+
+  if (wasSelected) {
+    ids = ids.filter((x) => x !== id);
+    ids = Array.from(new Set(ids));
+    saveCompare(ids);
+    emitCompareUpdated(ids);
+
+    // ✅ tracking
+    track("compare_toggle", { id, action: "remove", count: ids.length });
+
+    return ids;
+  }
+
+  ids.push(id);
+  ids = Array.from(new Set(ids));
+  saveCompare(ids);
+  emitCompareUpdated(ids);
+
+  // ✅ tracking
+  track("compare_toggle", { id, action: "add", count: ids.length });
+
+  return ids;
+}
+
+function clearCompare() {
+  saveCompare([]);
+  emitCompareUpdated([]);
+
+  // ✅ tracking
+  track("compare_clear", { count: 0 });
+
+  return [];
+}
+
 function cameraById(id) {
   return CAMERAS.find((c) => c.id === id);
 }
@@ -278,52 +344,6 @@ function sanitizeCompare() {
   if (valid.length !== ids.length) saveCompare(valid);
   if (valid.length !== ids.length) emitCompareUpdated(valid);
   return valid;
-}
-
-function toggleCompareId(id) {
-  let ids = loadCompare();
-  const wasSelected = ids.includes(id);
-
-  if (wasSelected) {
-    ids = ids.filter((x) => x !== id);
-    ids = Array.from(new Set(ids));
-    saveCompare(ids);
-    emitCompareUpdated(ids);
-
-    const cam = cameraById(id);
-    track("compare_toggle", {
-      id,
-      action: "remove",
-      count: ids.length,
-      brand: cam?.brand || "",
-      model: cam?.model || "",
-    });
-
-    return ids;
-  }
-
-  ids.push(id);
-  ids = Array.from(new Set(ids));
-  saveCompare(ids);
-  emitCompareUpdated(ids);
-
-  const cam = cameraById(id);
-  track("compare_toggle", {
-    id,
-    action: "add",
-    count: ids.length,
-    brand: cam?.brand || "",
-    model: cam?.model || "",
-  });
-
-  return ids;
-}
-
-function clearCompare() {
-  saveCompare([]);
-  emitCompareUpdated([]);
-  track("compare_clear", { count: 0 });
-  return [];
 }
 
 // --------------------
@@ -340,22 +360,51 @@ function scoreCamera(camera, answers, weights) {
   else if (answers.genre === "City/Street") score += (camera.travel || 0) * 3;
   else if (answers.genre === "People") score += (camera.lowLight || 0) * 2;
   else if (answers.genre === "A mix of everything")
-    score += ((camera.travel || 0) + (camera.landscape || 0) + (camera.video || 0)) * 1.5;
+    score +=
+      ((camera.travel || 0) +
+        (camera.landscape || 0) +
+        (camera.video || 0)) *
+      1.5;
 
   const budget = answers.budget || "";
   if (budget === "Under $1,000")
-    score += camera.priceTier === "budget" ? 6 : camera.priceTier === "mid" ? 2 : -6;
+    score +=
+      camera.priceTier === "budget"
+        ? 6
+        : camera.priceTier === "mid"
+        ? 2
+        : -6;
   else if (budget === "$1,000–$1,800")
-    score += camera.priceTier === "mid" ? 6 : camera.priceTier === "high" ? 2 : -3;
+    score +=
+      camera.priceTier === "mid"
+        ? 6
+        : camera.priceTier === "high"
+        ? 2
+        : -3;
   else if (budget === "$1,800–$2,800")
-    score += camera.priceTier === "high" ? 6 : camera.priceTier === "pro" ? 2 : -2;
+    score +=
+      camera.priceTier === "high"
+        ? 6
+        : camera.priceTier === "pro"
+        ? 2
+        : -2;
   else if (budget === "$2,800+") score += camera.priceTier === "pro" ? 6 : 1;
 
   const weight = answers.weight || "";
   if (weight === "Must be light")
-    score += camera.weightClass === "light" ? 6 : camera.weightClass === "medium" ? 1 : -4;
+    score +=
+      camera.weightClass === "light"
+        ? 6
+        : camera.weightClass === "medium"
+        ? 1
+        : -4;
   else if (weight === "Nice to be light")
-    score += camera.weightClass === "light" ? 4 : camera.weightClass === "medium" ? 2 : -1;
+    score +=
+      camera.weightClass === "light"
+        ? 4
+        : camera.weightClass === "medium"
+        ? 2
+        : -1;
 
   const lowlight = answers.lowlight || "";
   if (lowlight === "Often") score += (camera.lowLight || 0) * 2;
@@ -371,7 +420,8 @@ function scoreCamera(camera, answers, weights) {
   score += (camera.video || 0) * 1.6 * wVideo;
 
   const wc = camera.weightClass || "medium";
-  const portabilityBase = wc === "very light" ? 10 : wc === "light" ? 7 : wc === "medium" ? 4 : 1;
+  const portabilityBase =
+    wc === "very light" ? 10 : wc === "light" ? 7 : wc === "medium" ? 4 : 1;
   score += portabilityBase * 0.8 * wPort;
 
   return score;
@@ -521,134 +571,109 @@ function updateCompareUI() {
 }
 
 // ✅ One capture-phase click handler for everything
-// ✅ Guard so we don't attach this handler multiple times across renders or transitions
-if (!window.__ccResultsClickBound) {
-  window.__ccResultsClickBound = true;
+document.addEventListener(
+  "click",
+  async (e) => {
+    // Close buy dropdowns if click is outside
+    if (
+      !e.target.closest("[data-buy-btn]") &&
+      !e.target.closest("[data-buy-menu]")
+    ) {
+      closeAllBuyMenus();
+    }
 
-  document.addEventListener(
-    "click",
-    async (e) => {
-      // Close buy dropdowns if click is outside
-      if (!e.target.closest("[data-buy-btn]") && !e.target.closest("[data-buy-menu]")) {
-        closeAllBuyMenus();
+    // ✅ Retailer click tracking (must happen before opening new tab)
+    const buyLink = e.target.closest("[data-buy-url]");
+    if (buyLink) {
+      // Let the link still open normally (don't preventDefault)
+      const wrap = buyLink.closest("[data-buy-wrap]");
+      const cameraId = wrap?.getAttribute?.("data-camera-id") || "";
+      const retailer = buyLink.getAttribute("data-buy-retailer") || "unknown";
+      const url = buyLink.getAttribute("data-buy-url") || buyLink.href || "";
+
+      track("buy_option_click", { id: cameraId, retailer, url });
+      closeAllBuyMenus();
+      return;
+    }
+
+    const go = e.target.closest("#ccCompareGo");
+    if (go) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const ids = sanitizeCompare();
+      if (!Array.isArray(ids) || ids.length < 2) return;
+
+      track("compare_now", { ids, count: ids.length });
+
+      const url = `/compare?ids=${ids.map(encodeURIComponent).join(",")}`;
+      window.location.assign(url);
+      return;
+    }
+
+    const copy = e.target.closest("#ccCompareCopy");
+    if (copy) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const ids = sanitizeCompare();
+      if (!Array.isArray(ids) || ids.length < 2) return;
+
+      const shareUrl =
+        window.location.origin +
+        `/compare?ids=${ids.map(encodeURIComponent).join(",")}`;
+
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        copy.textContent = "Copied!";
+        setTimeout(() => (copy.textContent = "Copy link"), 1200);
+        track("copy_compare_link", { ids, count: ids.length });
+      } catch {
+        window.prompt("Copy this link:", shareUrl);
+        track("copy_compare_link_fallback", { ids, count: ids.length });
       }
+      return;
+    }
 
-      // ✅ Retailer click tracking (must happen before opening new tab)
-      const buyLink = e.target.closest("[data-buy-url]");
-      if (buyLink) {
-        const wrap = buyLink.closest("[data-buy-wrap]");
-        const cameraId = wrap?.getAttribute?.("data-camera-id") || "";
-        const retailer = buyLink.getAttribute("data-buy-retailer") || "unknown";
-        const url = buyLink.getAttribute("data-buy-url") || buyLink.href || "";
+    const clearBtn = e.target.closest("#ccCompareClear");
+    if (clearBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      clearCompare();
+      updateCompareUI();
+      render();
+      return;
+    }
 
-        const cam = cameraById(cameraId);
-        track("buy_option_click", {
-          id: cameraId,
-          brand: cam?.brand || "",
-          model: cam?.model || "",
-          retailer,
-          url,
-        });
+    // Toggle dropdown menu
+    const buyBtn = e.target.closest("[data-buy-btn]");
+    if (buyBtn) {
+      e.preventDefault();
+      e.stopPropagation();
 
-        closeAllBuyMenus();
-        return;
+      const wrapper =
+        buyBtn.closest("[data-buy-wrap]") || buyBtn.closest(".relative");
+      const menu = wrapper?.querySelector?.("[data-buy-menu]");
+      if (!menu) return;
+
+      const isOpen = !menu.classList.contains("hidden");
+      const cameraId = wrapper?.getAttribute?.("data-camera-id") || "";
+
+      // only one open at a time
+      closeAllBuyMenus();
+
+      if (!isOpen) {
+        menu.classList.remove("hidden");
+        buyBtn.setAttribute("aria-expanded", "true");
+        track("buy_options_open", { id: cameraId });
+      } else {
+        track("buy_options_close", { id: cameraId });
       }
-
-      const go = e.target.closest("#ccCompareGo");
-      if (go) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const ids = sanitizeCompare();
-        if (!Array.isArray(ids) || ids.length < 2) return;
-
-        track("compare_now", { ids, count: ids.length });
-
-        const url = `/compare?ids=${ids.map(encodeURIComponent).join(",")}`;
-        window.location.assign(url);
-        return;
-      }
-
-      const copy = e.target.closest("#ccCompareCopy");
-      if (copy) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const ids = sanitizeCompare();
-        if (!Array.isArray(ids) || ids.length < 2) return;
-
-        const shareUrl =
-          window.location.origin + `/compare?ids=${ids.map(encodeURIComponent).join(",")}`;
-
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          copy.textContent = "Copied!";
-          setTimeout(() => (copy.textContent = "Copy link"), 1200);
-          track("copy_compare_link", { ids, count: ids.length });
-        } catch {
-          window.prompt("Copy this link:", shareUrl);
-          track("copy_compare_link_fallback", { ids, count: ids.length });
-        }
-        return;
-      }
-
-      const clearBtn = e.target.closest("#ccCompareClear");
-      if (clearBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        clearCompare();
-        updateCompareUI();
-        render();
-        return;
-      }
-
-      // Toggle dropdown menu
-      const buyBtn = e.target.closest("[data-buy-btn]");
-      if (buyBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const wrapper = buyBtn.closest("[data-buy-wrap]") || buyBtn.closest(".relative");
-        const menu = wrapper?.querySelector?.("[data-buy-menu]");
-        if (!menu) return;
-
-        const isOpen = !menu.classList.contains("hidden");
-        const cameraId = wrapper?.getAttribute?.("data-camera-id") || "";
-        const cam = cameraById(cameraId);
-
-        closeAllBuyMenus();
-
-        if (!isOpen) {
-          menu.classList.remove("hidden");
-          buyBtn.setAttribute("aria-expanded", "true");
-          track("buy_options_open", { id: cameraId, brand: cam?.brand || "", model: cam?.model || "" });
-        } else {
-          track("buy_options_close", { id: cameraId, brand: cam?.brand || "", model: cam?.model || "" });
-        }
-        return;
-      }
-
-      // Compare button toggle (delegated, prevents duplicate listeners on re-render)
-      const compareBtn = e.target.closest("button[data-compare]");
-      if (compareBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const id = compareBtn.getAttribute("data-compare");
-        if (!id) return;
-
-        const details = document.getElementById("moreMatches");
-        if (details) sessionStorage.setItem(MORE_OPEN_KEY, String(!!details.open));
-
-        toggleCompareId(id);
-        updateCompareUI();
-        render();
-        return;
-      }
-    },
-    true
-  );
-}
+      return;
+    }
+  },
+  true
+);
 
 // --------------------
 // Render blocks
@@ -656,8 +681,10 @@ if (!window.__ccResultsClickBound) {
 function bigCardHtml(c, i, isSelected) {
   const mpTxt = typeof c.mp === "number" ? `${c.mp} MP` : "—";
   const ibisTxt = typeof c.ibis === "boolean" ? (c.ibis ? "Yes" : "No") : "—";
-  const weightTxt = typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
-  const priceTxt = typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
+  const weightTxt =
+    typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
+  const priceTxt =
+    typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
 
   const systemTxt = c.system ? escapeHtml(c.system) : "—";
   const sensorTxt = c.sensor ? escapeHtml(c.sensor) : "—";
@@ -668,21 +695,18 @@ function bigCardHtml(c, i, isSelected) {
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
         <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
-        <h2 class="text-xl font-semibold">
-          ${escapeHtml(c.brand)} ${escapeHtml(c.model)}
-          ${
-            c.discontinued
-              ? `<span class="ml-2 inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-semibold text-gray-700">Discontinued</span>`
-              : ""
-          }
-        </h2>
+        <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(
+    c.model
+  )}</h2>
 
         <p class="text-sm text-gray-600">
           ${systemTxt} • ${sensorTxt} • ${mountTxt} mount
         </p>
 
         <p class="mt-1 text-sm text-gray-500">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)} • ${escapeHtml(String(c.year || "—"))}
+          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(
+    ibisTxt
+  )} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
         </p>
       </div>
 
@@ -693,7 +717,9 @@ function bigCardHtml(c, i, isSelected) {
           type="button"
           data-compare="${escapeHtml(c.id)}"
           class="px-4 py-2 rounded-xl border text-sm select-none ${
-            isSelected ? "border-gray-900 bg-gray-50" : "border-gray-200 bg-white hover:bg-gray-50"
+            isSelected
+              ? "border-gray-900 bg-gray-50"
+              : "border-gray-200 bg-white hover:bg-gray-50"
           }"
           style="cursor:pointer;"
         >
@@ -706,13 +732,19 @@ function bigCardHtml(c, i, isSelected) {
       <div>
         <p class="text-sm font-semibold mb-2">Why it fits</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.strengths || []).slice(0, 3).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}
+          ${(c.strengths || [])
+            .slice(0, 3)
+            .map((s) => `<li>${escapeHtml(s)}</li>`)
+            .join("")}
         </ul>
       </div>
       <div>
         <p class="text-sm font-semibold mb-2">Tradeoffs</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.tradeoffs || []).slice(0, 3).map((t) => `<li>${escapeHtml(t)}</li>`).join("")}
+          ${(c.tradeoffs || [])
+            .slice(0, 3)
+            .map((t) => `<li>${escapeHtml(t)}</li>`)
+            .join("")}
         </ul>
       </div>
     </div>
@@ -720,20 +752,30 @@ function bigCardHtml(c, i, isSelected) {
 }
 
 function compactRowHtml(camera, score, isSelected) {
-  const priceTxt = typeof camera.price === "number" ? `$${Number(camera.price).toLocaleString()}` : "—";
+  const priceTxt =
+    typeof camera.price === "number"
+      ? `$${Number(camera.price).toLocaleString()}`
+      : "—";
   const sensorTxt = camera.sensor ? escapeHtml(camera.sensor) : "—";
   const mpTxt = typeof camera.mp === "number" ? `${camera.mp} MP` : "—";
-  const ibisTxt = typeof camera.ibis === "boolean" ? (camera.ibis ? "Yes" : "No") : "—";
+  const ibisTxt =
+    typeof camera.ibis === "boolean" ? (camera.ibis ? "Yes" : "No") : "—";
+  const weightTxt =
+    typeof camera.weightGrams === "number" ? `${camera.weightGrams} g` : "—";
 
   return `
     <div class="flex items-center justify-between gap-3 py-3">
       <div class="min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
-          <p class="font-semibold truncate">${escapeHtml(camera.brand)} ${escapeHtml(camera.model)}</p>
-          <span class="text-xs text-gray-500">Score: ${Number(score).toFixed(1)}</span>
+          <p class="font-semibold truncate">${escapeHtml(camera.brand)} ${escapeHtml(
+    camera.model
+  )}</p>
+          <span class="text-xs text-gray-500">Score: ${Number(score).toFixed(
+            1
+          )}</span>
         </div>
         <p class="text-xs text-gray-500 mt-1 truncate">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)} • ${escapeHtml(String(c.year || "—"))}
+          ${sensorTxt} • ${mpTxt} • IBIS: ${ibisTxt} • ${weightTxt} • ${priceTxt}
         </p>
       </div>
 
@@ -744,7 +786,9 @@ function compactRowHtml(camera, score, isSelected) {
           type="button"
           data-compare="${escapeHtml(camera.id)}"
           class="px-3 py-2 rounded-xl border text-sm ${
-            isSelected ? "border-gray-900 bg-gray-50" : "border-gray-200 bg-white hover:bg-gray-50"
+            isSelected
+              ? "border-gray-900 bg-gray-50"
+              : "border-gray-200 bg-white hover:bg-gray-50"
           }"
           style="cursor:pointer;"
         >
@@ -758,11 +802,10 @@ function compactRowHtml(camera, score, isSelected) {
 // --------------------
 // Main render
 // --------------------
-let __resultsViewSent = false;
-
 function render() {
   ensureCompareBar();
   updateCompareUI();
+
   closeAllBuyMenus();
 
   const answers = loadAnswers();
@@ -772,8 +815,6 @@ function render() {
   if (!cardsWrap) return;
 
   if (!answers) {
-    // ✅ Track this so you know if people are landing here without finishing the quiz
-    track("results_no_answers", {});
     cardsWrap.innerHTML = `
       <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
         <h2 class="text-xl font-semibold">No quiz answers found</h2>
@@ -794,23 +835,6 @@ function render() {
 
   const top3 = scored.slice(0, 3).map((x) => x.camera);
   const more = scored.slice(3);
-
-  // ✅ The main KPI event: what did we recommend?
-  if (!__resultsViewSent) {
-    __resultsViewSent = true;
-    track("results_view", {
-      answers,
-      weights: seeded,
-      top: top3.map((c) => ({
-        id: c.id,
-        brand: c.brand || "",
-        model: c.model || "",
-        price: typeof c.price === "number" ? c.price : null,
-      })),
-      moreCount: more.length,
-      totalCandidates: scored.length,
-    });
-  }
 
   const moreWasOpen = sessionStorage.getItem(MORE_OPEN_KEY) === "true";
 
@@ -836,7 +860,9 @@ function render() {
 
         <div class="mt-4 divide-y divide-gray-100">
           ${more
-            .map(({ camera, score }) => compactRowHtml(camera, score, compareSelected.includes(camera.id)))
+            .map(({ camera, score }) =>
+              compactRowHtml(camera, score, compareSelected.includes(camera.id))
+            )
             .join("")}
         </div>
       </details>
@@ -860,11 +886,28 @@ function render() {
     });
   }
 
+  // Compare buttons tracking
+  cardsWrap.querySelectorAll("button[data-compare]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-compare");
+      if (!id) return;
+
+      const details = document.getElementById("moreMatches");
+      if (details)
+        sessionStorage.setItem(MORE_OPEN_KEY, String(!!details.open));
+
+      // toggleCompareId already tracks add/remove
+      toggleCompareId(id);
+      updateCompareUI();
+      render();
+    });
+  });
+
   updateCompareUI();
 }
 
 // --------------------
-// Tuning UI (mostly unchanged)
+// Tuning UI (unchanged)
 // --------------------
 function initTuningUI() {
   const toggle = $("tuneToggle");
@@ -888,11 +931,16 @@ function initTuningUI() {
   const wPortFill = $("wPortFill");
   const wVideoFill = $("wVideoFill");
 
-  const trackTuningChange = throttle((payload) => {
-    track("tuning_change", payload);
-  }, 250);
-
-  if (!toggle || !panel || !wPhoto || !wPort || !wVideo || !wBudgetMin || !wBudgetMax) return;
+  if (
+    !toggle ||
+    !panel ||
+    !wPhoto ||
+    !wPort ||
+    !wVideo ||
+    !wBudgetMin ||
+    !wBudgetMax
+  )
+    return;
 
   function updateBudgetFill(minV, maxV) {
     if (!budgetFill) return;
@@ -936,7 +984,8 @@ function initTuningUI() {
 
     wBudgetMin.value = String(w.budgetMin);
     wBudgetMax.value = String(w.budgetMax);
-    if (wBudgetLabel) wBudgetLabel.textContent = `$${w.budgetMin} — $${w.budgetMax}`;
+    if (wBudgetLabel)
+      wBudgetLabel.textContent = `$${w.budgetMin} — $${w.budgetMax}`;
 
     updateBudgetFill(w.budgetMin, w.budgetMax);
     updateBudgetZ();
@@ -955,7 +1004,8 @@ function initTuningUI() {
 
   wBudgetMin.value = String(weights.budgetMin);
   wBudgetMax.value = String(weights.budgetMax);
-  if (wBudgetLabel) wBudgetLabel.textContent = `$${weights.budgetMin} — $${weights.budgetMax}`;
+  if (wBudgetLabel)
+    wBudgetLabel.textContent = `$${weights.budgetMin} — $${weights.budgetMax}`;
 
   updateSingleFill(wPhoto, wPhotoFill, 0, 5);
   updateSingleFill(wPort, wPortFill, 0, 5);
@@ -971,8 +1021,18 @@ function initTuningUI() {
   });
 
   function onChange() {
-    let minV = clampInt(wBudgetMin.value, BUDGET_MIN, BUDGET_MAX, DEFAULT_WEIGHTS.budgetMin);
-    let maxV = clampInt(wBudgetMax.value, BUDGET_MIN, BUDGET_MAX, DEFAULT_WEIGHTS.budgetMax);
+    let minV = clampInt(
+      wBudgetMin.value,
+      BUDGET_MIN,
+      BUDGET_MAX,
+      DEFAULT_WEIGHTS.budgetMin
+    );
+    let maxV = clampInt(
+      wBudgetMax.value,
+      BUDGET_MIN,
+      BUDGET_MAX,
+      DEFAULT_WEIGHTS.budgetMax
+    );
 
     if (minV > maxV) {
       maxV = minV;
@@ -990,7 +1050,8 @@ function initTuningUI() {
     if (wPhotoVal) wPhotoVal.textContent = String(newWeights.photo);
     if (wPortVal) wPortVal.textContent = String(newWeights.port);
     if (wVideoVal) wVideoVal.textContent = String(newWeights.video);
-    if (wBudgetLabel) wBudgetLabel.textContent = `$${newWeights.budgetMin} — $${newWeights.budgetMax}`;
+    if (wBudgetLabel)
+      wBudgetLabel.textContent = `$${newWeights.budgetMin} — $${newWeights.budgetMax}`;
 
     updateSingleFill(wPhoto, wPhotoFill, 0, 5);
     updateSingleFill(wPort, wPortFill, 0, 5);
@@ -1000,8 +1061,8 @@ function initTuningUI() {
 
     saveWeights(newWeights);
 
-    // Avoid spamming: only send on input end? (You can upgrade later to throttle)
-    trackTuningChange({ ...newWeights });
+    // light tracking (so you can see what people do later)
+    track("tuning_change", { ...newWeights });
 
     render();
   }
@@ -1011,18 +1072,6 @@ function initTuningUI() {
   wVideo.addEventListener("input", onChange);
   wBudgetMin.addEventListener("input", onChange);
   wBudgetMax.addEventListener("input", onChange);
-
-  // Fires once when the user finishes dragging / releases slider
-  function onCommit() {
-    const w = loadWeights();
-    track("tuning_commit", { ...w });
-  }
-
-wPhoto.addEventListener("change", onCommit);
-wPort.addEventListener("change", onCommit);
-wVideo.addEventListener("change", onCommit);
-wBudgetMin.addEventListener("change", onCommit);
-wBudgetMax.addEventListener("change", onCommit);
 
   reset?.addEventListener("click", () => {
     localStorage.removeItem("cc_weights");
@@ -1037,7 +1086,8 @@ wBudgetMax.addEventListener("change", onCommit);
     if (wPhotoVal) wPhotoVal.textContent = String(DEFAULT_WEIGHTS.photo);
     if (wPortVal) wPortVal.textContent = String(DEFAULT_WEIGHTS.port);
     if (wVideoVal) wVideoVal.textContent = String(DEFAULT_WEIGHTS.video);
-    if (wBudgetLabel) wBudgetLabel.textContent = `$${DEFAULT_WEIGHTS.budgetMin} — $${DEFAULT_WEIGHTS.budgetMax}`;
+    if (wBudgetLabel)
+      wBudgetLabel.textContent = `$${DEFAULT_WEIGHTS.budgetMin} — $${DEFAULT_WEIGHTS.budgetMax}`;
 
     updateSingleFill(wPhoto, wPhotoFill, 0, 5);
     updateSingleFill(wPort, wPortFill, 0, 5);
