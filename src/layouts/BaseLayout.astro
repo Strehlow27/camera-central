@@ -60,6 +60,14 @@ const ogImageUrl = new URL(ogImage, origin).toString();
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> -->
 
+    <!-- ✅ Fonts (kills the “generic SaaS / ChatGPT look”) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- ✅ Enables smooth page transitions -->
     <ClientRouter />
 
@@ -137,20 +145,6 @@ const ogImageUrl = new URL(ogImage, origin).toString();
         <!-- ✅ Google tag (gtag.js) -->
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA4_ID}`}></script>
 
-        <script is:inline>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = window.gtag || gtag;
-
-          gtag("js", new Date());
-
-          // ✅ IMPORTANT: use the real ID value (not a string with braces)
-          gtag("config", "{import.meta.env.PUBLIC_GA4_ID}".replace("{import.meta.env.PUBLIC_GA4_ID}", ""), {});
-
-          // The above line is still not correct in Astro because it stays a string.
-          // So we set config using a data-attr injected by Astro below.
-        </script>
-
         <!-- ✅ Correct GA config using a real value injected by Astro -->
         <script is:inline data-ga-id={import.meta.env.PUBLIC_GA4_ID}>
           (function () {
@@ -160,18 +154,77 @@ const ogImageUrl = new URL(ogImage, origin).toString();
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               window.gtag = window.gtag || gtag;
+              window.gtag("js", new Date());
               window.gtag("config", id, { anonymize_ip: true });
             } catch {}
           })();
         </script>
       </>
     )}
+
+    <!-- ✅ Global style pass: fonts + background + subtle “brand” -->
+    <style is:global>
+      :root {
+        --cc-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        --cc-font-display: "Fraunces", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+        /* Brand accents (feel free to tweak later) */
+        --cc-ink: #0b1220;      /* deep ink */
+        --cc-muted: #4b5563;    /* gray-600-ish */
+        --cc-accent: #0f2a1d;   /* deep evergreen */
+      }
+
+      html, body {
+        font-family: var(--cc-font-body);
+      }
+
+      /* Headings get the display font */
+      h1, h2, h3, .cc-display {
+        font-family: var(--cc-font-display);
+        letter-spacing: -0.01em;
+      }
+
+      /* Slightly nicer selection color (small touch, feels “designed”) */
+      ::selection {
+        background: rgba(15, 42, 29, 0.18);
+      }
+
+      /* Make links feel less “default” without breaking Tailwind */
+      a {
+        text-underline-offset: 3px;
+      }
+
+      /* A gentle “premium” hover on buttons */
+      button, a[role="button"] {
+        transition: transform 120ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      }
+      button:active, a[role="button"]:active {
+        transform: translateY(0.5px);
+      }
+
+      /* Background wrapper styling */
+      .cc-page-bg {
+        background:
+          radial-gradient(900px 500px at 20% 0%, rgba(15, 42, 29, 0.10), transparent 60%),
+          radial-gradient(700px 420px at 90% 10%, rgba(17, 24, 39, 0.08), transparent 55%),
+          linear-gradient(to bottom, #f8fafc, #ffffff 55%);
+      }
+
+      /* Make cards feel a bit less “Tailwind demo” */
+      .cc-card {
+        border-color: rgba(17, 24, 39, 0.12) !important;
+        box-shadow:
+          0 1px 0 rgba(17, 24, 39, 0.04),
+          0 10px 30px rgba(17, 24, 39, 0.06) !important;
+      }
+    </style>
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
     <SiteHeader />
 
-    <main class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <!-- ✅ New: original background wrapper -->
+    <main class="min-h-screen cc-page-bg">
       <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
         <slot />
       </div>
