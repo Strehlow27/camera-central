@@ -1,6 +1,6 @@
 <div
   class="w-full max-w-2xl mx-auto rounded-2xl bg-white border border-gray-200 shadow-sm
-       p-5 sm:p-8 min-h-[460px] sm:min-h-[520px] flex flex-col"
+       p-5 sm:p-8 min-h-[360px] sm:min-h-[420px] flex flex-col"
 >
   <div id="flow" class="flex-1 flex flex-col">
     <div class="space-y-1">
@@ -28,9 +28,11 @@
       <p class="text-gray-600" id="helper"></p>
     </div>
 
-    <div id="options" class="space-y-3"></div>
+    <!-- ✅ container provides the "one gap" before buttons -->
+    <div id="options" class="mb-3"></div>
 
-    <div class="pt-1 flex items-center justify-between">
+    <!-- ✅ no extra padding so the gap is controlled by options mb-3 -->
+    <div class="flex items-center justify-between">
       <button
         id="backBtn"
         class="min-w-[96px] px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 transition cursor-pointer
@@ -90,7 +92,8 @@
         {
           id: "cameraType",
           q: "What type of camera are you looking for?",
-          helper: "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
+          helper:
+            "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
           options: [
             "Detachable-lens camera",
             "Fixed-lens digital camera",
@@ -131,8 +134,8 @@
 
       // Storage keys
       const SESSION_KEY = "cameraCentralAnswers"; // keeps progress if user refreshes mid-quiz
-      const LS_KEY = "cc_answers";               // used by /results
-      const LS_META_KEY = "cc_answers_meta";     // optional
+      const LS_KEY = "cc_answers"; // used by /results
+      const LS_META_KEY = "cc_answers_meta"; // optional
 
       let idx = 0;
       const answers = {};
@@ -160,8 +163,9 @@
         } catch {}
       }
 
+      // ✅ add mb-3 so option spacing equals the final "gap to buttons"
       const optionBase =
-        "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
+        "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer mb-3 " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
 
       const optionUnselected =
@@ -179,7 +183,16 @@
       const backBtn = document.getElementById("backBtn");
       const nextBtn = document.getElementById("nextBtn");
 
-      if (!progress || !percentEl || !bar || !question || !helper || !optionsWrap || !backBtn || !nextBtn) {
+      if (
+        !progress ||
+        !percentEl ||
+        !bar ||
+        !question ||
+        !helper ||
+        !optionsWrap ||
+        !backBtn ||
+        !nextBtn
+      ) {
         console.warn("[FindFlow] Missing expected DOM elements. Quiz script not started.");
         return;
       }
@@ -198,16 +211,23 @@
       }
 
       function saveProgress() {
-        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers)); } catch {}
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
+        } catch {}
       }
 
       function finalizeAndGoToResults() {
         try {
           localStorage.setItem(LS_KEY, JSON.stringify(answers));
-          localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
+          localStorage.setItem(
+            LS_META_KEY,
+            JSON.stringify({ version: 1, updatedAt: Date.now() })
+          );
         } catch {}
 
-        try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+        try {
+          sessionStorage.removeItem(SESSION_KEY);
+        } catch {}
 
         // ---- analytics: completion (send before navigating)
         track("find_complete", {
@@ -240,18 +260,26 @@
         optionsWrap.innerHTML = "";
         const selected = answers[q.id];
 
-        q.options.forEach((opt) => {
+        q.options.forEach((opt, i) => {
           const btn = document.createElement("button");
           btn.type = "button";
 
           btn.innerHTML = `
             <span class="flex items-center justify-between">
               <span>${opt}</span>
-              <span class="text-sm text-gray-500 w-4 text-right">${selected === opt ? "✓" : ""}</span>
+              <span class="text-sm text-gray-500 w-4 text-right">${
+                selected === opt ? "✓" : ""
+              }</span>
             </span>
           `;
 
-          btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+          btn.className =
+            optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+
+          // ✅ remove mb-3 from last option so we don't double-gap
+          if (i === q.options.length - 1) {
+            btn.classList.remove("mb-3");
+          }
 
           btn.addEventListener("click", () => {
             // ---- analytics: quiz "start" = first interaction
@@ -277,7 +305,8 @@
         });
 
         backBtn.disabled = idx === 0;
-        nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
+        nextBtn.textContent =
+          idx === questions.length - 1 ? "Show my recommendation" : "Next";
         nextBtn.disabled = !answers[q.id];
       }
 
@@ -302,7 +331,11 @@
     }
 
     function boot() {
-      try { initFindFlow(); } catch (e) { console.error("[FindFlow] init error", e); }
+      try {
+        initFindFlow();
+      } catch (e) {
+        console.error("[FindFlow] init error", e);
+      }
     }
 
     // ✅ First load
