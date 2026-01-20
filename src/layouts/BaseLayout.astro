@@ -12,22 +12,22 @@ const {
   ogImage = "/cameracentralLOGO.png",
 
   // Optional: set these later if you make a Twitter/X account
-  twitterSite = "",    // e.g. "@cameracentral"
-  twitterCreator = "", // e.g. "@benstrehlow"
+  twitterSite = "",
+  twitterCreator = "",
 
   tight = false,
 } = Astro.props;
 
-const origin = (Astro.site ?? Astro.url.origin);
+const origin = Astro.site ?? Astro.url.origin;
 const canonicalUrl = new URL(Astro.url.pathname, origin).toString();
 const ogImageUrl = new URL(ogImage, origin).toString();
----
 
 // ✅ "Last updated" (from Vercel git metadata when available)
 const vercelCommit = import.meta.env.VERCEL_GIT_COMMIT_TIMESTAMP;
 const lastUpdatedISO = vercelCommit
   ? new Date(Number(vercelCommit) * 1000).toISOString()
-  : new Date().toISOString(); // fallback for local/dev
+  : null;
+---
 
 <!DOCTYPE html>
 <html lang="en">
