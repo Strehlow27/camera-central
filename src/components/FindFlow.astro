@@ -28,10 +28,9 @@
       <p class="text-gray-600" id="helper"></p>
     </div>
 
-    <!-- ✅ container provides the "one gap" before buttons -->
+    <!-- ✅ always keeps one "gap unit" before buttons -->
     <div id="options" class="mb-3"></div>
 
-    <!-- ✅ no extra padding so the gap is controlled by options mb-3 -->
     <div class="flex items-center justify-between">
       <button
         id="backBtn"
@@ -61,18 +60,14 @@
 <script is:inline>
   (function () {
     function initFindFlow() {
-      // Guard: if this instance is already initialized, do nothing
       const flowRoot = document.getElementById("flow");
       if (!flowRoot) return;
       if (flowRoot.dataset.ccInit === "1") return;
       flowRoot.dataset.ccInit = "1";
 
-      // ---- tiny helper: safe analytics call
       function track(name, props) {
         try {
-          if (typeof window.ccTrack === "function") {
-            window.ccTrack(name, props || {});
-          }
+          if (typeof window.ccTrack === "function") window.ccTrack(name, props || {});
         } catch {}
       }
 
@@ -92,8 +87,7 @@
         {
           id: "cameraType",
           q: "What type of camera are you looking for?",
-          helper:
-            "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
+          helper: "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
           options: [
             "Detachable-lens camera",
             "Fixed-lens digital camera",
@@ -132,38 +126,29 @@
         },
       ];
 
-      // Storage keys
-      const SESSION_KEY = "cameraCentralAnswers"; // keeps progress if user refreshes mid-quiz
-      const LS_KEY = "cc_answers"; // used by /results
-      const LS_META_KEY = "cc_answers_meta"; // optional
+      const SESSION_KEY = "cameraCentralAnswers";
+      const LS_KEY = "cc_answers";
+      const LS_META_KEY = "cc_answers_meta";
 
       let idx = 0;
       const answers = {};
 
-      // ---- analytics: page view (once per init)
       track("find_view", { questionCount: questions.length });
 
-      // Load saved in-progress answers (if any)
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === "object") {
             Object.assign(answers, parsed);
-
-            // Resume at the first unanswered question
             const firstUnanswered = questions.findIndex((q) => !answers[q.id]);
             idx = firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
-
-            track("find_resume", {
-              answeredCount: Object.keys(answers).length,
-              resumeIndex: idx,
-            });
+            track("find_resume", { answeredCount: Object.keys(answers).length, resumeIndex: idx });
           }
         } catch {}
       }
 
-      // ✅ add mb-3 so option spacing equals the final "gap to buttons"
+      // ✅ base class includes mb-3 (gap unit). We'll remove it for last items.
       const optionBase =
         "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer mb-3 " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
@@ -183,21 +168,11 @@
       const backBtn = document.getElementById("backBtn");
       const nextBtn = document.getElementById("nextBtn");
 
-      if (
-        !progress ||
-        !percentEl ||
-        !bar ||
-        !question ||
-        !helper ||
-        !optionsWrap ||
-        !backBtn ||
-        !nextBtn
-      ) {
+      if (!progress || !percentEl || !bar || !question || !helper || !optionsWrap || !backBtn || !nextBtn) {
         console.warn("[FindFlow] Missing expected DOM elements. Quiz script not started.");
         return;
       }
 
-      // ---- analytics guards to avoid spam
       let hasStarted = false;
       let lastQuestionId = null;
 
@@ -205,31 +180,21 @@
         const pct = Math.round(((idx + 1) / questions.length) * 100);
         bar.style.width = `${pct}%`;
         percentEl.textContent = `${pct}%`;
-
         const pb = bar.parentElement;
         if (pb) pb.setAttribute("aria-valuenow", String(pct));
       }
 
       function saveProgress() {
-        try {
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
-        } catch {}
+        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers)); } catch {}
       }
 
       function finalizeAndGoToResults() {
         try {
           localStorage.setItem(LS_KEY, JSON.stringify(answers));
-          localStorage.setItem(
-            LS_META_KEY,
-            JSON.stringify({ version: 1, updatedAt: Date.now() })
-          );
+          localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
         } catch {}
+        try { sessionStorage.removeItem(SESSION_KEY); } catch {}
 
-        try {
-          sessionStorage.removeItem(SESSION_KEY);
-        } catch {}
-
-        // ---- analytics: completion (send before navigating)
         track("find_complete", {
           questionCount: questions.length,
           answeredCount: Object.keys(answers).length,
@@ -237,6 +202,16 @@
         });
 
         window.location.href = "/results";
+      }
+
+      // ✅ creates an invisible row that matches a button's height + spacing
+      function makeSpacerRow(isLast) {
+        const d = document.createElement("div");
+        d.className =
+          "w-full px-4 py-3 rounded-xl border border-transparent bg-transparent " +
+          (isLast ? "" : "mb-3");
+        d.setAttribute("aria-hidden", "true");
+        return d;
       }
 
       function render() {
@@ -248,18 +223,15 @@
 
         updateProgressUI();
 
-        // ---- analytics: question view (only when question changes)
         if (q.id !== lastQuestionId) {
           lastQuestionId = q.id;
-          track("find_question_view", {
-            index: idx,
-            id: q.id,
-          });
+          track("find_question_view", { index: idx, id: q.id });
         }
 
         optionsWrap.innerHTML = "";
         const selected = answers[q.id];
 
+        // --- render real options ---
         q.options.forEach((opt, i) => {
           const btn = document.createElement("button");
           btn.type = "button";
@@ -267,22 +239,16 @@
           btn.innerHTML = `
             <span class="flex items-center justify-between">
               <span>${opt}</span>
-              <span class="text-sm text-gray-500 w-4 text-right">${
-                selected === opt ? "✓" : ""
-              }</span>
+              <span class="text-sm text-gray-500 w-4 text-right">${selected === opt ? "✓" : ""}</span>
             </span>
           `;
 
-          btn.className =
-            optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+          btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
 
-          // ✅ remove mb-3 from last option so we don't double-gap
-          if (i === q.options.length - 1) {
-            btn.classList.remove("mb-3");
-          }
+          // ✅ remove mb-3 from last real option
+          if (i === q.options.length - 1) btn.classList.remove("mb-3");
 
           btn.addEventListener("click", () => {
-            // ---- analytics: quiz "start" = first interaction
             if (!hasStarted) {
               hasStarted = true;
               track("find_start", { firstQuestionId: q.id });
@@ -291,11 +257,7 @@
             answers[q.id] = opt;
             saveProgress();
 
-            track("find_answer_select", {
-              questionId: q.id,
-              value: opt,
-              index: idx,
-            });
+            track("find_answer_select", { questionId: q.id, value: opt, index: idx });
 
             nextBtn.disabled = false;
             render();
@@ -304,9 +266,19 @@
           optionsWrap.appendChild(btn);
         });
 
+        // ✅ add "phantom" rows so total = 4
+        const TARGET_ROWS = 4;
+        const missing = Math.max(0, TARGET_ROWS - q.options.length);
+
+        for (let k = 0; k < missing; k++) {
+          const isLastSpacer = k === missing - 1;
+          // If there are no missing rows, irrelevant. If there ARE missing rows,
+          // the last spacer should have NO mb-3 (same as last real option behavior).
+          optionsWrap.appendChild(makeSpacerRow(isLastSpacer));
+        }
+
         backBtn.disabled = idx === 0;
-        nextBtn.textContent =
-          idx === questions.length - 1 ? "Show my recommendation" : "Next";
+        nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
         nextBtn.disabled = !answers[q.id];
       }
 
@@ -318,7 +290,6 @@
 
       nextBtn.addEventListener("click", () => {
         track("find_next", { fromIndex: idx });
-
         if (idx < questions.length - 1) {
           idx++;
           render();
@@ -331,21 +302,15 @@
     }
 
     function boot() {
-      try {
-        initFindFlow();
-      } catch (e) {
-        console.error("[FindFlow] init error", e);
-      }
+      try { initFindFlow(); } catch (e) { console.error("[FindFlow] init error", e); }
     }
 
-    // ✅ First load
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", boot, { once: true });
     } else {
       boot();
     }
 
-    // ✅ Astro transitions (client-side nav)
     document.addEventListener("astro:page-load", boot);
     document.addEventListener("astro:after-swap", boot);
   })();
