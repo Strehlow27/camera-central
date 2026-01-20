@@ -23,6 +23,12 @@ const canonicalUrl = new URL(Astro.url.pathname, origin).toString();
 const ogImageUrl = new URL(ogImage, origin).toString();
 ---
 
+// ✅ "Last updated" (from Vercel git metadata when available)
+const vercelCommit = import.meta.env.VERCEL_GIT_COMMIT_TIMESTAMP;
+const lastUpdatedISO = vercelCommit
+  ? new Date(Number(vercelCommit) * 1000).toISOString()
+  : new Date().toISOString(); // fallback for local/dev
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
