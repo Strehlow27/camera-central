@@ -28,8 +28,8 @@
       <p class="text-gray-600" id="helper"></p>
     </div>
 
-    <!-- ✅ always keeps one "gap unit" before buttons -->
-    <div id="options" class="mb-3"></div>
+    <!-- ✅ grid + gap ensures consistent spacing; mb-3 gives a consistent gap above buttons -->
+    <div id="options" class="grid gap-3 mb-3"></div>
 
     <div class="flex items-center justify-between">
       <button
@@ -148,9 +148,9 @@
         } catch {}
       }
 
-      // ✅ base class includes mb-3 (gap unit). We'll remove it for last items.
+      // ✅ make option height consistent so spacers reserve exactly 1 option slot
       const optionBase =
-        "w-full text-left px-4 py-3 rounded-xl border transition cursor-pointer mb-3 " +
+        "w-full min-h-[56px] text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
 
       const optionUnselected =
@@ -204,12 +204,9 @@
         window.location.href = "/results";
       }
 
-      // ✅ creates an invisible row that matches a button's height + spacing
-      function makeSpacerRow(isLast) {
+      function makeSpacer() {
         const d = document.createElement("div");
-        d.className =
-          "w-full px-4 py-3 rounded-xl border border-transparent bg-transparent " +
-          (isLast ? "" : "mb-3");
+        d.className = "w-full min-h-[56px] px-4 py-3 rounded-xl border border-transparent";
         d.setAttribute("aria-hidden", "true");
         return d;
       }
@@ -231,8 +228,8 @@
         optionsWrap.innerHTML = "";
         const selected = answers[q.id];
 
-        // --- render real options ---
-        q.options.forEach((opt, i) => {
+        // render options
+        q.options.forEach((opt) => {
           const btn = document.createElement("button");
           btn.type = "button";
 
@@ -244,9 +241,6 @@
           `;
 
           btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
-
-          // ✅ remove mb-3 from last real option
-          if (i === q.options.length - 1) btn.classList.remove("mb-3");
 
           btn.addEventListener("click", () => {
             if (!hasStarted) {
@@ -266,15 +260,11 @@
           optionsWrap.appendChild(btn);
         });
 
-        // ✅ add "phantom" rows so total = 4
-        const TARGET_ROWS = 4;
-        const missing = Math.max(0, TARGET_ROWS - q.options.length);
-
-        for (let k = 0; k < missing; k++) {
-          const isLastSpacer = k === missing - 1;
-          // If there are no missing rows, irrelevant. If there ARE missing rows,
-          // the last spacer should have NO mb-3 (same as last real option behavior).
-          optionsWrap.appendChild(makeSpacerRow(isLastSpacer));
+        // ✅ always reserve 4 slots total (so 3-option questions create exactly 1 option-height gap)
+        const TARGET = 4;
+        const missing = Math.max(0, TARGET - q.options.length);
+        for (let i = 0; i < missing; i++) {
+          optionsWrap.appendChild(makeSpacer());
         }
 
         backBtn.disabled = idx === 0;
