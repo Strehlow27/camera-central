@@ -787,7 +787,7 @@ function bigCardHtml(c, i, isSelected) {
     </div>
 
     <!-- bottom section now hugs upward (no image-caused gap) -->
-    <div class="mt-4 flex flex-wrap gap-x-2 gap-y-4">
+    <div class="mt-4 flex flex-wrap gap-x-1 gap-y-1">
       <div class="min-w-[260px] max-w-[320px] flex-1">
         <p class="text-sm font-semibold mb-2">Why it fits</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
