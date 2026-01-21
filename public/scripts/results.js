@@ -14,6 +14,23 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+function cameraImageUrl(c) {
+  // Prefer normalized field from cameras.js
+  if (typeof c?.image === "string" && c.image.trim()) return c.image.trim();
+
+  // Fallbacks (slug first because your filenames look like slug.jpg)
+  const slug = typeof c?.slug === "string" ? c.slug.trim() : "";
+  if (slug) return `/images/cameras/${slug}.jpg`;
+
+  const id = typeof c?.id === "string" ? c.id.trim() : "";
+  return id ? `/images/cameras/${id}.jpg` : "";
+}
+
+function cameraImageAlt(c) {
+  if (typeof c?.imageAlt === "string" && c.imageAlt.trim()) return c.imageAlt.trim();
+  return `${c?.brand || ""} ${c?.model || ""}`.trim() || "Camera";
+}
+
 // ---------- B&H affiliate config ----------
 // NOTE: public/ scripts are not reliably Vite-bundled, so don't use import.meta.env here.
 const BH = {
@@ -722,24 +739,41 @@ function bigCardHtml(c, i, isSelected) {
   const sensorTxt = c.sensor ? escapeHtml(c.sensor) : "—";
   const mountTxt = c.mount ? escapeHtml(c.mount) : "—";
 
+  const imgSrc = cameraImageUrl(c);
+  const imgAlt = cameraImageAlt(c);
+
   return `
   <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
         <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
-        <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(
-    c.model
-  )}</h2>
+        <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(c.model)}</h2>
 
         <p class="text-sm text-gray-600">
           ${systemTxt} • ${sensorTxt} • ${mountTxt} mount
         </p>
 
         <p class="mt-1 text-sm text-gray-500">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(
-    ibisTxt
-  )} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
+          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(
+    weightTxt
+  )} • ${escapeHtml(priceTxt)}
         </p>
+
+        ${
+          imgSrc
+            ? `
+          <div class="mt-4">
+            <img
+              src="${escapeHtml(imgSrc)}"
+              alt="${escapeHtml(imgAlt)}"
+              loading="lazy"
+              class="w-full max-w-sm rounded-xl border border-gray-200 bg-gray-50 object-cover"
+              onerror="this.style.display='none';"
+            />
+          </div>
+        `
+            : ""
+        }
       </div>
 
       <div class="shrink-0 flex flex-col gap-2 items-end">
@@ -795,20 +829,37 @@ function compactRowHtml(camera, score, isSelected) {
   const weightTxt =
     typeof camera.weightGrams === "number" ? `${camera.weightGrams} g` : "—";
 
+  const imgSrc = cameraImageUrl(camera);
+  const imgAlt = cameraImageAlt(camera);
+
   return `
     <div class="flex items-center justify-between gap-3 py-3">
-      <div class="min-w-0">
-        <div class="flex items-center gap-2 flex-wrap">
-          <p class="font-semibold truncate">${escapeHtml(camera.brand)} ${escapeHtml(
+      <div class="min-w-0 flex items-center gap-3">
+        ${
+          imgSrc
+            ? `
+          <img
+            src="${escapeHtml(imgSrc)}"
+            alt="${escapeHtml(imgAlt)}"
+            loading="lazy"
+            class="h-12 w-12 rounded-lg border border-gray-200 bg-gray-50 object-cover shrink-0"
+            onerror="this.style.display='none';"
+          />
+        `
+            : ""
+        }
+
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="font-semibold truncate">${escapeHtml(camera.brand)} ${escapeHtml(
     camera.model
   )}</p>
-          <span class="text-xs text-gray-500">Score: ${Number(score).toFixed(
-            1
-          )}</span>
+            <span class="text-xs text-gray-500">Score: ${Number(score).toFixed(1)}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1 truncate">
+            ${sensorTxt} • ${mpTxt} • IBIS: ${ibisTxt} • ${weightTxt} • ${priceTxt}
+          </p>
         </div>
-        <p class="text-xs text-gray-500 mt-1 truncate">
-          ${sensorTxt} • ${mpTxt} • IBIS: ${ibisTxt} • ${weightTxt} • ${priceTxt}
-        </p>
       </div>
 
       <div class="shrink-0 flex items-center gap-2">

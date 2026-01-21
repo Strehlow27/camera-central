@@ -13,29 +13,21 @@ const mpb = (q) =>
 // By default, each camera uses /public/images/cameras/<id>.jpg
 // You can override per camera by adding: image: "/images/cameras/<whatever>.png"
 function defaultCameraImage(cam) {
-  // If explicit image is set, use it
   if (typeof cam.image === "string" && cam.image.trim()) return cam.image.trim();
 
-  // Prefer slug because your filenames match slug (e.g. canon-eos-r8.jpg)
   const slug = typeof cam.slug === "string" ? cam.slug.trim() : "";
   if (slug) return `/images/cameras/${slug}.jpg`;
 
-  // Fallback to id (only if you have files named by id)
   const id = typeof cam.id === "string" ? cam.id.trim() : "";
   return id ? `/images/cameras/${id}.jpg` : null;
 }
 
 function defaultCameraAlt(cam) {
-  if (typeof cam.imageAlt === "string" && cam.imageAlt.trim())
-    return cam.imageAlt.trim();
-
-  const brand = cam.brand ?? "";
-  const model = cam.model ?? "";
-  const alt = `${brand} ${model}`.trim();
+  if (typeof cam.imageAlt === "string" && cam.imageAlt.trim()) return cam.imageAlt.trim();
+  const alt = `${cam.brand ?? ""} ${cam.model ?? ""}`.trim();
   return alt || "Camera";
 }
 
-// --- normalize fields so scoring can rely on them later ---
 function normalizeCamera(cam) {
   const isIL =
     typeof cam.isInterchangeableLens === "boolean"
@@ -46,12 +38,12 @@ function normalizeCamera(cam) {
     ...cam,
     isInterchangeableLens: isIL,
     cameraType: isIL ? "detachable" : "fixed",
-
-    // ✅ images
     image: defaultCameraImage(cam),
     imageAlt: defaultCameraAlt(cam),
   };
 }
+
+export const CAMERAS = RAW_CAMERAS.filter(Boolean).map(normalizeCamera);
 
 const RAW_CAMERAS = [
   // =========================
