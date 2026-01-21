@@ -10,8 +10,6 @@ const mpb = (q) =>
   `https://www.mpb.com/en-us/search?q=${encodeURIComponent(q)}`;
 
 // ✅ Default image helper:
-// By default, each camera uses /public/images/cameras/<id>.jpg
-// You can override per camera by adding: image: "/images/cameras/<whatever>.png"
 function defaultCameraImage(cam) {
   if (typeof cam.image === "string" && cam.image.trim()) return cam.image.trim();
 
@@ -23,7 +21,9 @@ function defaultCameraImage(cam) {
 }
 
 function defaultCameraAlt(cam) {
-  if (typeof cam.imageAlt === "string" && cam.imageAlt.trim()) return cam.imageAlt.trim();
+  if (typeof cam.imageAlt === "string" && cam.imageAlt.trim())
+    return cam.imageAlt.trim();
+
   const alt = `${cam.brand ?? ""} ${cam.model ?? ""}`.trim();
   return alt || "Camera";
 }
@@ -43,7 +43,7 @@ function normalizeCamera(cam) {
   };
 }
 
-export const CAMERAS = RAW_CAMERAS.filter(Boolean).map(normalizeCamera);
+
 
 const RAW_CAMERAS = [
   // =========================
@@ -2239,5 +2239,9 @@ const RAW_CAMERAS = [
   },
 ];
 
-export const CAMERAS = RAW_CAMERAS.map(normalizeCamera);
+// ✅ 2) Build CAMERAS ONCE
+const CAMERAS = RAW_CAMERAS.filter(Boolean).map(normalizeCamera);
+
+// ✅ 3) Export both named + default
+export { CAMERAS };
 export default CAMERAS;
