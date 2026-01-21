@@ -787,14 +787,15 @@ function bigCardHtml(c, i, isSelected) {
     </div>
 
     <!-- bottom section now hugs upward (no image-caused gap) -->
-    <div class="mt-4 grid gap-6 sm:grid-cols-2">
-      <div>
+    <div class="mt-4 flex flex-wrap gap-x-8 gap-y-4">
+      <div class="min-w-[260px] max-w-[320px] flex-1">
         <p class="text-sm font-semibold mb-2">Why it fits</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
           ${(c.strengths || []).slice(0, 3).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}
         </ul>
       </div>
-      <div>
+
+      <div class="min-w-[240px] max-w-[300px] flex-1">
         <p class="text-sm font-semibold mb-2">Tradeoffs</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
           ${(c.tradeoffs || []).slice(0, 3).map((t) => `<li>${escapeHtml(t)}</li>`).join("")}
