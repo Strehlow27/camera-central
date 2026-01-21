@@ -19,7 +19,7 @@ function defaultCameraImage(cam) {
   // Otherwise, assume an image exists using the camera's id
   // (Put your images in: public/images/cameras/<id>.jpg)
   const id = typeof cam.id === "string" ? cam.id.trim() : "";
-  return id ? `/images/cameras/${id}.jpg` : null;
+  return id ? `/images/cameras/${id}` : null;
 }
 
 function defaultCameraAlt(cam) {
