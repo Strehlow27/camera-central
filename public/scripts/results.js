@@ -756,7 +756,7 @@ function bigCardHtml(c, i, isSelected) {
       </div>
 
       <!-- RIGHT: actions + image (small, consistent) -->
-      <div class="shrink-0 flex flex-col items-end gap-2">
+      <div class="shrink-0 w-44 flex flex-col items-end gap-2">
         ${buyMenuHtml(c)}
 
         <button
@@ -779,7 +779,7 @@ function bigCardHtml(c, i, isSelected) {
             src="${escapeHtml(imgSrc)}"
             alt="${escapeHtml(imgAlt)}"
             loading="lazy"
-            class="mt-1 w-32 h-24 rounded-xl border border-gray-200 bg-gray-50 object-cover"
+            class="mt-1 w-40 h-28 rounded-xl border border-gray-200 bg-gray-50 object-cover"
             onerror="this.style.display='none';"
           />
         `
