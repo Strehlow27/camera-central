@@ -726,8 +726,10 @@ document.addEventListener(
 function bigCardHtml(c, i, isSelected) {
   const mpTxt = typeof c.mp === "number" ? `${c.mp} MP` : "—";
   const ibisTxt = typeof c.ibis === "boolean" ? (c.ibis ? "Yes" : "No") : "—";
-  const weightTxt = typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
-  const priceTxt = typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
+  const weightTxt =
+    typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
+  const priceTxt =
+    typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
 
   const systemTxt = c.system ? escapeHtml(c.system) : "—";
   const sensorTxt = c.sensor ? escapeHtml(c.sensor) : "—";
@@ -737,72 +739,82 @@ function bigCardHtml(c, i, isSelected) {
   const imgAlt = cameraImageAlt(c);
 
   return `
-  <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
-    <div class="flex items-start justify-between gap-6">
-      <!-- LEFT: text -->
-      <div class="min-w-0 flex-1">
-        <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
-        <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(c.model)}</h2>
+    <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
+      <div class="grid grid-cols-[1fr_auto] gap-x-6 items-start">
 
-        <p class="text-sm text-gray-600">
-          ${systemTxt} • ${sensorTxt} • ${mountTxt} mount
-        </p>
+        <div class="min-w-0">
+          <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
 
-        <p class="mt-1 text-sm text-gray-500">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
-        </p>
-      </div>
+          <h2 class="text-xl font-semibold">
+            ${escapeHtml(c.brand)} ${escapeHtml(c.model)}
+          </h2>
 
-      <!-- RIGHT: actions + image (does NOT push content below) -->
-      <div class="shrink-0 w-56 flex flex-col items-end gap-2">
-        ${buyMenuHtml(c)}
+          <p class="text-sm text-gray-600">
+            ${systemTxt} • ${sensorTxt} • ${mountTxt} mount
+          </p>
 
-        <button
-          type="button"
-          data-compare="${escapeHtml(c.id)}"
-          class="px-4 py-2 rounded-xl border text-sm select-none ${
-            isSelected ? "border-gray-900 bg-gray-50" : "border-gray-200 bg-white hover:bg-gray-50"
-          }"
-          style="cursor:pointer;"
-        >
-          ${isSelected ? "Selected ✓" : "Compare"}
-        </button>
+          <p class="mt-1 text-sm text-gray-500">
+            ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} •
+            ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
+          </p>
 
-        ${
-          imgSrc
-            ? `
-          <div class="mt-1 w-40">
+          <div class="mt-3 flex gap-x-6">
+            <div class="min-w-[220px]">
+              <p class="text-sm font-semibold mb-1">Why it fits</p>
+              <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                ${(c.strengths || [])
+                  .slice(0, 3)
+                  .map((s) => `<li>${escapeHtml(s)}</li>`)
+                  .join("")}
+              </ul>
+            </div>
+
+            <div class="min-w-[200px]">
+              <p class="text-sm font-semibold mb-1">Tradeoffs</p>
+              <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                ${(c.tradeoffs || [])
+                  .slice(0, 3)
+                  .map((t) => `<li>${escapeHtml(t)}</li>`)
+                  .join("")}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end gap-2">
+          ${buyMenuHtml(c)}
+
+          <button
+            type="button"
+            data-compare="${escapeHtml(c.id)}"
+            class="px-4 py-2 rounded-xl border text-sm ${
+              isSelected
+                ? "border-gray-900 bg-gray-50"
+                : "border-gray-200 bg-white hover:bg-gray-50"
+            }"
+            style="cursor:pointer;"
+          >
+            ${isSelected ? "Selected ✓" : "Compare"}
+          </button>
+
+          ${
+            imgSrc
+              ? `
             <img
               src="${escapeHtml(imgSrc)}"
               alt="${escapeHtml(imgAlt)}"
               loading="lazy"
-              class="w-full h-24 rounded-lg border border-gray-200 bg-gray-100 object-cover"
+              class="mt-2 w-44 h-auto rounded-lg border border-gray-200 bg-white object-contain"
               onerror="this.style.display='none';"
             />
-          </div>
-        `
-            : ""
-        }
+          `
+              : ""
+          }
+        </div>
+
       </div>
     </div>
-
-    <!-- bottom section now hugs upward (no image-caused gap) -->
-    <div class="mt-4 flex flex-wrap gap-x-1 gap-y-1">
-      <div class="min-w-[260px] max-w-[320px] flex-1">
-        <p class="text-sm font-semibold mb-2">Why it fits</p>
-        <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.strengths || []).slice(0, 3).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}
-        </ul>
-      </div>
-
-      <div class="min-w-[240px] max-w-[300px] flex-1">
-        <p class="text-sm font-semibold mb-2">Tradeoffs</p>
-        <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.tradeoffs || []).slice(0, 3).map((t) => `<li>${escapeHtml(t)}</li>`).join("")}
-        </ul>
-      </div>
-    </div>
-  </div>`;
+  `;
 }
 
 function compactRowHtml(camera, score, isSelected) {
