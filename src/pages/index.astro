@@ -12,6 +12,43 @@ const lastUpdatedISO = import.meta.env.VERCEL_GIT_COMMIT_TIMESTAMP
     Choose the right camera in under 2 minutes.
   </h1>
 
+  {lastUpdatedISO && (
+    <div class="mt-3">
+      <span
+        class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-600"
+      >
+        <span class="h-2 w-2 rounded-full bg-green-500"></span>
+        <span>
+          Last updated <strong id="ccUpdatedAgo">recently</strong>
+        </span>
+      </span>
+
+      <script is:inline data-updated={lastUpdatedISO}>
+        (function () {
+          const iso = document.currentScript?.getAttribute("data-updated");
+          const el = document.getElementById("ccUpdatedAgo");
+          if (!iso || !el) return;
+
+          const updated = new Date(iso).getTime();
+          const now = Date.now();
+          const diffMs = now - updated;
+
+          const mins = Math.floor(diffMs / (1000 * 60));
+          const hours = Math.floor(mins / 60);
+          const days = Math.floor(hours / 24);
+
+          if (mins < 60) {
+            el.textContent = `${mins} minute${mins === 1 ? "" : "s"} ago`;
+          } else if (hours < 24) {
+            el.textContent = `${hours} hour${hours === 1 ? "" : "s"} ago`;
+          } else {
+            el.textContent = `${days} day${days === 1 ? "" : "s"} ago`;
+          }
+        })();
+      </script>
+    </div>
+  )}
+
   <p class="text-lg text-gray-600 max-w-2xl leading-relaxed mt-4">
     Camera Central asks a few questions, explains the tradeoffs,
     and recommends 1–3 cameras that actually fit how you shoot.
