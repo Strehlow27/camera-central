@@ -1,9 +1,12 @@
 // camera.js
 
+
+const BH_SID = "29391";
+
 const bh = (q) =>
   `https://www.bhphotovideo.com/c/search?Ntt=${encodeURIComponent(
     q
-  )}&N=0&InitialSearch=yes&sts=ma`;
+  )}&N=0&InitialSearch=yes&sts=ma&SID=${BH_SID}`;
 
 const amz = (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`;
 const mpb = (q) =>
