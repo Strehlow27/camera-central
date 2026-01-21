@@ -930,14 +930,7 @@ function render() {
   const moreWasOpen = sessionStorage.getItem(MORE_OPEN_KEY) === "true";
 
   cardsWrap.innerHTML = `
-    <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
-      <p class="text-sm text-gray-600">
-        <span class="font-semibold text-gray-900">Why these were recommended:</span>
-        We scored cameras based on your answers (genre, portability, low-light, video) and your refine sliders.
-        Your budget range filters out bodies outside $${seeded.budgetMin}–$${seeded.budgetMax}.
-        ${typeNote ? `<span class="block mt-2">${escapeHtml(typeNote)}</span>` : ""}
-      </p>
-    </div>
+    
 
     ${top3.map((c, i) => bigCardHtml(c, i, compareSelected.includes(c.id))).join("")}
 
@@ -961,6 +954,21 @@ function render() {
     `
         : ""
     }
+
+    <div class="rounded-2xl bg-gray-50 border border-gray-200 p-5 text-sm text-gray-600">
+      <p>
+        <span class="font-semibold text-gray-900">Why these were recommended:</span>
+        We scored cameras based on your answers (genre, portability, low-light, video) and your refine sliders.
+        Your budget range filters out bodies outside
+        $${seeded.budgetMin}–$${seeded.budgetMax}.
+      </p>
+
+      ${
+        typeNote
+          ? `<p class="mt-2">${escapeHtml(typeNote)}</p>`
+          : ""
+      }
+    </div>
 
     <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
       <p class="text-xs text-gray-500">
