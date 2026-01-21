@@ -232,6 +232,38 @@ const lastUpdatedISO = vercelCommit
     <!-- ✅ New: original background wrapper -->
     <main class="min-h-screen cc-page-bg">
       <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
+        <slot name="hero" />
+          {lastUpdatedISO && (
+            <div class="mt-3">
+              <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-600">
+                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                <span>
+                  Last updated <strong id="ccUpdatedAgo">recently</strong>
+                </span>
+              </span>
+
+              <script is:inline data-updated={lastUpdatedISO}>
+                (function () {
+                  const iso = document.currentScript?.getAttribute("data-updated");
+                  const el = document.getElementById("ccUpdatedAgo");
+                  if (!iso || !el) return;
+
+                  const updated = new Date(iso).getTime();
+                  const now = Date.now();
+                  const mins = Math.floor((now - updated) / 60000);
+                  const hours = Math.floor(mins / 60);
+                  const days = Math.floor(hours / 24);
+
+                  el.textContent =
+                    mins < 60
+                      ? `${mins} minute${mins === 1 ? "" : "s"} ago`
+                      : hours < 24
+                      ? `${hours} hour${hours === 1 ? "" : "s"} ago`
+                      : `${days} day${days === 1 ? "" : "s"} ago`;
+                })();
+              </script>
+            </div>
+          )}
         <slot />
       </div>
     </main>
