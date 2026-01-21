@@ -15,28 +15,24 @@ function escapeHtml(str) {
 }
 
 function cameraImageUrl(c) {
-  // Prefer normalized field from cameras.js
-  if (typeof c?.image === "string" && c.image.trim()) return c.image.trim();
+  if (c && typeof c.image === "string" && c.image.trim()) return c.image.trim();
 
-  // Fallbacks (slug first because your filenames look like slug.jpg)
-  const slug = typeof c?.slug === "string" ? c.slug.trim() : "";
-  if (slug) return `/images/cameras/${slug}.jpg`;
+  var slug = c && typeof c.slug === "string" ? c.slug.trim() : "";
+  if (slug) return "/images/cameras/" + slug + ".jpg";
 
-  const id = typeof c?.id === "string" ? c.id.trim() : "";
-  return id ? `/images/cameras/${id}.jpg` : "";
+  var id = c && typeof c.id === "string" ? c.id.trim() : "";
+  return id ? "/images/cameras/" + id + ".jpg" : "";
 }
 
 function cameraImageAlt(c) {
-  if (typeof c?.imageAlt === "string" && c.imageAlt.trim()) return c.imageAlt.trim();
-  return `${c?.brand || ""} ${c?.model || ""}`.trim() || "Camera";
+  if (c && typeof c.imageAlt === "string" && c.imageAlt.trim()) {
+    return c.imageAlt.trim();
+  }
+  var brand = (c && c.brand) ? c.brand : "";
+  var model = (c && c.model) ? c.model : "";
+  var alt = (brand + " " + model).trim();
+  return alt || "Camera";
 }
-
-// ---------- B&H affiliate config ----------
-// NOTE: public/ scripts are not reliably Vite-bundled, so don't use import.meta.env here.
-const BH = {
-  BI: (window.CC_BH && window.CC_BH.BI) || "23954",
-  KBID: (window.CC_BH && window.CC_BH.KBID) || "29391",
-};
 
 /**
  * Build a B&H affiliate URL with optional SID
