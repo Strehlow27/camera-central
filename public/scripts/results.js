@@ -740,8 +740,9 @@ function bigCardHtml(c, i, isSelected) {
 
   return `
   <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
-    <div class="flex items-start justify-between gap-4">
-      <div class="min-w-0">
+    <div class="flex items-start justify-between gap-6">
+      <!-- LEFT: text -->
+      <div class="min-w-0 flex-1">
         <p class="text-sm text-gray-500">${i === 0 ? "Top pick" : "Alternative"}</p>
         <h2 class="text-xl font-semibold">${escapeHtml(c.brand)} ${escapeHtml(c.model)}</h2>
 
@@ -750,29 +751,12 @@ function bigCardHtml(c, i, isSelected) {
         </p>
 
         <p class="mt-1 text-sm text-gray-500">
-          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(
-    weightTxt
-  )} • ${escapeHtml(priceTxt)}
+          ${escapeHtml(mpTxt)} • IBIS: ${escapeHtml(ibisTxt)} • ${escapeHtml(weightTxt)} • ${escapeHtml(priceTxt)}
         </p>
-
-        ${
-          imgSrc
-            ? `
-          <div class="mt-4">
-            <img
-              src="${escapeHtml(imgSrc)}"
-              alt="${escapeHtml(imgAlt)}"
-              loading="lazy"
-              class="w-full max-w-sm rounded-xl border border-gray-200 bg-gray-50 object-cover"
-              onerror="this.style.display='none';"
-            />
-          </div>
-        `
-            : ""
-        }
       </div>
 
-      <div class="shrink-0 flex flex-col gap-2 items-end">
+      <!-- RIGHT: actions + image (small, consistent) -->
+      <div class="shrink-0 flex flex-col items-end gap-2">
         ${buyMenuHtml(c)}
 
         <button
@@ -787,6 +771,20 @@ function bigCardHtml(c, i, isSelected) {
         >
           ${isSelected ? "Selected ✓" : "Compare"}
         </button>
+
+        ${
+          imgSrc
+            ? `
+          <img
+            src="${escapeHtml(imgSrc)}"
+            alt="${escapeHtml(imgAlt)}"
+            loading="lazy"
+            class="mt-1 w-32 h-24 rounded-xl border border-gray-200 bg-gray-50 object-cover"
+            onerror="this.style.display='none';"
+          />
+        `
+            : ""
+        }
       </div>
     </div>
 
