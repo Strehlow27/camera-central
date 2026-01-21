@@ -84,6 +84,23 @@
           helper: "This helps prioritize photo resolution vs video features.",
           options: ["Photography", "Videography", "Both"],
         },
+
+        // ✅ NEW: Brand preference (4-box limit friendly)
+        {
+          id: "brandGate",
+          q: "Do you have a brand preference?",
+          helper: "If you’re loyal to a brand, we can prioritize cameras that match.",
+          options: ["No preference", "Canon", "Sony", "Nikon or Fujifilm"],
+        },
+
+        // ✅ NEW: Only shown if they choose “Nikon or Fujifilm”
+        {
+          id: "brandOther",
+          q: "Which brand do you prefer?",
+          helper: "Pick the one you’re most interested in.",
+          options: ["Nikon", "Fujifilm"],
+        },
+
         {
           id: "cameraType",
           q: "What type of camera are you looking for?",
@@ -141,7 +158,9 @@
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === "object") {
             Object.assign(answers, parsed);
-            const firstUnanswered = questions.findIndex((q) => !answers[q.id]);
+            const firstUnanswered = questions.findIndex(
+              (q) => shouldShowQuestion(q.id) && !answers[q.id]
+            );
             idx = firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
             track("find_resume", { answeredCount: Object.keys(answers).length, resumeIndex: idx });
           }
@@ -188,7 +207,28 @@
         try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers)); } catch {}
       }
 
+      function shouldShowQuestion(qid) {
+        // Only show brandOther if they picked “Nikon or Fujifilm”
+        if (qid === "brandOther") return answers.brandGate === "Nikon or Fujifilm";
+        return true;
+      }
+
       function finalizeAndGoToResults() {
+        // ✅ Normalize brand answer into ONE field (answers.brand)
+        // brandGate: No preference / Canon / Sony / Nikon or Fujifilm
+        // brandOther: Nikon / Fujifilm (only if needed)
+        if (answers.brandGate === "Nikon or Fujifilm") {
+          // Use the follow-up choice if present
+          answers.brand = answers.brandOther || "Nikon";
+        } else if (answers.brandGate) {
+          answers.brand = answers.brandGate;
+        } else {
+          answers.brand = "No preference";
+        }
+        
+        delete answers.brandGate;
+        delete answers.brandOther;
+
         try {
           localStorage.setItem(LS_KEY, JSON.stringify(answers));
           localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
@@ -212,7 +252,16 @@
       }
 
       function render() {
-        const q = questions[idx];
+        let q = questions[idx];
+
+        // ✅ If this question shouldn’t be shown, automatically move forward/backward
+        if (!shouldShowQuestion(q.id)) {
+          // If it’s hidden, and we somehow landed here, skip it.
+          // Prefer moving forward unless we’re at the end.
+          if (idx < questions.length - 1) idx++;
+          else if (idx > 0) idx--;
+          q = questions[idx];
+        }
 
         progress.textContent = `Question ${idx + 1} of ${questions.length}`;
         question.textContent = q.q;
@@ -274,14 +323,24 @@
 
       backBtn.addEventListener("click", () => {
         track("find_back", { fromIndex: idx });
-        if (idx > 0) idx--;
+
+        if (idx <= 0) return;
+
+        do {
+          idx--;
+        } while (idx > 0 && !shouldShowQuestion(questions[idx].id));
+
         render();
       });
 
       nextBtn.addEventListener("click", () => {
         track("find_next", { fromIndex: idx });
+
         if (idx < questions.length - 1) {
-          idx++;
+          do {
+            idx++;
+          } while (idx < questions.length - 1 && !shouldShowQuestion(questions[idx].id));
+
           render();
         } else {
           finalizeAndGoToResults();
