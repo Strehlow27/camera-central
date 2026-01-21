@@ -13,11 +13,14 @@ const mpb = (q) =>
 // By default, each camera uses /public/images/cameras/<id>.jpg
 // You can override per camera by adding: image: "/images/cameras/<whatever>.png"
 function defaultCameraImage(cam) {
-  // If you add an explicit image on the camera object, use it.
+  // If explicit image is set, use it
   if (typeof cam.image === "string" && cam.image.trim()) return cam.image.trim();
 
-  // Otherwise, assume an image exists using the camera's id
-  // (Put your images in: public/images/cameras/<id>.jpg)
+  // Prefer slug because your filenames match slug (e.g. canon-eos-r8.jpg)
+  const slug = typeof cam.slug === "string" ? cam.slug.trim() : "";
+  if (slug) return `/images/cameras/${slug}.jpg`;
+
+  // Fallback to id (only if you have files named by id)
   const id = typeof cam.id === "string" ? cam.id.trim() : "";
   return id ? `/images/cameras/${id}.jpg` : null;
 }
