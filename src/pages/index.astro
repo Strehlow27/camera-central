@@ -79,14 +79,16 @@ const LOGO_SRC = "/cameracentralLOGO.png";
     <!-- RIGHT: big logo showcase (desktop only) -->
     <div class="hidden lg:flex justify-center">
       <div class="relative">
+        <!-- ✅ glow behind (bigger + softer) -->
+        <div class="pointer-events-none absolute -inset-10 -z-10 rounded-full blur-3xl bg-black/5"></div>
+
         <img
           src={LOGO_SRC}
           alt="Camera Central logo"
-          class="w-[340px] xl:w-[380px] h-auto opacity-95 select-none"
+          class="w-[340px] xl:w-[380px] h-auto opacity-90 drop-shadow-xl select-none"
           loading="lazy"
+          draggable="false"
         />
-        <!-- subtle “glow” behind the logo -->
-        <div class="absolute inset-0 -z-10 rounded-full blur-3xl bg-black/5"></div>
       </div>
     </div>
   </div>
