@@ -9,6 +9,29 @@ const amz = (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`;
 const mpb = (q) =>
   `https://www.mpb.com/en-us/search?q=${encodeURIComponent(q)}`;
 
+// ✅ Default image helper:
+// By default, each camera uses /public/images/cameras/<id>.jpg
+// You can override per camera by adding: image: "/images/cameras/<whatever>.png"
+function defaultCameraImage(cam) {
+  // If you add an explicit image on the camera object, use it.
+  if (typeof cam.image === "string" && cam.image.trim()) return cam.image.trim();
+
+  // Otherwise, assume an image exists using the camera's id
+  // (Put your images in: public/images/cameras/<id>.jpg)
+  const id = typeof cam.id === "string" ? cam.id.trim() : "";
+  return id ? `/images/cameras/${id}.jpg` : null;
+}
+
+function defaultCameraAlt(cam) {
+  if (typeof cam.imageAlt === "string" && cam.imageAlt.trim())
+    return cam.imageAlt.trim();
+
+  const brand = cam.brand ?? "";
+  const model = cam.model ?? "";
+  const alt = `${brand} ${model}`.trim();
+  return alt || "Camera";
+}
+
 // --- normalize fields so scoring can rely on them later ---
 function normalizeCamera(cam) {
   const isIL =
@@ -20,6 +43,10 @@ function normalizeCamera(cam) {
     ...cam,
     isInterchangeableLens: isIL,
     cameraType: isIL ? "detachable" : "fixed",
+
+    // ✅ images
+    image: defaultCameraImage(cam),
+    imageAlt: defaultCameraAlt(cam),
   };
 }
 
@@ -912,7 +939,6 @@ const RAW_CAMERAS = [
   // Nikon
   // =========================
 
-  // ---- APS-C (Entry / Travel) ----
   {
     id: "nikon-z50",
     slug: "nikon-z50",
@@ -1167,7 +1193,6 @@ const RAW_CAMERAS = [
     },
   },
 
-  // ---- Full Frame (Video / Hybrid) ----
   {
     id: "nikon-z8",
     slug: "nikon-z8",
@@ -1208,7 +1233,6 @@ const RAW_CAMERAS = [
   // Fujifilm
   // =========================
 
-  // ---- APS-C (Entry / Travel) ----
   {
     id: "fuji-x-t30-ii",
     slug: "fujifilm-x-t30-ii",
@@ -1282,7 +1306,6 @@ const RAW_CAMERAS = [
     },
   },
 
-  // ---- APS-C (All-round / Enthusiast) ----
   {
     id: "fuji-xs20",
     slug: "fujifilm-x-s20",
@@ -1463,7 +1486,6 @@ const RAW_CAMERAS = [
     },
   },
 
-  // ---- GFX (Medium Format / Landscape Premium) ----
   {
     id: "fuji-gfx-50s-ii",
     slug: "fujifilm-gfx-50s-ii",
@@ -1540,7 +1562,6 @@ const RAW_CAMERAS = [
   // Panasonic
   // =========================
 
-  // ---- Full Frame (L-mount) ----
   {
     id: "panasonic-s5",
     slug: "panasonic-lumix-s5",
@@ -1650,7 +1671,6 @@ const RAW_CAMERAS = [
     },
   },
 
-  // ---- Micro Four Thirds (MFT) ----
   {
     id: "panasonic-g9",
     slug: "panasonic-lumix-g9",
@@ -2037,6 +2057,7 @@ const RAW_CAMERAS = [
   // =========================
   // Fixed-lens Digital Cameras (Compacts)
   // =========================
+
   {
     id: "sony-rx100-vii",
     slug: "sony-rx100-vii",
@@ -2051,7 +2072,7 @@ const RAW_CAMERAS = [
     isInterchangeableLens: false,
 
     mp: 20,
-    ibis: false, // lens stabilization, not IBIS
+    ibis: false,
     weightGrams: 302,
     price: 1299,
 
