@@ -771,13 +771,12 @@ function bigCardHtml(c, i, isSelected) {
         ${
           imgSrc
             ? `
-          <div class="mt-1 w-56">
+          <div class="mt-1 w-40">
             <img
               src="${escapeHtml(imgSrc)}"
               alt="${escapeHtml(imgAlt)}"
               loading="lazy"
-              class="w-full h-32 rounded-xl border border-gray-200 bg-white object-contain"
-              style="image-rendering:auto;"
+              class="w-full h-24 rounded-lg border border-gray-200 bg-gray-100 object-cover"
               onerror="this.style.display='none';"
             />
           </div>
