@@ -726,10 +726,8 @@ document.addEventListener(
 function bigCardHtml(c, i, isSelected) {
   const mpTxt = typeof c.mp === "number" ? `${c.mp} MP` : "—";
   const ibisTxt = typeof c.ibis === "boolean" ? (c.ibis ? "Yes" : "No") : "—";
-  const weightTxt =
-    typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
-  const priceTxt =
-    typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
+  const weightTxt = typeof c.weightGrams === "number" ? `${c.weightGrams}g` : "—";
+  const priceTxt = typeof c.price === "number" ? `$${Number(c.price).toLocaleString()}` : "—";
 
   const systemTxt = c.system ? escapeHtml(c.system) : "—";
   const sensorTxt = c.sensor ? escapeHtml(c.sensor) : "—";
@@ -755,17 +753,15 @@ function bigCardHtml(c, i, isSelected) {
         </p>
       </div>
 
-      <!-- RIGHT: actions + image (small, consistent) -->
-      <div class="shrink-0 w-44 flex flex-col items-end gap-2">
+      <!-- RIGHT: actions + image (does NOT push content below) -->
+      <div class="shrink-0 w-56 flex flex-col items-end gap-2">
         ${buyMenuHtml(c)}
 
         <button
           type="button"
           data-compare="${escapeHtml(c.id)}"
           class="px-4 py-2 rounded-xl border text-sm select-none ${
-            isSelected
-              ? "border-gray-900 bg-gray-50"
-              : "border-gray-200 bg-white hover:bg-gray-50"
+            isSelected ? "border-gray-900 bg-gray-50" : "border-gray-200 bg-white hover:bg-gray-50"
           }"
           style="cursor:pointer;"
         >
@@ -775,36 +771,34 @@ function bigCardHtml(c, i, isSelected) {
         ${
           imgSrc
             ? `
-          <img
-            src="${escapeHtml(imgSrc)}"
-            alt="${escapeHtml(imgAlt)}"
-            loading="lazy"
-            class="mt-1 w-40 h-28 rounded-xl border border-gray-200 bg-gray-50 object-cover"
-            onerror="this.style.display='none';"
-          />
+          <div class="mt-1 w-56">
+            <img
+              src="${escapeHtml(imgSrc)}"
+              alt="${escapeHtml(imgAlt)}"
+              loading="lazy"
+              class="w-full h-32 rounded-xl border border-gray-200 bg-white object-contain"
+              style="image-rendering:auto;"
+              onerror="this.style.display='none';"
+            />
+          </div>
         `
             : ""
         }
       </div>
     </div>
 
-    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+    <!-- bottom section now hugs upward (no image-caused gap) -->
+    <div class="mt-4 grid gap-6 sm:grid-cols-2">
       <div>
         <p class="text-sm font-semibold mb-2">Why it fits</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.strengths || [])
-            .slice(0, 3)
-            .map((s) => `<li>${escapeHtml(s)}</li>`)
-            .join("")}
+          ${(c.strengths || []).slice(0, 3).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}
         </ul>
       </div>
       <div>
         <p class="text-sm font-semibold mb-2">Tradeoffs</p>
         <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
-          ${(c.tradeoffs || [])
-            .slice(0, 3)
-            .map((t) => `<li>${escapeHtml(t)}</li>`)
-            .join("")}
+          ${(c.tradeoffs || []).slice(0, 3).map((t) => `<li>${escapeHtml(t)}</li>`).join("")}
         </ul>
       </div>
     </div>
