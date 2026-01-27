@@ -36,6 +36,12 @@ const lastUpdatedISO = vercelCommit
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
 
+    <!-- Site favicon -->
+    <link rel="icon" href="/favicon2.png" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon2.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon2.png" />
+    <link rel="apple-touch-icon" href="/favicon2.png" />
+
     <!-- ✅ Canonical -->
     <link rel="canonical" href={canonicalUrl} />
 
@@ -223,7 +229,19 @@ const lastUpdatedISO = vercelCommit
           0 1px 0 rgba(17, 24, 39, 0.04),
           0 10px 30px rgba(17, 24, 39, 0.06) !important;
       }
+
+      
     </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Camera Central",
+      "url": "https://camera-central.com",
+      "logo": "https://camera-central.com/favicon2.png"
+    }
+    </script>
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
