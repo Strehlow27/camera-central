@@ -57,10 +57,10 @@ const LOGO_SRC = "/cameracentralLOGO.png";
     </p>
   </div>
 
-  <!-- BOTTOM: quiz card + logo aligned on the same row (desktop) -->
+<!-- BOTTOM: quiz card + logo aligned on the same row (desktop) -->
   <div class="mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-10 items-start">
-    <!-- Quiz card -->
-    <div>
+    <!-- Left column: Quiz card + article link -->
+    <div class="flex flex-col">
       <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 max-w-md">
         <h2 class="font-semibold text-lg mb-2">Take the quiz!</h2>
 
@@ -75,9 +75,18 @@ const LOGO_SRC = "/cameracentralLOGO.png";
           Find my camera
         </a>
       </div>
+
+      <!-- ✅ Article link now sits right under the quiz box -->
+      <a
+        href="/best-camera-for-travel-photography"
+        class="mt-6 inline-flex items-center gap-2 text-base text-gray-700 hover:text-gray-900 hover:underline"
+        style="cursor:pointer;"
+      >
+        Best Camera for Travel Photography <span aria-hidden="true">→</span>
+      </a>
     </div>
 
-    <!-- Logo showcase (desktop) -->
+    <!-- Right column: Logo showcase (desktop only) -->
     <div class="hidden lg:flex justify-center">
       <div class="relative -mt-16">
         <img
@@ -89,16 +98,5 @@ const LOGO_SRC = "/cameracentralLOGO.png";
         <div class="absolute inset-0 -z-10 rounded-full blur-3xl bg-black/5"></div>
       </div>
     </div>
-  </div>
-
-  <!-- ✅ Article link OUTSIDE the grid (tight spacing) -->
-  <div class="mt-8">
-    <a
-      href="/best-camera-for-travel-photography"
-      class="inline-flex items-center gap-2 text-base text-gray-700 hover:text-gray-900 hover:underline"
-      style="cursor:pointer;"
-    >
-      Best Camera for Travel Photography <span aria-hidden="true">→</span>
-    </a>
   </div>
 </BaseLayout>
