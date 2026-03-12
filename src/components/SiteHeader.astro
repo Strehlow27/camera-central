@@ -2,6 +2,7 @@
 
 <header class="w-full border-b border-gray-200 bg-white/90 backdrop-blur">
   <div class="mx-auto max-w-5xl px-6 h-20 flex items-center justify-between gap-4">
+    
     <!-- Left: brand -->
     <a
       href="/"
@@ -28,18 +29,17 @@
       <a href="/cameras" class="hover:text-gray-900" style="cursor:pointer;">Cameras</a>
       <a href="/about" class="hover:text-gray-900" style="cursor:pointer;">About</a>
       <a href="/disclaimer" class="hover:text-gray-900" style="cursor:pointer;">Disclaimer</a>
-
       <a href="/feedback" class="hover:text-gray-900" style="cursor:pointer;">Feedback</a>
 
       <a
-        id="headerCompareLink"
+        id="headerResultsLink"
         href="/results"
         class="inline-flex items-center gap-1 hover:text-gray-900 text-gray-700"
         style="cursor:pointer;"
       >
-        Compare
+        Results
         <span
-          id="ccCompareBadge"
+          id="ccResultsBadge"
           class="hidden ml-1 rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none"
         >
           0
@@ -68,18 +68,17 @@
       <a href="/cameras" class="py-2 hover:text-gray-900" style="cursor:pointer;">Cameras</a>
       <a href="/about" class="py-2 hover:text-gray-900" style="cursor:pointer;">About</a>
       <a href="/disclaimer" class="py-2 hover:text-gray-900" style="cursor:pointer;">Disclaimer</a>
-
       <a href="/feedback" class="py-2 hover:text-gray-900" style="cursor:pointer;">Feedback</a>
 
       <a
-        id="headerCompareLinkMobile"
+        id="headerResultsLinkMobile"
         href="/results"
         class="py-2 inline-flex items-center gap-2 hover:text-gray-900 text-gray-700"
         style="cursor:pointer;"
       >
-        Compare
+        Results
         <span
-          id="ccCompareBadgeMobile"
+          id="ccResultsBadgeMobile"
           class="hidden rounded-full bg-black text-white text-xs px-2 py-0.5 leading-none"
         >
           0
@@ -104,8 +103,8 @@
     }
 
     function setBadgeCount(n) {
-      const b1 = document.getElementById("ccCompareBadge");
-      const b2 = document.getElementById("ccCompareBadgeMobile");
+      const b1 = document.getElementById("ccResultsBadge");
+      const b2 = document.getElementById("ccResultsBadgeMobile");
 
       [b1, b2].forEach((badge) => {
         if (!badge) return;
@@ -119,22 +118,18 @@
       });
     }
 
-    // Initial
     setBadgeCount(safeIds().length);
 
-    // Updates from results.js (and others)
     window.addEventListener("cc-compare-updated", (e) => {
       const ids = e?.detail?.ids;
       if (Array.isArray(ids)) setBadgeCount(ids.filter(Boolean).length);
       else setBadgeCount(safeIds().length);
     });
 
-    // Other tabs
     window.addEventListener("storage", (e) => {
       if (e.key === KEY) setBadgeCount(safeIds().length);
     });
 
-    // Mobile menu toggle
     const btn = document.getElementById("ccMobileMenuBtn");
     const panel = document.getElementById("ccMobileMenu");
 
@@ -156,13 +151,11 @@
       toggleMenu();
     });
 
-    // Close mobile menu after clicking a link
     panel?.addEventListener("click", (e) => {
       const a = e.target.closest("a[href]");
       if (a) closeMenu();
     });
 
-    // Close menu after Astro page swaps (prevents "stuck open" feel)
     document.addEventListener("astro:after-swap", closeMenu);
     document.addEventListener("astro:page-load", closeMenu);
   })();
