@@ -84,23 +84,13 @@
           helper: "This helps prioritize photo resolution vs video features.",
           options: ["Photography", "Videography", "Both"],
         },
-
-        // ✅ NEW: Brand preference (4-box limit friendly)
         {
-          id: "brandGate",
+          id: "brand",
           q: "Do you have a brand preference?",
-          helper: "If you’re loyal to a brand, we can prioritize cameras that match.",
-          options: ["No preference", "Canon", "Sony", "Nikon or Fujifilm"],
+          helper: "Select one or more brands if you already have a preference.",
+          options: ["No preference", "Canon", "Sony", "Nikon", "Fujifilm"],
+          multi: true,
         },
-
-        // ✅ NEW: Only shown if they choose “Nikon or Fujifilm”
-        {
-          id: "brandOther",
-          q: "Which brand do you prefer?",
-          helper: "Pick the one you’re most interested in.",
-          options: ["Nikon", "Fujifilm"],
-        },
-
         {
           id: "cameraType",
           q: "What type of camera are you looking for?",
@@ -158,16 +148,13 @@
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === "object") {
             Object.assign(answers, parsed);
-            const firstUnanswered = questions.findIndex(
-              (q) => shouldShowQuestion(q.id) && !answers[q.id]
-            );
+            const firstUnanswered = questions.findIndex((q) => !isAnswered(q));
             idx = firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
             track("find_resume", { answeredCount: Object.keys(answers).length, resumeIndex: idx });
           }
         } catch {}
       }
 
-      // ✅ make option height consistent so spacers reserve exactly 1 option slot
       const optionBase =
         "w-full min-h-[56px] text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
@@ -195,6 +182,16 @@
       let hasStarted = false;
       let lastQuestionId = null;
 
+      function isMultiQuestion(q) {
+        return q.multi === true;
+      }
+
+      function isAnswered(q) {
+        const value = answers[q.id];
+        if (isMultiQuestion(q)) return Array.isArray(value) && value.length > 0;
+        return !!value;
+      }
+
       function updateProgressUI() {
         const pct = Math.round(((idx + 1) / questions.length) * 100);
         bar.style.width = `${pct}%`;
@@ -204,36 +201,20 @@
       }
 
       function saveProgress() {
-        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers)); } catch {}
-      }
-
-      function shouldShowQuestion(qid) {
-        // Only show brandOther if they picked “Nikon or Fujifilm”
-        if (qid === "brandOther") return answers.brandGate === "Nikon or Fujifilm";
-        return true;
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
+        } catch {}
       }
 
       function finalizeAndGoToResults() {
-        // ✅ Normalize brand answer into ONE field (answers.brand)
-        // brandGate: No preference / Canon / Sony / Nikon or Fujifilm
-        // brandOther: Nikon / Fujifilm (only if needed)
-        if (answers.brandGate === "Nikon or Fujifilm") {
-          // Use the follow-up choice if present
-          answers.brand = answers.brandOther || "Nikon";
-        } else if (answers.brandGate) {
-          answers.brand = answers.brandGate;
-        } else {
-          answers.brand = "No preference";
-        }
-        
-        delete answers.brandGate;
-        delete answers.brandOther;
-
         try {
           localStorage.setItem(LS_KEY, JSON.stringify(answers));
           localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
         } catch {}
-        try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+
+        try {
+          sessionStorage.removeItem(SESSION_KEY);
+        } catch {}
 
         track("find_complete", {
           questionCount: questions.length,
@@ -251,17 +232,37 @@
         return d;
       }
 
-      function render() {
-        let q = questions[idx];
-
-        // ✅ If this question shouldn’t be shown, automatically move forward/backward
-        if (!shouldShowQuestion(q.id)) {
-          // If it’s hidden, and we somehow landed here, skip it.
-          // Prefer moving forward unless we’re at the end.
-          if (idx < questions.length - 1) idx++;
-          else if (idx > 0) idx--;
-          q = questions[idx];
+      function getSelectedState(q, opt) {
+        if (isMultiQuestion(q)) {
+          return Array.isArray(answers[q.id]) && answers[q.id].includes(opt);
         }
+        return answers[q.id] === opt;
+      }
+
+      function toggleMultiSelect(q, opt) {
+        const current = Array.isArray(answers[q.id]) ? [...answers[q.id]] : [];
+
+        if (opt === "No preference") {
+          answers[q.id] = ["No preference"];
+          return;
+        }
+
+        const withoutNoPreference = current.filter((v) => v !== "No preference");
+        const alreadySelected = withoutNoPreference.includes(opt);
+
+        if (alreadySelected) {
+          answers[q.id] = withoutNoPreference.filter((v) => v !== opt);
+        } else {
+          answers[q.id] = [...withoutNoPreference, opt];
+        }
+
+        if (answers[q.id].length === 0) {
+          delete answers[q.id];
+        }
+      }
+
+      function render() {
+        const q = questions[idx];
 
         progress.textContent = `Question ${idx + 1} of ${questions.length}`;
         question.textContent = q.q;
@@ -275,21 +276,21 @@
         }
 
         optionsWrap.innerHTML = "";
-        const selected = answers[q.id];
 
-        // render options
         q.options.forEach((opt) => {
+          const selected = getSelectedState(q, opt);
+
           const btn = document.createElement("button");
           btn.type = "button";
 
           btn.innerHTML = `
             <span class="flex items-center justify-between">
               <span>${opt}</span>
-              <span class="text-sm text-gray-500 w-4 text-right">${selected === opt ? "✓" : ""}</span>
+              <span class="text-sm text-gray-500 w-4 text-right">${selected ? "✓" : ""}</span>
             </span>
           `;
 
-          btn.className = optionBase + " " + (selected === opt ? optionSelected : optionUnselected);
+          btn.className = optionBase + " " + (selected ? optionSelected : optionUnselected);
 
           btn.addEventListener("click", () => {
             if (!hasStarted) {
@@ -297,20 +298,28 @@
               track("find_start", { firstQuestionId: q.id });
             }
 
-            answers[q.id] = opt;
+            if (isMultiQuestion(q)) {
+              toggleMultiSelect(q, opt);
+            } else {
+              answers[q.id] = opt;
+            }
+
             saveProgress();
 
-            track("find_answer_select", { questionId: q.id, value: opt, index: idx });
+            track("find_answer_select", {
+              questionId: q.id,
+              value: isMultiQuestion(q) ? answers[q.id] : opt,
+              index: idx,
+            });
 
-            nextBtn.disabled = false;
+            nextBtn.disabled = !isAnswered(q);
             render();
           });
 
           optionsWrap.appendChild(btn);
         });
 
-        // ✅ always reserve 4 slots total (so 3-option questions create exactly 1 option-height gap)
-        const TARGET = 4;
+        const TARGET = Math.max(5, q.options.length);
         const missing = Math.max(0, TARGET - q.options.length);
         for (let i = 0; i < missing; i++) {
           optionsWrap.appendChild(makeSpacer());
@@ -318,18 +327,13 @@
 
         backBtn.disabled = idx === 0;
         nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
-        nextBtn.disabled = !answers[q.id];
+        nextBtn.disabled = !isAnswered(q);
       }
 
       backBtn.addEventListener("click", () => {
         track("find_back", { fromIndex: idx });
-
         if (idx <= 0) return;
-
-        do {
-          idx--;
-        } while (idx > 0 && !shouldShowQuestion(questions[idx].id));
-
+        idx--;
         render();
       });
 
@@ -337,10 +341,7 @@
         track("find_next", { fromIndex: idx });
 
         if (idx < questions.length - 1) {
-          do {
-            idx++;
-          } while (idx < questions.length - 1 && !shouldShowQuestion(questions[idx].id));
-
+          idx++;
           render();
         } else {
           finalizeAndGoToResults();
@@ -351,7 +352,11 @@
     }
 
     function boot() {
-      try { initFindFlow(); } catch (e) { console.error("[FindFlow] init error", e); }
+      try {
+        initFindFlow();
+      } catch (e) {
+        console.error("[FindFlow] init error", e);
+      }
     }
 
     if (document.readyState === "loading") {

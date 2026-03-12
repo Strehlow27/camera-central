@@ -359,9 +359,29 @@ function sanitizeCompare() {
   return valid;
 }
 
+function getBrandBonus(camera, answers) {
+  const selectedBrands = answers?.brand;
+
+  if (!Array.isArray(selectedBrands) || !selectedBrands.length) return 0;
+  if (selectedBrands.includes("No preference")) return 0;
+
+  if (!camera?.brand) return 0;
+  if (!selectedBrands.includes(camera.brand)) return 0;
+
+  // 1 selected brand = stronger preference
+  if (selectedBrands.length === 1) return 8;
+
+  // 2 selected brands = moderate preference
+  if (selectedBrands.length === 2) return 5;
+
+  // 3+ selected brands = lighter preference
+  return 3;
+}
+
 // --------------------
 // Scoring (unchanged)
 // --------------------
+
 function scoreCamera(camera, answers, weights) {
   let score = 0;
 
@@ -436,6 +456,8 @@ function scoreCamera(camera, answers, weights) {
   const portabilityBase =
     wc === "very light" ? 10 : wc === "light" ? 7 : wc === "medium" ? 4 : 1;
   score += portabilityBase * 0.8 * wPort;
+
+  score += getBrandBonus(camera, answers);
 
   return score;
 }
