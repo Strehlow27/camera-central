@@ -7,296 +7,368 @@ const description =
 ---
 
 <BaseLayout title={title} description={description}>
-  <article
-    class="mx-auto max-w-4xl px-6 py-16 md:px-8 lg:py-20
-           prose prose-neutral lg:prose-lg
-           prose-h1:text-4xl prose-h1:font-bold prose-h1:tracking-tight prose-h1:mb-6
-           prose-h2:text-2xl prose-h2:font-bold prose-h2:tracking-tight prose-h2:mt-14 prose-h2:mb-4
-           prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-2
-           prose-p:leading-8 prose-p:mb-5
-           prose-ul:my-4 prose-li:my-1
-           prose-a:text-blue-600 hover:prose-a:text-blue-700
-           prose-strong:font-semibold"
-  >
-    <h1>{title}</h1>
+  <section class="px-4 py-12 md:px-6 lg:py-16">
+    <article class="mx-auto max-w-4xl rounded-2xl bg-white px-6 py-10 shadow-sm md:px-10 md:py-14 lg:px-14">
+      <header class="mb-12 border-b border-gray-200 pb-8">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+          Buying Guide
+        </p>
 
-    <p>
-      Buying a camera today can feel overwhelming. There are dozens of brands,
-      hundreds of models, and a lot of technical specifications that don’t
-      always mean much if you’re just getting started. The good news is that
-      choosing the right camera becomes much easier once you narrow down a few
-      key factors: what you want to shoot, the type of camera you prefer, the
-      sensor size, and the lenses you’ll use.
-    </p>
+        <h1 class="text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl">
+          {title}
+        </h1>
 
-    <p>
-      This guide walks through the most important things to consider so you can
-      confidently choose a camera that fits your needs.
-    </p>
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-gray-700 md:text-xl">
+          Choosing a camera can feel confusing at first, but it gets much easier
+          once you focus on a few key things: what you want to shoot, what type
+          of camera you want, what sensor size fits your needs, and which lenses
+          make sense for your style.
+        </p>
+      </header>
 
-    <h2>What Do You Want to Shoot?</h2>
+      <div class="space-y-14 text-[1.08rem] leading-8 text-gray-800">
+        <section class="space-y-6">
+          <p>
+            There are dozens of brands, hundreds of models, and plenty of specs
+            that sound important but don’t always matter in real-world use. For
+            most beginners and hobbyists, the goal is not to find the
+            “best camera on paper.” It’s to find the camera that best fits how
+            you actually shoot.
+          </p>
 
-    <p>
-      Before looking at specific camera models, it helps to think about the type
-      of photography you want to do most. Different types of photography benefit
-      from different features and equipment.
-    </p>
+          <p>
+            This guide walks through the most important things to consider so you
+            can narrow down your options without getting lost in the details.
+          </p>
+        </section>
 
-    <h3>Wildlife</h3>
-    <p>
-      Wildlife photography often requires photographing animals that are far
-      away or moving quickly. Because of that, two things matter most: reach and
-      speed.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              What Do You Want to Shoot?
+            </h2>
+          </div>
 
-    <p>
-      Wildlife photographers usually want a camera with fast autofocus that can
-      track animals or birds, strong burst shooting speeds, and compatibility
-      with long telephoto lenses. Sensor size can also matter here, since APS-C
-      cameras effectively give telephoto lenses more reach.
-    </p>
+          <p>
+            Before looking at camera models, start with the kind of photography
+            or video you care about most. Different types of shooting benefit
+            from different strengths.
+          </p>
 
-    <h3>Travel</h3>
-    <p>
-      Travel photography is often about convenience and versatility. When you're
-      walking through cities, hiking trails, or exploring new places, carrying a
-      heavy camera setup can become tiring.
-    </p>
+          <div class="space-y-8">
+            <div class="rounded-xl bg-gray-50 px-6 py-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">Wildlife</h3>
+              <p class="mb-4">
+                Wildlife photography often means photographing subjects that are
+                far away, moving quickly, or both. That usually makes
+                <strong> autofocus, burst shooting, and lens reach </strong>
+                especially important.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Fast autofocus helps keep animals and birds sharp</li>
+                <li>Burst shooting increases your chances of catching the moment</li>
+                <li>Long telephoto lenses are often essential</li>
+                <li>APS-C cameras can be helpful because they add effective reach</li>
+              </ul>
+            </div>
 
-    <p>
-      Many travel photographers prefer lightweight cameras with a versatile zoom
-      lens so they can photograph landscapes, street scenes, and everyday
-      moments without constantly changing lenses.
-    </p>
+            <div class="rounded-xl bg-gray-50 px-6 py-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">Travel</h3>
+              <p class="mb-4">
+                Travel photography is usually about balancing image quality with
+                portability. A camera that is too heavy or inconvenient may stay
+                in your bag instead of being used.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Lighter gear is easier to carry all day</li>
+                <li>A standard zoom lens is often the most practical choice</li>
+                <li>Smaller systems make travel simpler and less tiring</li>
+              </ul>
+            </div>
 
-    <h3>Video</h3>
-    <p>
-      If video is an important part of your workflow, you’ll want to pay
-      attention to different features than someone who only shoots photos.
-    </p>
+            <div class="rounded-xl bg-gray-50 px-6 py-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">Video</h3>
+              <p class="mb-4">
+                If video matters to you, some features become more important
+                than they would for still photography alone.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Reliable autofocus during recording</li>
+                <li>Image stabilization for handheld shooting</li>
+                <li>A flip screen for self-recording</li>
+                <li>Strong overall video performance and usability</li>
+              </ul>
+            </div>
 
-    <p>
-      Useful video features include strong autofocus during recording, good
-      image stabilization, flip-out screens for self-recording, and support for
-      high-quality video resolutions and frame rates.
-    </p>
+            <div class="rounded-xl bg-gray-50 px-6 py-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Versatile / Beginner
+              </h3>
+              <p class="mb-4">
+                If you want one camera that can do a bit of everything, focus on
+                balance. You probably do not need the most specialized or
+                expensive setup.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Good autofocus</li>
+                <li>Easy-to-use controls</li>
+                <li>Solid image quality</li>
+                <li>A useful starter lens</li>
+              </ul>
+              <p class="mt-4">
+                For many people, an
+                <strong>APS-C mirrorless camera with a standard zoom</strong>
+                is the strongest starting point.
+              </p>
+            </div>
+          </div>
+        </section>
 
-    <h3>Versatile / Beginner</h3>
-    <p>
-      If you're just getting started, versatility is usually the most important
-      factor. Many beginners want a camera that can handle a little bit of
-      everything: travel, family photos, occasional wildlife, and some video.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              What Camera Type Do You Want?
+            </h2>
+          </div>
 
-    <p>
-      An APS-C mirrorless camera paired with a standard zoom lens is one of the
-      most common starting points because it offers a great balance between
-      image quality, portability, and price.
-    </p>
+          <div class="space-y-8">
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Compact Camera
+              </h3>
+              <p class="mb-4">
+                Compact cameras have a built-in lens and are designed to be easy
+                to carry and simple to use.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Best for simplicity and portability</li>
+                <li>No need to buy extra lenses</li>
+                <li>Less flexible than interchangeable-lens systems</li>
+              </ul>
+            </div>
 
-    <h2>What Camera Type Do You Want?</h2>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">DSLR</h3>
+              <p class="mb-4">
+                DSLRs are still capable cameras with strong image quality and
+                access to many lenses, especially on the used market.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Often a strong used-value option</li>
+                <li>Great lens availability</li>
+                <li>Larger and heavier than mirrorless cameras</li>
+              </ul>
+            </div>
 
-    <p>
-      There are three main categories of cameras most people consider when
-      buying a new camera.
-    </p>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Mirrorless
+              </h3>
+              <p class="mb-4">
+                Mirrorless cameras are now the default choice for many new
+                buyers because they combine strong autofocus, excellent image
+                quality, and modern features in a smaller package.
+              </p>
+              <ul class="list-disc space-y-2 pl-6 marker:text-gray-500">
+                <li>Strong autofocus and modern performance</li>
+                <li>Usually more compact than DSLRs</li>
+                <li>The most future-focused system for most buyers</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
-    <h3>Compact Camera</h3>
-    <p>
-      Compact cameras, sometimes called point-and-shoot cameras, have a built-in
-      lens and are designed to be simple and portable.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              Understand Sensor Size
+            </h2>
+          </div>
 
-    <p>
-      These cameras are easy to carry and require no additional lenses. They are
-      great for casual photography and travel, but they offer less flexibility
-      than cameras with interchangeable lenses.
-    </p>
+          <p>
+            Sensor size affects image quality, low-light performance, overall
+            system size, and how easy it is to get a blurred background.
+          </p>
 
-    <h3>DSLR</h3>
-    <p>
-      DSLR cameras were the dominant type of interchangeable-lens camera for
-      many years. They use an optical viewfinder and a mirror system to show the
-      scene through the lens.
-    </p>
+          <div class="grid gap-6 md:grid-cols-3">
+            <div class="rounded-xl border border-gray-200 p-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">APS-C</h3>
+              <p>
+                A great middle ground. APS-C cameras usually offer excellent
+                image quality while keeping cost, size, and lens weight more
+                reasonable.
+              </p>
+            </div>
 
-    <p>
-      DSLRs still offer excellent image quality and access to large lens
-      ecosystems. However, they are generally larger and heavier than newer
-      mirrorless systems, and most manufacturers are focusing development on
-      mirrorless cameras moving forward.
-    </p>
+            <div class="rounded-xl border border-gray-200 p-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Full Frame
+              </h3>
+              <p>
+                Best for people who want stronger low-light performance and are
+                comfortable with higher prices and often larger lenses.
+              </p>
+            </div>
 
-    <h3>Mirrorless</h3>
-    <p>
-      Mirrorless cameras have become the most common type of camera released in
-      recent years. As the name suggests, they do not use a mirror system and
-      instead rely on electronic viewfinders or rear screens.
-    </p>
+            <div class="rounded-xl border border-gray-200 p-6">
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Micro Four Thirds
+              </h3>
+              <p>
+                A compact system that can be especially attractive for travel
+                and video shooters who want smaller gear.
+              </p>
+            </div>
+          </div>
+        </section>
 
-    <p>
-      Mirrorless cameras tend to be more compact and offer advanced autofocus
-      systems, strong photo and video capabilities, and rapid technological
-      development. For most new buyers today, mirrorless systems are often the
-      most future-proof choice.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              Choosing Lenses
+            </h2>
+          </div>
 
-    <h2>Understand Sensor Size</h2>
+          <p>
+            The lens often matters just as much as the camera body. In many
+            cases, choosing the right lens is what really determines whether a
+            setup fits your needs.
+          </p>
 
-    <p>
-      Sensor size has a major impact on image quality, low-light performance,
-      and how much background blur you can achieve in your photos.
-    </p>
+          <div class="space-y-8">
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Wildlife (Telephoto)
+              </h3>
+              <p>
+                Wildlife photography usually calls for telephoto lenses such as
+                100–400mm, 150–600mm, or similar long focal lengths. These let
+                you photograph distant subjects without needing to get close.
+              </p>
+            </div>
 
-    <h3>APS-C</h3>
-    <p>
-      APS-C sensors are smaller than full-frame sensors but still deliver
-      excellent image quality. Cameras with APS-C sensors are usually smaller,
-      lighter, and more affordable.
-    </p>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Standard Zoom
+              </h3>
+              <p>
+                A standard zoom is often the most useful all-around lens for
+                beginners. It works well for travel, general photography, and
+                everyday use.
+              </p>
+            </div>
 
-    <p>
-      They are often the best option for beginners and hobbyists who want strong
-      performance without the higher cost of full-frame systems.
-    </p>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Landscape (Wide Angle)
+              </h3>
+              <p>
+                Wide-angle lenses help capture large scenes, dramatic skies, and
+                more of the environment. They are especially popular for
+                landscapes and architecture.
+              </p>
+            </div>
+          </div>
+        </section>
 
-    <h3>Full Frame</h3>
-    <p>
-      Full-frame sensors are physically larger and capture more light. This can
-      improve low-light performance and allow for shallower depth of field,
-      which creates stronger background blur.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              Setting a Budget
+            </h2>
+          </div>
 
-    <p>
-      Full-frame cameras tend to be more expensive, and the lenses are usually
-      larger as well. These systems are popular with professionals and serious
-      enthusiasts.
-    </p>
+          <p>
+            It helps to decide early whether you are shopping for a starter kit,
+            a stronger enthusiast setup, or a long-term system you plan to grow
+            into.
+          </p>
 
-    <h3>Micro Four Thirds</h3>
-    <p>
-      Micro Four Thirds sensors are smaller than APS-C sensors but allow for
-      very compact camera bodies and lenses.
-    </p>
+          <ul class="list-disc space-y-3 pl-6 marker:text-gray-500">
+            <li><strong>$400–$700:</strong> entry-level kit cameras</li>
+            <li><strong>$700–$1200:</strong> strong beginner mirrorless setups</li>
+            <li><strong>$1200–$2500+:</strong> enthusiast bodies and better lenses</li>
+          </ul>
 
-    <p>
-      These systems are often appreciated for travel and video because they
-      offer strong performance in lightweight setups.
-    </p>
+          <p>
+            Also remember that lenses are often the bigger long-term investment.
+            The body may change every few years, but lenses are what many
+            photographers keep much longer.
+          </p>
+        </section>
 
-    <h2>Choosing Lenses</h2>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              Important Specs
+            </h2>
+          </div>
 
-    <p>
-      The lens you use can affect your images just as much as the camera body
-      itself.
-    </p>
+          <div class="space-y-8">
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Autofocus
+              </h3>
+              <p>
+                Good autofocus makes a huge difference. It helps you get more
+                sharp photos and makes the camera feel easier to use.
+              </p>
+            </div>
 
-    <h3>Wildlife (Telephoto)</h3>
-    <p>
-      Wildlife photography typically requires telephoto lenses that allow you
-      to photograph distant subjects. Focal lengths like 100–400mm or 150–600mm
-      are common for wildlife photographers.
-    </p>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Burst Shooting (Wildlife)
+              </h3>
+              <p>
+                Fast burst rates matter most when the subject is unpredictable,
+                especially for birds, wildlife, and action.
+              </p>
+            </div>
 
-    <p>
-      Longer lenses allow you to photograph animals from a distance without
-      disturbing them.
-    </p>
+            <div>
+              <h3 class="mb-3 text-2xl font-semibold text-gray-900">
+                Image Stabilization
+              </h3>
+              <p>
+                Stabilization can come from the camera body, the lens, or both.
+                It helps reduce blur when shooting handheld, especially in lower
+                light or with longer lenses.
+              </p>
+            </div>
+          </div>
+        </section>
 
-    <h3>Standard Zoom</h3>
-    <p>
-      Standard zoom lenses are the most versatile lenses available. They often
-      cover focal ranges like 18–55mm on APS-C cameras or 24–70mm on full-frame
-      cameras.
-    </p>
+        <section class="space-y-8">
+          <div class="border-t border-gray-200 pt-10">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-[2.1rem]">
+              Easy Route
+            </h2>
+          </div>
 
-    <p>
-      These lenses are excellent for everyday photography, travel, street
-      photography, and general use.
-    </p>
+          <p>
+            Even after you understand the basics, comparing camera models can
+            still be time-consuming. A lot of cameras are close enough in specs
+            that the real question becomes which one fits your use case best.
+          </p>
 
-    <h3>Landscape (Wide Angle)</h3>
-    <p>
-      Landscape photography often benefits from wide-angle lenses, which allow
-      you to capture large scenes and dramatic perspectives.
-    </p>
-
-    <p>
-      Typical focal lengths include 10–20mm for APS-C cameras and 16–35mm for
-      full-frame cameras.
-    </p>
-
-    <h2>Setting a Budget</h2>
-
-    <p>
-      Before choosing a camera, it’s helpful to set a realistic budget for your
-      entire setup.
-    </p>
-
-    <p>
-      Entry-level camera kits often fall between $400 and $700. Mid-range
-      beginner mirrorless setups commonly range from $700 to $1200. Enthusiast
-      cameras and higher-quality lenses can easily reach $1200 to $2500 or more.
-    </p>
-
-    <p>
-      Many photographers eventually spend more on lenses than the camera body,
-      so it’s important to consider the long-term cost of building a system.
-    </p>
-
-    <h2>Important Specs</h2>
-
-    <p>
-      Camera manufacturers list dozens of specifications, but a few tend to
-      matter more than others in real-world use.
-    </p>
-
-    <h3>Autofocus</h3>
-    <p>
-      Modern autofocus systems can track subjects like people, animals, and
-      birds. Reliable autofocus is one of the most important features for
-      capturing sharp images.
-    </p>
-
-    <h3>Burst Shooting (Wildlife)</h3>
-    <p>
-      Burst shooting refers to how many photos a camera can take per second.
-      Higher burst rates are useful for wildlife and sports photography because
-      they help capture fast-moving moments.
-    </p>
-
-    <h3>Image Stabilization</h3>
-    <p>
-      Image stabilization helps reduce blur caused by camera shake. Some
-      cameras include stabilization inside the body (IBIS), while some lenses
-      include optical stabilization.
-    </p>
-
-    <p>
-      Either type can help when shooting handheld, especially with longer
-      lenses or in low light.
-    </p>
-
-    <h2>The Easy Route</h2>
-
-    <p>
-      Even after understanding these factors, comparing camera models can still
-      take a lot of time. Many cameras have similar specifications, and the
-      differences can be difficult to interpret.
-    </p>
-
-    <p>
-      One easier approach is to answer a few simple questions about how you plan
-      to use the camera. From there, you can narrow down the best options for
-      your shooting style and budget.
-    </p>
-
-    <p>
-      If you're unsure where to start, try the
-      <a href="/find">Camera Central Finder</a>. It helps narrow down cameras
-      based on what you want to shoot and the features that matter most to you.
-      From there you can refine your choices and compare the options that best
-      fit your needs.
-    </p>
-  </article>
+          <div class="rounded-2xl bg-gray-900 px-6 py-7 text-white md:px-8">
+            <h3 class="mb-3 text-2xl font-semibold">
+              Narrow it down faster
+            </h3>
+            <p class="mb-5 text-base leading-7 text-gray-200 md:text-lg">
+              Take the Camera Central Finder quiz to narrow your options, refine
+              your choices, and compare the cameras that actually fit your
+              needs.
+            </p>
+            <a
+              href="/find"
+              class="inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-100"
+            >
+              Take the quiz
+            </a>
+          </div>
+        </section>
+      </div>
+    </article>
+  </section>
 </BaseLayout>
