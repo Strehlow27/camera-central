@@ -1,7 +1,13 @@
 {
   "redirects": [
     {
-      "source": "https://www.camera-central.com/(.*)",
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.camera-central.com"
+        }
+      ],
       "destination": "https://camera-central.com/$1",
       "permanent": true
     }
