@@ -992,6 +992,18 @@ function render() {
       }
     </div>
 
+     <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-gray-600">
+        Not seeing the camera you had in mind?
+      </p>
+      <a
+        href="/cameras"
+        class="mt-3 inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+      >
+        Browse all cameras
+      </a>
+    </div>
+
     <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
       <p class="text-xs text-gray-500">
         Disclosure: “Some links are affiliate links. If you buy through them, we may earn a small commission at no extra cost to you.”
