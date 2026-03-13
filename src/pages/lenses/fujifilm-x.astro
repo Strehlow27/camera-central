@@ -225,71 +225,67 @@ const fujiXBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
   <script is:inline>
     // fujifilm-x.astro lens filtering + query highlight
     (() => {
-      const grid = document.getElementById("lensGrid");
-      const categoryFilter = document.getElementById("lensCategoryFilter");
-      const sortSelect = document.getElementById("lensSort");
+        const grid = document.getElementById("lensGrid");
+        const categoryFilter = document.getElementById("lensCategoryFilter");
+        const sortSelect = document.getElementById("lensSort");
 
-      if (!grid || !categoryFilter || !sortSelect) return;
+        if (!grid || !categoryFilter || !sortSelect) return;
 
-      const cards = Array.from(grid.querySelectorAll(".lens-card"));
+        const cards = Array.from(grid.querySelectorAll(".lens-card"));
 
-      function getNum(value, fallback) {
+        function getNum(value, fallback) {
         const n = Number(value);
         return Number.isFinite(n) ? n : fallback;
-      }
+        }
 
-      function applyFilters() {
+        function applyFilters() {
         const category = categoryFilter.value;
         const sort = sortSelect.value;
 
         cards.forEach((card) => {
-          const cardCategory = card.dataset.category || "";
-          const show = category === "all" || cardCategory === category;
-          card.style.display = show ? "" : "none";
+            const cardCategory = card.dataset.category || "";
+            const show = category === "all" || cardCategory === category;
+            card.style.display = show ? "" : "none";
         });
 
         const visibleCards = cards.filter((card) => card.style.display !== "none");
 
         visibleCards.sort((a, b) => {
-          const aPrice = getNum(a.dataset.price, 999999);
-          const bPrice = getNum(b.dataset.price, 999999);
-          const aWeight = getNum(a.dataset.weight, 999999);
-          const bWeight = getNum(b.dataset.weight, 999999);
+            const aPrice = getNum(a.dataset.price, 999999);
+            const bPrice = getNum(b.dataset.price, 999999);
+            const aWeight = getNum(a.dataset.weight, 999999);
+            const bWeight = getNum(b.dataset.weight, 999999);
 
-          if (sort === "price-asc") return aPrice - bPrice;
-          if (sort === "price-desc") return bPrice - aPrice;
-          if (sort === "weight-asc") return aWeight - bWeight;
-          if (sort === "weight-desc") return bWeight - aWeight;
-          return 0;
+            if (sort === "price-asc") return aPrice - bPrice;
+            if (sort === "price-desc") return bPrice - aPrice;
+            if (sort === "weight-asc") return aWeight - bWeight;
+            if (sort === "weight-desc") return bWeight - aWeight;
+            return 0;
         });
 
         visibleCards.forEach((card) => grid.appendChild(card));
-      }
+        }
 
-      function highlightLensFromQuery() {
+        function highlightLensFromQuery() {
         const params = new URLSearchParams(window.location.search);
         const lensId = params.get("lens");
         if (!lensId) return;
 
-        let target = null;
-
-        try {
-          target = document.querySelector(`[data-lens-id="${CSS.escape(lensId)}"]`);
-        } catch {
-          target = document.querySelector(`[data-lens-id="${lensId}"]`);
-        }
+        const target = Array.from(cards).find((card) => {
+            return (card.getAttribute("data-lens-id") || "") === lensId;
+        });
 
         if (!target) return;
 
         target.classList.add("ring-2", "ring-black", "ring-offset-2");
         target.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+        }
 
-      categoryFilter.addEventListener("change", applyFilters);
-      sortSelect.addEventListener("change", applyFilters);
+        categoryFilter.addEventListener("change", applyFilters);
+        sortSelect.addEventListener("change", applyFilters);
 
-      applyFilters();
-      highlightLensFromQuery();
+        applyFilters();
+        highlightLensFromQuery();
     })();
-  </script>
+    </script>
 </BaseLayout>
