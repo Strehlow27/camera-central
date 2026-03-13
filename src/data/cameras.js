@@ -1,6 +1,5 @@
 // camera.js
 
-
 const BH_SID = "29391";
 
 const bh = (q) =>
@@ -31,11 +30,142 @@ function defaultCameraAlt(cam) {
   return alt || "Camera";
 }
 
+function buildLensCompatibility(cam) {
+  const system = cam.system ?? "";
+  const brand = cam.brand ?? "";
+  const mount = cam.mount ?? "";
+  const sensor = cam.sensor ?? "";
+  const isIL =
+    typeof cam.isInterchangeableLens === "boolean"
+      ? cam.isInterchangeableLens
+      : system === "Mirrorless" || system === "DSLR";
+
+  // Fixed-lens cameras
+  if (!isIL || mount === "Fixed Lens" || system === "Compact") {
+    return {
+      lensMountCategory: "fixed",
+      nativeLensMounts: [],
+      directCompatibleLensMounts: [],
+      adapterCompatibleLensMounts: [],
+      cropModeLensMounts: [],
+      futureProofLensMounts: [],
+      hasLensEcosystem: false,
+      lensCompatibilitySummary: ["Fixed lens camera — lenses are not interchangeable."],
+    };
+  }
+
+  // Canon-specific logic
+  if (brand === "Canon") {
+    if (mount === "RF" && sensor === "APS-C") {
+      return {
+        lensMountCategory: "canon-rf-aps-c",
+        nativeLensMounts: ["RF", "RF-S"],
+        directCompatibleLensMounts: ["RF", "RF-S"],
+        adapterCompatibleLensMounts: ["EF", "EF-S"],
+        cropModeLensMounts: ["EF-S"],
+        futureProofLensMounts: ["RF"],
+        hasLensEcosystem: true,
+        lensCompatibilitySummary: [
+          "RF lenses fit directly.",
+          "RF-S lenses fit directly.",
+          "EF lenses work with an adapter.",
+          "EF-S lenses work with an adapter and may use crop mode.",
+        ],
+      };
+    }
+
+    if (mount === "RF" && sensor === "Full Frame") {
+      return {
+        lensMountCategory: "canon-rf-full-frame",
+        nativeLensMounts: ["RF", "RF-S"],
+        directCompatibleLensMounts: ["RF", "RF-S"],
+        adapterCompatibleLensMounts: ["EF", "EF-S"],
+        cropModeLensMounts: ["RF-S", "EF-S"],
+        futureProofLensMounts: ["RF"],
+        hasLensEcosystem: true,
+        lensCompatibilitySummary: [
+          "RF lenses fit directly.",
+          "RF-S lenses fit directly but use crop mode.",
+          "EF lenses work with an adapter.",
+          "EF-S lenses work with an adapter and use crop mode.",
+        ],
+      };
+    }
+
+    if (mount === "EF" && system === "DSLR" && sensor === "APS-C") {
+      return {
+        lensMountCategory: "canon-ef-aps-c-dslr",
+        nativeLensMounts: ["EF", "EF-S"],
+        directCompatibleLensMounts: ["EF", "EF-S"],
+        adapterCompatibleLensMounts: [],
+        cropModeLensMounts: [],
+        futureProofLensMounts: ["EF"],
+        hasLensEcosystem: true,
+        lensCompatibilitySummary: [
+          "EF lenses fit directly.",
+          "EF-S lenses fit directly.",
+        ],
+      };
+    }
+
+    if (mount === "EF" && system === "DSLR" && sensor === "Full Frame") {
+      return {
+        lensMountCategory: "canon-ef-full-frame-dslr",
+        nativeLensMounts: ["EF"],
+        directCompatibleLensMounts: ["EF"],
+        adapterCompatibleLensMounts: [],
+        cropModeLensMounts: [],
+        futureProofLensMounts: ["EF"],
+        hasLensEcosystem: true,
+        lensCompatibilitySummary: [
+          "EF lenses fit directly.",
+          "EF-S lenses are not compatible.",
+        ],
+      };
+    }
+
+    if (mount === "EF-M") {
+      return {
+        lensMountCategory: "canon-ef-m",
+        nativeLensMounts: ["EF-M"],
+        directCompatibleLensMounts: ["EF-M"],
+        adapterCompatibleLensMounts: ["EF", "EF-S"],
+        cropModeLensMounts: [],
+        futureProofLensMounts: [],
+        hasLensEcosystem: true,
+        lensCompatibilitySummary: [
+          "EF-M lenses fit directly.",
+          "EF and EF-S lenses work with an adapter.",
+          "EF-M is a discontinued mount.",
+        ],
+      };
+    }
+  }
+
+  return {
+    lensMountCategory: `${String(brand).toLowerCase().replace(/\s+/g, "-")}-${String(
+      mount
+    ).toLowerCase().replace(/\s+/g, "-")}`,
+    nativeLensMounts: [mount],
+    directCompatibleLensMounts: [mount],
+    adapterCompatibleLensMounts: [],
+    cropModeLensMounts: [],
+    futureProofLensMounts: [mount],
+    hasLensEcosystem: true,
+    lensCompatibilitySummary: [`${mount} lenses fit directly.`],
+  };
+}
+
 function normalizeCamera(cam) {
   const isIL =
     typeof cam.isInterchangeableLens === "boolean"
       ? cam.isInterchangeableLens
       : cam.system === "Mirrorless" || cam.system === "DSLR";
+
+  const compatibility = buildLensCompatibility({
+    ...cam,
+    isInterchangeableLens: isIL,
+  });
 
   return {
     ...cam,
@@ -43,10 +173,11 @@ function normalizeCamera(cam) {
     cameraType: isIL ? "detachable" : "fixed",
     image: defaultCameraImage(cam),
     imageAlt: defaultCameraAlt(cam),
+
+    // Lens-system fields
+    ...compatibility,
   };
 }
-
-
 
 const RAW_CAMERAS = [
   // =========================
