@@ -365,34 +365,40 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       if (!hasAny) return "";
 
       return `
-        <div class="mt-5 border-t border-gray-200 pt-5">
-          <h3 class="text-base font-semibold text-gray-900">Recommended lenses</h3>
-          <p class="mt-1 text-sm text-gray-600">
-            Compatible lenses to help build out this camera system.
-          </p>
+        <details class="mt-5 rounded-xl border border-gray-200 bg-gray-50">
+          <summary class="cursor-pointer list-none px-4 py-3 font-semibold text-gray-900 flex items-center justify-between">
+            <span>Lens information</span>
+            <span class="text-sm text-gray-500">View compatible lenses</span>
+          </summary>
 
-          <div class="mt-4 grid gap-3 sm:grid-cols-3">
-            ${lensCardHtml("Standard", picks.standard)}
-            ${lensCardHtml("Wide", picks.wide)}
-            ${lensCardHtml("Telephoto", picks.telephoto)}
-          </div>
+          <div class="border-t border-gray-200 px-4 py-4">
+            <p class="text-sm text-gray-600">
+              Compatible lenses to help build out this camera system.
+            </p>
 
-          ${
-            Array.isArray(camera.lensCompatibilitySummary) &&
-            camera.lensCompatibilitySummary.length
-              ? `
-            <div class="mt-4 rounded-xl bg-gray-50 p-3">
-              <p class="text-sm font-medium text-gray-900">Lens compatibility</p>
-              <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
-                ${camera.lensCompatibilitySummary
-                  .map((item) => `<li>${escapeHtml(item)}</li>`)
-                  .join("")}
-              </ul>
+            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+              ${lensCardHtml("Standard", picks.standard)}
+              ${lensCardHtml("Wide", picks.wide)}
+              ${lensCardHtml("Telephoto", picks.telephoto)}
             </div>
-          `
-              : ""
-          }
-        </div>
+
+            ${
+              Array.isArray(camera.lensCompatibilitySummary) &&
+              camera.lensCompatibilitySummary.length
+                ? `
+              <div class="mt-4 rounded-xl bg-white p-3 border border-gray-200">
+                <p class="text-sm font-medium text-gray-900">Lens compatibility</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                  ${camera.lensCompatibilitySummary
+                    .map((item) => `<li>${escapeHtml(item)}</li>`)
+                    .join("")}
+                </ul>
+              </div>
+            `
+                : ""
+            }
+          </div>
+        </details>
       `;
     }
 
