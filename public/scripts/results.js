@@ -200,340 +200,308 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
   });
 
   const LENSES = Array.isArray(window.LENSES) ? window.LENSES.filter(Boolean) : [];
-    function normalizeMountList(value) {
-      return Array.isArray(value) ? value.filter(Boolean) : [];
-    }
 
-    function hasMount(camera, mount, key) {
-      return normalizeMountList(camera?.[key]).includes(mount);
-    }
+  function normalizeMountList(value) {
+    return Array.isArray(value) ? value.filter(Boolean) : [];
+  }
 
-    function getLensCompatibility(camera, lens) {
-      if (!camera || !lens) {
-        return {
-          compatible: false,
-          mode: "incompatible",
-          label: "Not compatible",
-          warning: "Missing camera or lens data.",
-        };
-      }
+  function hasMount(camera, mount, key) {
+    return normalizeMountList(camera && camera[key]).includes(mount);
+  }
 
-      if (!camera.hasLensEcosystem) {
-        return {
-          compatible: false,
-          mode: "fixed",
-          label: "Fixed lens camera",
-          warning: "This camera does not support interchangeable lenses.",
-        };
-      }
-
-      const lensMount = lens.mount ?? "";
-
-      if (hasMount(camera, lensMount, "directCompatibleLensMounts")) {
-        const usesCropMode = hasMount(camera, lensMount, "cropModeLensMounts");
-
-        return {
-          compatible: true,
-          mode: usesCropMode ? "native-crop" : "native",
-          label: usesCropMode ? "Native fit • crop mode" : "Native fit",
-          warning: usesCropMode
-            ? "This lens fits directly, but the camera will use crop mode."
-            : null,
-        };
-      }
-
-      if (hasMount(camera, lensMount, "adapterCompatibleLensMounts")) {
-        const usesCropMode = hasMount(camera, lensMount, "cropModeLensMounts");
-
-        return {
-          compatible: true,
-          mode: usesCropMode ? "adapter-crop" : "adapter",
-          label: usesCropMode ? "Adapter required • crop mode" : "Adapter required",
-          warning: usesCropMode
-            ? "This lens works with an adapter, and the camera may use crop mode."
-            : "This lens requires an adapter to work with this camera.",
-        };
-      }
-
+  function getLensCompatibility(camera, lens) {
+    if (!camera || !lens) {
       return {
         compatible: false,
         mode: "incompatible",
         label: "Not compatible",
-        warning: "This lens is not compatible with this camera.",
+        warning: "Missing camera or lens data.",
       };
     }
 
-    function getCompatibleLenses(camera, lenses) {
-      return (Array.isArray(lenses) ? lenses : [])
-        .map((lens) => ({
-          ...lens,
-          compatibility: getLensCompatibility(camera, lens),
-        }))
-        .filter((lens) => lens.compatibility.compatible);
+    if (!camera.hasLensEcosystem) {
+      return {
+        compatible: false,
+        mode: "fixed",
+        label: "Fixed lens camera",
+        warning: "This camera does not support interchangeable lenses.",
+      };
     }
 
-    function getCompatibleLensesByCategory(camera, lenses) {
-      const compatible = getCompatibleLenses(camera, lenses);
+    const lensMount = lens.mount || "";
+
+    if (hasMount(camera, lensMount, "directCompatibleLensMounts")) {
+      const usesCropMode = hasMount(camera, lensMount, "cropModeLensMounts");
 
       return {
-        standard: compatible.filter((lens) => lens.category === "standard"),
-        wide: compatible.filter((lens) => lens.category === "wide"),
-        telephoto: compatible.filter((lens) => lens.category === "telephoto"),
-        all: compatible,
+        compatible: true,
+        mode: usesCropMode ? "native-crop" : "native",
+        label: usesCropMode ? "Native fit • crop mode" : "Native fit",
+        warning: usesCropMode
+          ? "This lens fits directly, but the camera will use crop mode."
+          : null,
       };
     }
 
-    function normalizeLensTypeAnswers(raw) {
-      if (!Array.isArray(raw) || !raw.length) return ["all"];
+    if (hasMount(camera, lensMount, "adapterCompatibleLensMounts")) {
+      const usesCropMode = hasMount(camera, lensMount, "cropModeLensMounts");
 
-      if (raw.includes("All lens types")) return ["all"];
-
-      const mapped = raw
-        .map((v) => {
-          if (v === "Standard / everyday") return "standard";
-          if (v === "Wide angle") return "wide";
-          if (v === "Telephoto") return "telephoto";
-          return null;
-        })
-        .filter(Boolean);
-
-      return mapped.length ? mapped : ["all"];
+      return {
+        compatible: true,
+        mode: usesCropMode ? "adapter-crop" : "adapter",
+        label: usesCropMode ? "Adapter required • crop mode" : "Adapter required",
+        warning: usesCropMode
+          ? "This lens works with an adapter, and the camera may use crop mode."
+          : "This lens requires an adapter to work with this camera.",
+      };
     }
 
-    function normalizeFutureProofingAnswer(raw) {
-      if (raw === "I need my setup to be future-proof") return "high";
-      if (raw === "Somewhat important") return "medium";
-      if (raw === "Not important") return "low";
-      return "medium";
-    }
+    return {
+      compatible: false,
+      mode: "incompatible",
+      label: "Not compatible",
+      warning: "This lens is not compatible with this camera.",
+    };
+  }
 
-    function sortRecommendedLenses(lenses, options = {}) {
-      const {
-        futureProofing = "medium",
-        preferLightweight = false,
-      } = options;
-
-      return [...(Array.isArray(lenses) ? lenses : [])].sort((a, b) => {
-        let scoreA = 0;
-        let scoreB = 0;
-
-        if (futureProofing === "high") {
-          if (a.futureProof) scoreA += 5;
-          if (b.futureProof) scoreB += 5;
-          if (!a.futureProof) scoreA -= 2;
-          if (!b.futureProof) scoreB -= 2;
-        } else if (futureProofing === "medium") {
-          if (a.futureProof) scoreA += 2;
-          if (b.futureProof) scoreB += 2;
-        }
-
-        if (preferLightweight) {
-          scoreA += Math.max(0, 1000 - (a.weightGrams ?? 1000)) / 200;
-          scoreB += Math.max(0, 1000 - (b.weightGrams ?? 1000)) / 200;
-        }
-
-        scoreA += Math.max(0, 2000 - (a.price ?? 2000)) / 500;
-        scoreB += Math.max(0, 2000 - (b.price ?? 2000)) / 500;
-
-        return scoreB - scoreA;
+  function getCompatibleLenses(camera, lenses) {
+    return (Array.isArray(lenses) ? lenses : [])
+      .map(function (lens) {
+        return {
+          ...lens,
+          compatibility: getLensCompatibility(camera, lens),
+        };
+      })
+      .filter(function (lens) {
+        return lens.compatibility.compatible;
       });
-    }
+  }
 
-    function recommendLensesForCamera(camera, lenses, answers = {}) {
-      const categorized = getCompatibleLensesByCategory(camera, lenses);
+  function getCompatibleLensesByCategory(camera, lenses) {
+    const compatible = getCompatibleLenses(camera, lenses);
 
-      const preferLightweight = (camera?.travel ?? 0) >= 4;
-      const futureProofing = normalizeFutureProofingAnswer(answers?.futureProofing);
-      const desiredLensTypes = normalizeLensTypeAnswers(answers?.lensTypes);
+    return {
+      standard: compatible.filter(function (lens) {
+        return lens.category === "standard";
+      }),
+      wide: compatible.filter(function (lens) {
+        return lens.category === "wide";
+      }),
+      telephoto: compatible.filter(function (lens) {
+        return lens.category === "telephoto";
+      }),
+      all: compatible,
+    };
+  }
 
-      const standard =
-        desiredLensTypes.includes("all") || desiredLensTypes.includes("standard")
+  function normalizeLensTypeAnswers(raw) {
+    if (!Array.isArray(raw) || !raw.length) return ["all"];
+    if (raw.includes("All lens types")) return ["all"];
+
+    const mapped = raw
+      .map(function (v) {
+        if (v === "Standard / everyday") return "standard";
+        if (v === "Wide angle") return "wide";
+        if (v === "Telephoto") return "telephoto";
+        return null;
+      })
+      .filter(Boolean);
+
+    return mapped.length ? mapped : ["all"];
+  }
+
+  function normalizeFutureProofingAnswer(raw) {
+    if (raw === "I need my setup to be future-proof") return "high";
+    if (raw === "Somewhat important") return "medium";
+    if (raw === "Not important") return "low";
+    return "medium";
+  }
+
+  function sortRecommendedLenses(lenses, options) {
+    const opts = options || {};
+    const futureProofing = opts.futureProofing || "medium";
+    const preferLightweight = !!opts.preferLightweight;
+
+    return [...(Array.isArray(lenses) ? lenses : [])].sort(function (a, b) {
+      let scoreA = 0;
+      let scoreB = 0;
+
+      if (futureProofing === "high") {
+        if (a.futureProof) scoreA += 5;
+        if (b.futureProof) scoreB += 5;
+        if (!a.futureProof) scoreA -= 2;
+        if (!b.futureProof) scoreB -= 2;
+      } else if (futureProofing === "medium") {
+        if (a.futureProof) scoreA += 2;
+        if (b.futureProof) scoreB += 2;
+      }
+
+      if (preferLightweight) {
+        scoreA += Math.max(0, 1000 - (a.weightGrams || 1000)) / 200;
+        scoreB += Math.max(0, 1000 - (b.weightGrams || 1000)) / 200;
+      }
+
+      scoreA += Math.max(0, 2000 - (a.price || 2000)) / 500;
+      scoreB += Math.max(0, 2000 - (b.price || 2000)) / 500;
+
+      return scoreB - scoreA;
+    });
+  }
+
+  function recommendLensesForCamera(camera, lenses, answers) {
+    const categorized = getCompatibleLensesByCategory(camera, lenses);
+    const preferLightweight = (camera && camera.travel ? camera.travel : 0) >= 4;
+    const futureProofing = normalizeFutureProofingAnswer(
+      answers && answers.futureProofing
+    );
+    const desiredLensTypes = normalizeLensTypeAnswers(
+      answers && answers.lensTypes
+    );
+
+    const wantsAll = desiredLensTypes.includes("all");
+
+    return {
+      standard:
+        wantsAll || desiredLensTypes.includes("standard")
           ? sortRecommendedLenses(categorized.standard, {
-              futureProofing,
-              preferLightweight,
-            })[0] ?? null
-          : null;
+              futureProofing: futureProofing,
+              preferLightweight: preferLightweight,
+            })[0] || null
+          : null,
 
-      const wide =
-        desiredLensTypes.includes("all") || desiredLensTypes.includes("wide")
+      wide:
+        wantsAll || desiredLensTypes.includes("wide")
           ? sortRecommendedLenses(categorized.wide, {
-              futureProofing,
-              preferLightweight,
-            })[0] ?? null
-          : null;
+              futureProofing: futureProofing,
+              preferLightweight: preferLightweight,
+            })[0] || null
+          : null,
 
-      const telephoto =
-        desiredLensTypes.includes("all") || desiredLensTypes.includes("telephoto")
+      telephoto:
+        wantsAll || desiredLensTypes.includes("telephoto")
           ? sortRecommendedLenses(categorized.telephoto, {
-              futureProofing,
-              preferLightweight,
-            })[0] ?? null
-          : null;
+              futureProofing: futureProofing,
+              preferLightweight: preferLightweight,
+            })[0] || null
+          : null,
+    };
+  }
 
-      return { standard, wide, telephoto };
+  function getLensBrowseUrl(camera) {
+    if (!camera || !camera.hasLensEcosystem) return "";
+
+    const category = camera.lensMountCategory || "";
+    const brand = camera.brand || "";
+    const mount = camera.mount || "";
+
+    if (category.indexOf("canon-rf") === 0) return "/lenses/canon-rf";
+    if (category.indexOf("canon-ef") === 0) return "/lenses/canon-ef";
+    if (category === "canon-ef-m") return "/lenses/canon-ef";
+
+    if (brand === "Sony" && mount === "E") return "/lenses/sony-e";
+    if (brand === "Nikon" && mount === "Z") return "/lenses/nikon-z";
+    if (brand === "Fujifilm" && mount === "X") return "/lenses/fujifilm-x";
+
+    return "/lenses";
+  }
+
+  function lensCardHtml(label, lens, browseUrl) {
+    if (!lens) return "";
+
+    const priceTxt =
+      typeof lens.price === "number"
+        ? "$" + Number(lens.price).toLocaleString()
+        : "—";
+
+    const weightTxt =
+      typeof lens.weightGrams === "number"
+        ? String(lens.weightGrams) + "g"
+        : "—";
+
+    const lensUrl =
+      (browseUrl || "/lenses") + "?lens=" + encodeURIComponent(lens.id || "");
+
+    return (
+      '<a href="' +
+      escapeHtml(lensUrl) +
+      '" target="_blank" rel="noopener noreferrer" class="block rounded-xl border border-gray-200 p-3 transition hover:bg-white hover:border-gray-300">' +
+        '<p class="text-xs font-medium uppercase tracking-wide text-gray-500">' +
+          escapeHtml(label) +
+        "</p>" +
+        '<p class="mt-1 font-medium text-gray-900">' +
+          escapeHtml((lens.brand || "") + " " + (lens.name || "")) +
+        "</p>" +
+        '<p class="text-sm text-gray-600">' +
+          escapeHtml((lens.compatibility && lens.compatibility.label) || "Compatible") +
+        "</p>" +
+        '<p class="text-sm text-gray-500">' +
+          escapeHtml(priceTxt) +
+          " • " +
+          escapeHtml(weightTxt) +
+        "</p>" +
+        '<p class="mt-2 text-xs font-medium text-gray-900 underline">Open lens page ↗</p>' +
+      "</a>"
+    );
+  }
+
+  function recommendedLensesSectionHtml(camera, answers) {
+    if (!camera || !camera.hasLensEcosystem) return "";
+
+    const picks = recommendLensesForCamera(camera, LENSES, answers || {});
+    const browseUrl = getLensBrowseUrl(camera);
+    const hasAny = picks.standard || picks.wide || picks.telephoto;
+
+    if (!hasAny) return "";
+
+    let compatibilityHtml = "";
+    if (
+      Array.isArray(camera.lensCompatibilitySummary) &&
+      camera.lensCompatibilitySummary.length
+    ) {
+      compatibilityHtml =
+        '<div class="mt-4 rounded-xl bg-white p-3 border border-gray-200">' +
+          '<p class="text-sm font-medium text-gray-900">Lens compatibility</p>' +
+          '<ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">' +
+            camera.lensCompatibilitySummary
+              .map(function (item) {
+                return "<li>" + escapeHtml(item) + "</li>";
+              })
+              .join("") +
+          "</ul>" +
+        "</div>";
     }
 
-    function getLensBrowseUrlForLens(lens) {
-      if (!lens) return "/lenses";
-
-      const mountFamily = lens.mountFamily || "";
-      const mount = lens.mount || "";
-
-      if (mountFamily === "Canon RF") {
-        return `/lenses/canon-rf?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mountFamily === "Canon EF") {
-        return `/lenses/canon-ef?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mountFamily === "Sony E") {
-        return `/lenses/sony-e?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mountFamily === "Nikon Z") {
-        return `/lenses/nikon-z?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mountFamily === "Fujifilm X") {
-        return `/lenses/fujifilm-x?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mount === "RF" || mount === "RF-S") {
-        return `/lenses/canon-rf?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mount === "EF" || mount === "EF-S") {
-        return `/lenses/canon-ef?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mount === "E") {
-        return `/lenses/sony-e?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mount === "Z") {
-        return `/lenses/nikon-z?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      if (mount === "X") {
-        return `/lenses/fujifilm-x?lens=${encodeURIComponent(lens.id)}`;
-      }
-
-      return "/lenses";
+    let browseButtonHtml = "";
+    if (browseUrl) {
+      browseButtonHtml =
+        '<div class="mt-4">' +
+          '<a href="' +
+            escapeHtml(browseUrl) +
+            '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50">' +
+            "Explore compatible lenses ↗" +
+          "</a>" +
+        "</div>";
     }
 
-    function lensCardHtml(label, lens) {
-      if (!lens) return "";
-
-      const priceTxt =
-        typeof lens.price === "number"
-          ? `$${Number(lens.price).toLocaleString()}`
-          : "—";
-
-      const weightTxt =
-        typeof lens.weightGrams === "number"
-          ? `${lens.weightGrams}g`
-          : "—";
-
-      const href = getLensBrowseUrlForLens(lens);
-
-      return `
-        <a
-          href="${escapeHtml(href)}"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-lens-recommendation-link="1"
-          data-lens-id="${escapeHtml(lens.id || "")}"
-          class="block rounded-xl border border-gray-200 p-3 hover:bg-gray-50 transition"
-        >
-          <p class="text-xs font-medium uppercase tracking-wide text-gray-500">${escapeHtml(label)}</p>
-          <p class="mt-1 font-medium text-gray-900">${escapeHtml(lens.brand)} ${escapeHtml(lens.name)}</p>
-          <p class="text-sm text-gray-600">${escapeHtml(lens.compatibility?.label || "Compatible")}</p>
-          <p class="text-sm text-gray-500">${escapeHtml(priceTxt)} • ${escapeHtml(weightTxt)}</p>
-          <p class="mt-2 text-sm font-medium text-gray-900">Open lens page ↗</p>
-        </a>
-      `;
-    }
-
-    function getLensBrowseUrl(camera) {
-      if (!camera?.hasLensEcosystem) return "";
-
-      const category = camera.lensMountCategory || "";
-      const brand = camera.brand || "";
-      const mount = camera.mount || "";
-
-      if (category.startsWith("canon-rf")) return "/lenses/canon-rf";
-      if (category.startsWith("canon-ef")) return "/lenses/canon-ef";
-      if (category === "canon-ef-m") return "/lenses/canon-ef";
-
-      if (brand === "Sony" && mount === "E") return "/lenses/sony-e";
-      if (brand === "Nikon" && mount === "Z") return "/lenses/nikon-z";
-      if (brand === "Fujifilm" && mount === "X") return "/lenses/fujifilm-x";
-
-      return "/lenses";
-    }
-
-    function recommendedLensesSectionHtml(camera, answers) {
-      if (!camera?.hasLensEcosystem) return "";
-
-      const picks = recommendLensesForCamera(camera, LENSES, answers);
-      const browseUrl = getLensBrowseUrl(camera);
-      const hasAny = picks.standard || picks.wide || picks.telephoto;
-
-      if (!hasAny) return "";
-
-      return `
-        <details class="mt-5 rounded-xl border border-gray-200 bg-gray-50">
-          <summary class="cursor-pointer list-none px-4 py-3 font-semibold text-gray-900 flex items-center justify-between">
-            <span>Lens information</span>
-            <span class="text-sm text-gray-500">View compatible lenses</span>
-          </summary>
-
-          <div class="border-t border-gray-200 px-4 py-4">
-            <p class="text-sm text-gray-600">
-              Compatible lenses to help build out this camera system.
-            </p>
-
-            <div class="mt-4 grid gap-3 sm:grid-cols-3">
-              ${lensCardHtml("Standard", picks.standard)}
-              ${lensCardHtml("Wide", picks.wide)}
-              ${lensCardHtml("Telephoto", picks.telephoto)}
-            </div>
-
-            ${
-              Array.isArray(camera.lensCompatibilitySummary) &&
-              camera.lensCompatibilitySummary.length
-                ? `
-                  <div class="mt-4 rounded-xl bg-white p-3 border border-gray-200">
-                    <p class="text-sm font-medium text-gray-900">Lens compatibility</p>
-                    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
-                      ${camera.lensCompatibilitySummary
-                        .map((item) => `<li>${escapeHtml(item)}</li>`)
-                        .join("")}
-                    </ul>
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              browseUrl
-                ? `
-                  <div class="mt-4">
-                    <a
-                      href="${escapeHtml(browseUrl)}"
-                      class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
-                    >
-                      Explore compatible lenses →
-                    </a>
-                  </div>
-                `
-                : ""
-            }
-          </div>
-        </details>
-      `;
-    }
+    return (
+      '<details class="mt-5 rounded-xl border border-gray-200 bg-gray-50">' +
+        '<summary class="cursor-pointer list-none px-4 py-3 font-semibold text-gray-900 flex items-center justify-between">' +
+          "<span>Lens information</span>" +
+          '<span class="text-sm text-gray-500">View compatible lenses</span>' +
+        "</summary>" +
+        '<div class="border-t border-gray-200 px-4 py-4">' +
+          '<p class="text-sm text-gray-600">Compatible lenses to help build out this camera system.</p>' +
+          '<div class="mt-4 grid gap-3 sm:grid-cols-3">' +
+            lensCardHtml("Standard", picks.standard, browseUrl) +
+            lensCardHtml("Wide", picks.wide, browseUrl) +
+            lensCardHtml("Telephoto", picks.telephoto, browseUrl) +
+          "</div>" +
+          compatibilityHtml +
+          browseButtonHtml +
+        "</div>" +
+      "</details>"
+    );
+  }
 
 
 // --------------------
