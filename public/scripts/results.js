@@ -396,10 +396,23 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       `;
     }
 
+    function getLensBrowseUrl(camera) {
+      if (!camera?.hasLensEcosystem) return "";
+
+      const category = camera.lensMountCategory || "";
+
+      if (category.startsWith("canon-rf")) return "/lenses/canon-rf";
+      if (category.startsWith("canon-ef")) return "/lenses/canon-ef";
+      if (category === "canon-ef-m") return "/lenses/canon-ef";
+
+      return "/lenses";
+    }
+
     function recommendedLensesSectionHtml(camera, answers) {
       if (!camera?.hasLensEcosystem) return "";
 
       const picks = recommendLensesForCamera(camera, LENSES, answers);
+      const browseUrl = getLensBrowseUrl(camera);
       const hasAny = picks.standard || picks.wide || picks.telephoto;
 
       if (!hasAny) return "";
@@ -426,15 +439,30 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
               Array.isArray(camera.lensCompatibilitySummary) &&
               camera.lensCompatibilitySummary.length
                 ? `
-              <div class="mt-4 rounded-xl bg-white p-3 border border-gray-200">
-                <p class="text-sm font-medium text-gray-900">Lens compatibility</p>
-                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
-                  ${camera.lensCompatibilitySummary
-                    .map((item) => `<li>${escapeHtml(item)}</li>`)
-                    .join("")}
-                </ul>
-              </div>
-            `
+                  <div class="mt-4 rounded-xl bg-white p-3 border border-gray-200">
+                    <p class="text-sm font-medium text-gray-900">Lens compatibility</p>
+                    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                      ${camera.lensCompatibilitySummary
+                        .map((item) => `<li>${escapeHtml(item)}</li>`)
+                        .join("")}
+                    </ul>
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              browseUrl
+                ? `
+                  <div class="mt-4">
+                    <a
+                      href="${escapeHtml(browseUrl)}"
+                      class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+                    >
+                      Explore compatible lenses →
+                    </a>
+                  </div>
+                `
                 : ""
             }
           </div>
