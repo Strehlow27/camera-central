@@ -5,8 +5,8 @@
   <div id="flow" class="flex-1 flex flex-col">
     <div class="space-y-1">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500" id="progress">Question 1 of 8</p>
-        <p class="text-sm text-gray-500" id="percent">14%</p>
+        <p class="text-sm text-gray-500" id="progress">Question 1 of 10</p>
+        <p class="text-sm text-gray-500" id="percent">10%</p>
       </div>
 
       <!-- Progress bar -->
@@ -28,7 +28,6 @@
       <p class="text-gray-600" id="helper"></p>
     </div>
 
-    <!-- ✅ grid + gap ensures consistent spacing; mb-3 gives a consistent gap above buttons -->
     <div id="options" class="grid gap-3 mb-3"></div>
 
     <div class="flex items-center justify-between">
@@ -106,6 +105,28 @@
           q: "What’s your camera body budget?",
           helper: "Just the camera body, not lenses.",
           options: ["Under $1,000", "$1,000–$1,800", "$1,800–$2,800", "$2,800+"],
+        },
+        {
+          id: "futureProofing",
+          q: "How important is it that your lenses still work if you upgrade your camera later?",
+          helper: "This helps us balance APS-C-only lenses vs more future-proof system recommendations.",
+          options: [
+            "I need my setup to be future-proof",
+            "Somewhat important",
+            "Not important",
+          ],
+        },
+        {
+          id: "lensTypes",
+          q: "What types of lenses are you interested in?",
+          helper: "Select one or more. If you want a balanced setup, choose All lens types.",
+          options: [
+            "Standard / everyday",
+            "Wide angle",
+            "Telephoto",
+            "All lens types",
+          ],
+          multi: true,
         },
         {
           id: "weight",
@@ -242,18 +263,60 @@
       function toggleMultiSelect(q, opt) {
         const current = Array.isArray(answers[q.id]) ? [...answers[q.id]] : [];
 
-        if (opt === "No preference") {
-          answers[q.id] = ["No preference"];
+        if (q.id === "brand") {
+          if (opt === "No preference") {
+            answers[q.id] = ["No preference"];
+            return;
+          }
+
+          const withoutNoPreference = current.filter((v) => v !== "No preference");
+          const alreadySelected = withoutNoPreference.includes(opt);
+
+          if (alreadySelected) {
+            answers[q.id] = withoutNoPreference.filter((v) => v !== opt);
+          } else {
+            answers[q.id] = [...withoutNoPreference, opt];
+          }
+
+          if (answers[q.id].length === 0) {
+            delete answers[q.id];
+          }
           return;
         }
 
-        const withoutNoPreference = current.filter((v) => v !== "No preference");
-        const alreadySelected = withoutNoPreference.includes(opt);
+        if (q.id === "lensTypes") {
+          const ALL_OPTION = "All lens types";
+          const INDIVIDUALS = ["Standard / everyday", "Wide angle", "Telephoto"];
+
+          if (opt === ALL_OPTION) {
+            answers[q.id] = [ALL_OPTION];
+            return;
+          }
+
+          let next = current.filter((v) => v !== ALL_OPTION);
+          const alreadySelected = next.includes(opt);
+
+          if (alreadySelected) {
+            next = next.filter((v) => v !== opt);
+          } else {
+            next = [...next, opt];
+          }
+
+          const hasAllIndividuals = INDIVIDUALS.every((item) => next.includes(item));
+          answers[q.id] = hasAllIndividuals ? [ALL_OPTION] : next;
+
+          if (answers[q.id].length === 0) {
+            delete answers[q.id];
+          }
+          return;
+        }
+
+        const alreadySelected = current.includes(opt);
 
         if (alreadySelected) {
-          answers[q.id] = withoutNoPreference.filter((v) => v !== opt);
+          answers[q.id] = current.filter((v) => v !== opt);
         } else {
-          answers[q.id] = [...withoutNoPreference, opt];
+          answers[q.id] = [...current, opt];
         }
 
         if (answers[q.id].length === 0) {
