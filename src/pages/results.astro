@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { CAMERAS } from "../data/cameras.js";
+import { LENSES } from "../data/LENSES.js";
 ---
 
 <BaseLayout
@@ -33,7 +34,6 @@ import { CAMERAS } from "../data/cameras.js";
           <span id="tuneChevron" class="text-gray-500">▾</span>
         </button>
       </div>
-
 
       <!-- Refine panel -->
       <div
@@ -220,8 +220,9 @@ import { CAMERAS } from "../data/cameras.js";
   </div>
 
   <!-- ✅ Single source of truth -->
-  <script define:vars={{ CAMERAS }}>
+  <script define:vars={{ CAMERAS, LENSES }}>
     window.CAMERAS = CAMERAS;
+    window.LENSES = LENSES;
   </script>
 
   <!-- Make sure the hand cursor ALWAYS shows on compare + buying buttons -->
