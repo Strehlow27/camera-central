@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { LENSES } from "../../data/LENSES.js";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { LENSES } from "../data/LENSES.js";
 
 const rfLenses = (Array.isArray(LENSES) ? LENSES : [])
   .filter((l) => l.mount === "RF" || l.mount === "RF-S")
