@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { LENSES } from "../../data/LENSES.js";
+import { CAMERAS } from "../../data/cameras.js";
 
 const efLenses = (Array.isArray(LENSES) ? LENSES : [])
   .filter((l) => l.mount === "EF" || l.mount === "EF-S")
@@ -9,6 +10,10 @@ const efLenses = (Array.isArray(LENSES) ? LENSES : [])
     const bPrice = typeof b.price === "number" ? b.price : 999999;
     return aPrice - bPrice;
   });
+
+const canonEFBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
+  .filter((c) => c.brand === "Canon" && c.mount === "EF")
+  .slice(0, 6);
 ---
 
 <BaseLayout
@@ -183,6 +188,30 @@ const efLenses = (Array.isArray(LENSES) ? LENSES : [])
           </div>
         </article>
       ))}
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-gray-900">Works well with these cameras</h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Popular Canon DSLR bodies compatible with EF lenses.
+      </p>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {canonEFBodies.map((camera) => (
+          <a
+            href="/cameras"
+            class="rounded-xl border border-gray-200 p-4 transition hover:bg-gray-50"
+          >
+            <p class="font-medium text-gray-900">{camera.brand} {camera.model}</p>
+
+            <p class="mt-1 text-sm text-gray-600">
+              {camera.sensor} • {typeof camera.price === "number"
+                ? `$${camera.price.toLocaleString()}`
+                : "—"}
+            </p>
+          </a>
+        ))}
+      </div>
     </section>
 
     <section class="rounded-2xl border border-gray-200 bg-gray-50 p-6">
