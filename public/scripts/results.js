@@ -283,9 +283,33 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       };
     }
 
+    function normalizeLensTypeAnswers(raw) {
+      if (!Array.isArray(raw) || !raw.length) return ["all"];
+
+      if (raw.includes("All lens types")) return ["all"];
+
+      const mapped = raw
+        .map((v) => {
+          if (v === "Standard / everyday") return "standard";
+          if (v === "Wide angle") return "wide";
+          if (v === "Telephoto") return "telephoto";
+          return null;
+        })
+        .filter(Boolean);
+
+      return mapped.length ? mapped : ["all"];
+    }
+
+    function normalizeFutureProofingAnswer(raw) {
+      if (raw === "I need my setup to be future-proof") return "high";
+      if (raw === "Somewhat important") return "medium";
+      if (raw === "Not important") return "low";
+      return "medium";
+    }
+
     function sortRecommendedLenses(lenses, options = {}) {
       const {
-        preferFutureProof = false,
+        futureProofing = "medium",
         preferLightweight = false,
       } = options;
 
@@ -293,9 +317,14 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
         let scoreA = 0;
         let scoreB = 0;
 
-        if (preferFutureProof) {
-          if (a.futureProof) scoreA += 3;
-          if (b.futureProof) scoreB += 3;
+        if (futureProofing === "high") {
+          if (a.futureProof) scoreA += 5;
+          if (b.futureProof) scoreB += 5;
+          if (!a.futureProof) scoreA -= 2;
+          if (!b.futureProof) scoreB -= 2;
+        } else if (futureProofing === "medium") {
+          if (a.futureProof) scoreA += 2;
+          if (b.futureProof) scoreB += 2;
         }
 
         if (preferLightweight) {
@@ -310,27 +339,38 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       });
     }
 
-    function recommendLensesForCamera(camera, lenses) {
+    function recommendLensesForCamera(camera, lenses, answers = {}) {
       const categorized = getCompatibleLensesByCategory(camera, lenses);
 
       const preferLightweight = (camera?.travel ?? 0) >= 4;
+      const futureProofing = normalizeFutureProofingAnswer(answers?.futureProofing);
+      const desiredLensTypes = normalizeLensTypeAnswers(answers?.lensTypes);
 
-      return {
-        standard: sortRecommendedLenses(categorized.standard, {
-          preferFutureProof: true,
-          preferLightweight,
-        })[0] ?? null,
+      const standard =
+        desiredLensTypes.includes("all") || desiredLensTypes.includes("standard")
+          ? sortRecommendedLenses(categorized.standard, {
+              futureProofing,
+              preferLightweight,
+            })[0] ?? null
+          : null;
 
-        wide: sortRecommendedLenses(categorized.wide, {
-          preferFutureProof: true,
-          preferLightweight,
-        })[0] ?? null,
+      const wide =
+        desiredLensTypes.includes("all") || desiredLensTypes.includes("wide")
+          ? sortRecommendedLenses(categorized.wide, {
+              futureProofing,
+              preferLightweight,
+            })[0] ?? null
+          : null;
 
-        telephoto: sortRecommendedLenses(categorized.telephoto, {
-          preferFutureProof: true,
-          preferLightweight,
-        })[0] ?? null,
-      };
+      const telephoto =
+        desiredLensTypes.includes("all") || desiredLensTypes.includes("telephoto")
+          ? sortRecommendedLenses(categorized.telephoto, {
+              futureProofing,
+              preferLightweight,
+            })[0] ?? null
+          : null;
+
+      return { standard, wide, telephoto };
     }
 
     function lensCardHtml(label, lens) {
@@ -356,10 +396,10 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       `;
     }
 
-    function recommendedLensesSectionHtml(camera) {
+    function recommendedLensesSectionHtml(camera, answers) {
       if (!camera?.hasLensEcosystem) return "";
 
-      const picks = recommendLensesForCamera(camera, LENSES);
+      const picks = recommendLensesForCamera(camera, LENSES, answers);
       const hasAny = picks.standard || picks.wide || picks.telephoto;
 
       if (!hasAny) return "";
@@ -949,7 +989,7 @@ document.addEventListener(
 // --------------------
 // Render blocks
 // --------------------
-function bigCardHtml(c, i, isSelected) {
+function bigCardHtml(c, i, isSelected, answers) {
   const mpTxt = typeof c.mp === "number" ? `${c.mp} MP` : "—";
   const ibisTxt = typeof c.ibis === "boolean" ? (c.ibis ? "Yes" : "No") : "—";
   const weightTxt =
@@ -964,7 +1004,7 @@ function bigCardHtml(c, i, isSelected) {
   const imgSrc = cameraImageUrl(c);
   const imgAlt = cameraImageAlt(c);
 
-  const recommendedLensesHtml = recommendedLensesSectionHtml(c);
+  const recommendedLensesHtml = recommendedLensesSectionHtml(c, answers);
 
   return `
     <div class="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
@@ -1161,7 +1201,7 @@ function render() {
   cardsWrap.innerHTML = `
     
 
-    ${top3.map((c, i) => bigCardHtml(c, i, compareSelected.includes(c.id))).join("")}
+    ${top3.map((c, i) => bigCardHtml(c, i, compareSelected.includes(c.id), answers)).join("")}
 
     ${
       more.length
