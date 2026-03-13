@@ -400,10 +400,16 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       if (!camera?.hasLensEcosystem) return "";
 
       const category = camera.lensMountCategory || "";
+      const brand = camera.brand || "";
+      const mount = camera.mount || "";
 
       if (category.startsWith("canon-rf")) return "/lenses/canon-rf";
       if (category.startsWith("canon-ef")) return "/lenses/canon-ef";
       if (category === "canon-ef-m") return "/lenses/canon-ef";
+
+      if (brand === "Sony" && mount === "E") return "/lenses/sony-e";
+      if (brand === "Nikon" && mount === "Z") return "/lenses/nikon-z";
+      if (brand === "Fujifilm" && mount === "X") return "/lenses/fujifilm-x";
 
       return "/lenses";
     }
