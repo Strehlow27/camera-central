@@ -373,6 +373,55 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
       return { standard, wide, telephoto };
     }
 
+    function getLensBrowseUrlForLens(lens) {
+      if (!lens) return "/lenses";
+
+      const mountFamily = lens.mountFamily || "";
+      const mount = lens.mount || "";
+
+      if (mountFamily === "Canon RF") {
+        return `/lenses/canon-rf?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mountFamily === "Canon EF") {
+        return `/lenses/canon-ef?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mountFamily === "Sony E") {
+        return `/lenses/sony-e?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mountFamily === "Nikon Z") {
+        return `/lenses/nikon-z?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mountFamily === "Fujifilm X") {
+        return `/lenses/fujifilm-x?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mount === "RF" || mount === "RF-S") {
+        return `/lenses/canon-rf?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mount === "EF" || mount === "EF-S") {
+        return `/lenses/canon-ef?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mount === "E") {
+        return `/lenses/sony-e?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mount === "Z") {
+        return `/lenses/nikon-z?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      if (mount === "X") {
+        return `/lenses/fujifilm-x?lens=${encodeURIComponent(lens.id)}`;
+      }
+
+      return "/lenses";
+    }
+
     function lensCardHtml(label, lens) {
       if (!lens) return "";
 
@@ -386,13 +435,23 @@ const CAMERAS = (Array.isArray(window.CAMERAS) ? window.CAMERAS : [])
           ? `${lens.weightGrams}g`
           : "—";
 
+      const href = getLensBrowseUrlForLens(lens);
+
       return `
-        <div class="rounded-xl border border-gray-200 p-3">
+        <a
+          href="${escapeHtml(href)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-lens-recommendation-link="1"
+          data-lens-id="${escapeHtml(lens.id || "")}"
+          class="block rounded-xl border border-gray-200 p-3 hover:bg-gray-50 transition"
+        >
           <p class="text-xs font-medium uppercase tracking-wide text-gray-500">${escapeHtml(label)}</p>
           <p class="mt-1 font-medium text-gray-900">${escapeHtml(lens.brand)} ${escapeHtml(lens.name)}</p>
           <p class="text-sm text-gray-600">${escapeHtml(lens.compatibility?.label || "Compatible")}</p>
           <p class="text-sm text-gray-500">${escapeHtml(priceTxt)} • ${escapeHtml(weightTxt)}</p>
-        </div>
+          <p class="mt-2 text-sm font-medium text-gray-900">Open lens page ↗</p>
+        </a>
       `;
     }
 
@@ -938,6 +997,14 @@ document.addEventListener(
 
       track("buy_option_click", { id: cameraId, retailer, url });
       closeAllBuyMenus();
+      return;
+    }
+
+    const lensRecommendationLink = e.target.closest("[data-lens-recommendation-link]");
+    if (lensRecommendationLink) {
+      const lensId = lensRecommendationLink.getAttribute("data-lens-id") || "";
+      const href = lensRecommendationLink.getAttribute("href") || "";
+      track("lens_recommendation_click", { lensId, href });
       return;
     }
 

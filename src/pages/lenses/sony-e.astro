@@ -273,4 +273,279 @@ const sonyBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
       sortSelect.addEventListener("change", applyFilters);
     })();
   </script>
+</BaseLayout>---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { LENSES } from "../../data/LENSES.js";
+import { CAMERAS } from "../../data/cameras.js";
+
+const sonyELenses = (Array.isArray(LENSES) ? LENSES : [])
+  .filter((l) => l.mountFamily === "Sony E")
+  .sort((a, b) => {
+    const aPrice = typeof a.price === "number" ? a.price : 999999;
+    const bPrice = typeof b.price === "number" ? b.price : 999999;
+    return aPrice - bPrice;
+  });
+
+const sonyBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
+  .filter((c) => c.brand === "Sony" && c.mount === "E")
+  .slice(0, 6);
+---
+
+<BaseLayout
+  title="Sony E-Mount Lenses – Camera Central"
+  description="Browse Sony E-mount lenses, including native Sony lenses and third-party alternatives from Sigma and Tamron."
+>
+  <div class="w-full max-w-5xl mx-auto space-y-8">
+    <section class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+      <p class="text-sm font-medium text-gray-500">Lens System</p>
+
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-gray-900">
+        Sony E-Mount Lenses
+      </h1>
+
+      <p class="mt-3 max-w-2xl text-gray-600">
+        Browse Sony E-mount lenses for both APS-C and full-frame Sony mirrorless cameras.
+        This includes native Sony lenses plus strong third-party options from Sigma and Tamron.
+      </p>
+
+      <div class="mt-4 flex flex-wrap gap-3">
+        <a
+          href="/lenses"
+          class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+        >
+          ← Back to lens systems
+        </a>
+
+        <a
+          href="/find"
+          class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+        >
+          Take the quiz
+        </a>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Browse lenses</h2>
+          <p class="mt-1 text-sm text-gray-600">
+            Filter by lens type and sort by price or weight.
+          </p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="text-sm text-gray-700">
+            <span class="mb-1 block font-medium">Category</span>
+            <select
+              id="lensCategoryFilter"
+              class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+            >
+              <option value="all">All categories</option>
+              <option value="standard">Standard / everyday</option>
+              <option value="wide">Wide angle</option>
+              <option value="telephoto">Telephoto</option>
+            </select>
+          </label>
+
+          <label class="text-sm text-gray-700">
+            <span class="mb-1 block font-medium">Sort by</span>
+            <select
+              id="lensSort"
+              class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+            >
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="weight-asc">Weight: lightest first</option>
+              <option value="weight-desc">Weight: heaviest first</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="lensGrid"
+      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      data-lenses={JSON.stringify(sonyELenses)}
+    >
+      {sonyELenses.map((lens) => (
+        <article
+          class="lens-card rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          data-category={lens.category ?? ""}
+          data-price={typeof lens.price === "number" ? lens.price : ""}
+          data-weight={typeof lens.weightGrams === "number" ? lens.weightGrams : ""}
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">
+                {lens.category || "Lens"}
+              </p>
+
+              <h2 class="mt-1 text-lg font-semibold text-gray-900">
+                {lens.brand} {lens.name}
+              </h2>
+
+              <p class="mt-1 text-sm text-gray-600">
+                {lens.mount} mount • {lens.sensorCoverage || "Coverage not listed"}
+              </p>
+            </div>
+
+            {lens.manufacturerType === "third-party" ? (
+              <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                Third-party
+              </span>
+            ) : lens.futureProof ? (
+              <span class="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white">
+                Future-proof
+              </span>
+            ) : (
+              <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                APS-C focused
+              </span>
+            )}
+          </div>
+
+          <div class="mt-4 space-y-2 text-sm text-gray-700">
+            <p>
+              <span class="font-medium text-gray-900">Price:</span>
+              {typeof lens.price === "number" ? ` $${lens.price.toLocaleString()}` : " Price varies"}
+            </p>
+
+            <p>
+              <span class="font-medium text-gray-900">Weight:</span>
+              {typeof lens.weightGrams === "number" ? ` ${lens.weightGrams}g` : " —"}
+            </p>
+
+            <p>
+              <span class="font-medium text-gray-900">Type:</span>
+              {lens.lensType || "—"}
+            </p>
+          </div>
+
+          {Array.isArray(lens.strengths) && lens.strengths.length > 0 && (
+            <div class="mt-4">
+              <p class="text-sm font-medium text-gray-900">Why it stands out</p>
+              <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                {lens.strengths.slice(0, 3).map((item) => <li>{item}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {Array.isArray(lens.tradeoffs) && lens.tradeoffs.length > 0 && (
+            <div class="mt-4">
+              <p class="text-sm font-medium text-gray-900">Tradeoffs</p>
+              <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                {lens.tradeoffs.slice(0, 2).map((item) => <li>{item}</li>)}
+              </ul>
+            </div>
+          )}
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            {lens.buyLinks?.bh && (
+              <a
+                href={lens.buyLinks.bh}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-900"
+              >
+                View at B&H
+              </a>
+            )}
+
+            {lens.buyLinks?.used && (
+              <a
+                href={lens.buyLinks.used}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+              >
+                View used
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-gray-900">Works well with these cameras</h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Popular Sony bodies that use this lens system.
+      </p>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sonyBodies.map((camera) => (
+          <a
+            href="/cameras"
+            class="rounded-xl border border-gray-200 p-4 transition hover:bg-gray-50"
+          >
+            <p class="font-medium text-gray-900">{camera.brand} {camera.model}</p>
+            <p class="mt-1 text-sm text-gray-600">
+              {camera.sensor} • {typeof camera.price === "number" ? `$${camera.price.toLocaleString()}` : "—"}
+            </p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+      <h2 class="text-lg font-semibold text-gray-900">Sony E-mount lens notes</h2>
+
+      <p class="mt-2 text-sm text-gray-700">
+        Sony E-mount includes both APS-C and full-frame lenses. Full-frame Sony FE lenses can also
+        be used on APS-C bodies, while APS-C-specific E lenses are generally less ideal if you may
+        move to full frame later. One of Sony’s biggest strengths is its large ecosystem of native
+        and third-party lenses.
+      </p>
+    </section>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const grid = document.getElementById("lensGrid");
+      const categoryFilter = document.getElementById("lensCategoryFilter");
+      const sortSelect = document.getElementById("lensSort");
+
+      if (!grid || !categoryFilter || !sortSelect) return;
+
+      const cards = Array.from(grid.querySelectorAll(".lens-card"));
+
+      function getNum(value, fallback) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+      }
+
+      function applyFilters() {
+        const category = categoryFilter.value;
+        const sort = sortSelect.value;
+
+        cards.forEach((card) => {
+          const cardCategory = card.dataset.category || "";
+          const show = category === "all" || cardCategory === category;
+          card.style.display = show ? "" : "none";
+        });
+
+        const visibleCards = cards.filter((card) => card.style.display !== "none");
+
+        visibleCards.sort((a, b) => {
+          const aPrice = getNum(a.dataset.price, 999999);
+          const bPrice = getNum(b.dataset.price, 999999);
+          const aWeight = getNum(a.dataset.weight, 999999);
+          const bWeight = getNum(b.dataset.weight, 999999);
+
+          if (sort === "price-asc") return aPrice - bPrice;
+          if (sort === "price-desc") return bPrice - aPrice;
+          if (sort === "weight-asc") return aWeight - bWeight;
+          if (sort === "weight-desc") return bWeight - aWeight;
+          return 0;
+        });
+
+        visibleCards.forEach((card) => grid.appendChild(card));
+      }
+
+      categoryFilter.addEventListener("change", applyFilters);
+      sortSelect.addEventListener("change", applyFilters);
+    })();
+  </script>
 </BaseLayout>

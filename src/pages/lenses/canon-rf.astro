@@ -96,7 +96,8 @@ const canonRFBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
     >
       {rfLenses.map((lens) => (
         <article
-          class="lens-card rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          class="lens-card rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition"
+          data-lens-id={lens.id}
           data-category={lens.category ?? ""}
           data-price={typeof lens.price === "number" ? lens.price : ""}
           data-weight={typeof lens.weightGrams === "number" ? lens.weightGrams : ""}
@@ -226,6 +227,7 @@ const canonRFBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
   </div>
 
   <script is:inline>
+    // canon-rf.astro lens filtering + query highlight
     (() => {
       const grid = document.getElementById("lensGrid");
       const categoryFilter = document.getElementById("lensCategoryFilter");
@@ -268,8 +270,30 @@ const canonRFBodies = (Array.isArray(CAMERAS) ? CAMERAS : [])
         visibleCards.forEach((card) => grid.appendChild(card));
       }
 
+      function highlightLensFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const lensId = params.get("lens");
+        if (!lensId) return;
+
+        let target = null;
+
+        try {
+          target = document.querySelector(`[data-lens-id="${CSS.escape(lensId)}"]`);
+        } catch {
+          target = document.querySelector(`[data-lens-id="${lensId}"]`);
+        }
+
+        if (!target) return;
+
+        target.classList.add("ring-2", "ring-black", "ring-offset-2");
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
       categoryFilter.addEventListener("change", applyFilters);
       sortSelect.addEventListener("change", applyFilters);
+
+      applyFilters();
+      highlightLensFromQuery();
     })();
   </script>
 </BaseLayout>
