@@ -6,13 +6,13 @@ import Analytics from "@vercel/analytics/astro";
 import SiteFooter from "../components/SiteFooter.astro";
 
 const {
-  title = "Camera Central Yes!",
+  title = "Camera Central",
   description = "Find the right camera fast. Personalized picks and side-by-side compare.",
 
-  // ✅ Put an actual file at /public/cameracentralLOGO.png (recommended: 1200x630)
+  // Default social preview image
   ogImage = "/cameracentralLOGO.png",
 
-  // Optional: set these later if you make a Twitter/X account
+  // Optional Twitter/X account handles
   twitterSite = "",
   twitterCreator = "",
 
@@ -22,41 +22,31 @@ const {
 const origin = Astro.site ?? Astro.url.origin;
 const canonicalUrl = new URL(Astro.url.pathname, origin).toString();
 const ogImageUrl = new URL(ogImage, origin).toString();
-
-// ✅ "Last updated" (from Vercel git metadata when available)
-<main class="min-h-screen cc-page-bg">
-  <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
-    <slot name="hero" />
-    <slot />
-  </div>
-</main>
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
-    
-    
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>{title}</title>
 
-    <!-- Site favicon -->
+    <!-- Basic SEO -->
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Favicons -->
     <link rel="icon" href="/favicon2.png" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon2.png" />
     <link rel="icon" type="image/png" sizes="128x128" href="/favicon2.png" />
     <link rel="apple-touch-icon" href="/favicon2.png" />
 
-    <!-- ✅ Canonical -->
-    <link rel="canonical" href={canonicalUrl} />
-
-    <!-- ✅ Basic SEO -->
-    <meta name="description" content={description} />
-    <meta name="robots" content="index,follow" />
-    <meta name="theme-color" content="#ffffff" />
-
-    <!-- ✅ OpenGraph -->
+    <!-- OpenGraph -->
     <meta property="og:site_name" content="Camera Central" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -66,58 +56,75 @@ const ogImageUrl = new URL(ogImage, origin).toString();
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- ✅ Twitter cards -->
+    <!-- Twitter cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
-    {twitterSite && <meta name="twitter:site" content={twitterSite} />}
-    {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
 
-    <!-- ✅ Favicon(s) -->
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> -->
+    {twitterSite && (
+      <meta name="twitter:site" content={twitterSite} />
+    )}
 
-    <!-- ✅ Fonts (kills the “generic SaaS / ChatGPT look”) -->
+    {twitterCreator && (
+      <meta name="twitter:creator" content={twitterCreator} />
+    )}
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
-    <!-- ✅ Enables smooth page transitions -->
+    <!-- Smooth Astro page transitions -->
     <ClientRouter />
 
-    <!-- ✅ Global click tracking (available on every page) -->
+    <!-- Global click tracking -->
     <script is:inline>
       (function () {
         const KEY = "cc_event_queue";
         const MAX = 300;
 
         function safeJsonParse(s, fallback) {
-          try { return JSON.parse(s); } catch { return fallback; }
+          try {
+            return JSON.parse(s);
+          } catch {
+            return fallback;
+          }
         }
 
         function enqueue(evt) {
           try {
-            const arr = safeJsonParse(localStorage.getItem(KEY) || "[]", []);
+            const arr = safeJsonParse(
+              localStorage.getItem(KEY) || "[]",
+              []
+            );
+
             arr.push(evt);
-            while (arr.length > MAX) arr.shift();
+
+            while (arr.length > MAX) {
+              arr.shift();
+            }
+
             localStorage.setItem(KEY, JSON.stringify(arr));
           } catch {}
         }
 
         function trySend(evt) {
-          // Disabled for MVP (no backend endpoint yet)
+          // Disabled for MVP — no backend endpoint yet
           return;
         }
 
-        // ✅ Single source of truth for app tracking
         window.ccTrack = function (name, props) {
           const evt = {
             name: String(name || "event"),
-            props: props && typeof props === "object" ? props : {},
+            props:
+              props && typeof props === "object"
+                ? props
+                : {},
             path: window.location.pathname,
             url: window.location.href,
             ref: document.referrer || "",
@@ -128,29 +135,43 @@ const ogImageUrl = new URL(ogImage, origin).toString();
 
           // Dev-only logging
           try {
-            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+            if (
+              location.hostname === "localhost" ||
+              location.hostname === "127.0.0.1"
+            ) {
               console.log("[ccTrack]", evt.name, evt.props);
             }
           } catch {}
 
-          // Plausible support (if you add it later)
+          // Plausible support
           try {
             if (typeof window.plausible === "function") {
-              window.plausible(evt.name, { props: evt.props });
+              window.plausible(evt.name, {
+                props: evt.props,
+              });
             }
           } catch {}
 
-          // ✅ GA4 support (gtag)
+          // GA4 support
           try {
             if (typeof window.gtag === "function") {
-              window.gtag("event", evt.name, evt.props);
+              window.gtag(
+                "event",
+                evt.name,
+                evt.props
+              );
             }
           } catch {}
 
-          // ✅ Tag Manager style (dataLayer)
+          // Tag Manager-style support
           try {
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({ event: evt.name, ...evt.props });
+            window.dataLayer =
+              window.dataLayer || [];
+
+            window.dataLayer.push({
+              event: evt.name,
+              ...evt.props,
+            });
           } catch {}
 
           trySend(evt);
@@ -158,149 +179,183 @@ const ogImageUrl = new URL(ogImage, origin).toString();
       })();
     </script>
 
+    <!-- Optional GA4 -->
     {import.meta.env.PUBLIC_GA4_ID && (
       <>
-        <!-- ✅ Google tag (gtag.js) -->
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA4_ID}`}></script>
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA4_ID}`}
+        ></script>
 
-        <!-- ✅ Correct GA config using a real value injected by Astro -->
-        <script is:inline data-ga-id={import.meta.env.PUBLIC_GA4_ID}>
+        <script
+          is:inline
+          data-ga-id={import.meta.env.PUBLIC_GA4_ID}
+        >
           (function () {
-            const id = document.currentScript?.getAttribute("data-ga-id");
+            const id =
+              document.currentScript?.getAttribute(
+                "data-ga-id"
+              );
+
             if (!id) return;
+
             try {
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              window.gtag = window.gtag || gtag;
+              window.dataLayer =
+                window.dataLayer || [];
+
+              function gtag() {
+                dataLayer.push(arguments);
+              }
+
+              window.gtag =
+                window.gtag || gtag;
+
               window.gtag("js", new Date());
-              window.gtag("config", id, { anonymize_ip: true });
+
+              window.gtag("config", id, {
+                anonymize_ip: true,
+              });
             } catch {}
           })();
         </script>
       </>
     )}
 
-    <!-- ✅ Global style pass: fonts + background + subtle “brand” -->
+    <!-- Global styling -->
     <style is:global>
       :root {
-        --cc-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-        --cc-font-display: "Fraunces", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        --cc-font-body:
+          "Inter",
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
 
-        /* Brand accents (feel free to tweak later) */
-        --cc-ink: #0b1220;      /* deep ink */
-        --cc-muted: #4b5563;    /* gray-600-ish */
-        --cc-accent: #0f2a1d;   /* deep evergreen */
+        --cc-font-display:
+          "Fraunces",
+          ui-serif,
+          Georgia,
+          Cambria,
+          "Times New Roman",
+          Times,
+          serif;
+
+        --cc-ink: #0b1220;
+        --cc-muted: #4b5563;
+        --cc-accent: #0f2a1d;
       }
 
-      html, body {
+      html,
+      body {
         font-family: var(--cc-font-body);
       }
 
-      /* Headings get the display font */
-      h1, h2, h3, .cc-display {
+      h1,
+      h2,
+      h3,
+      .cc-display {
         font-family: var(--cc-font-display);
         letter-spacing: -0.01em;
       }
 
-      /* Slightly nicer selection color (small touch, feels “designed”) */
       ::selection {
         background: rgba(15, 42, 29, 0.18);
       }
 
-      /* Make links feel less “default” without breaking Tailwind */
       a {
         text-underline-offset: 3px;
       }
 
-      /* A gentle “premium” hover on buttons */
-      button, a[role="button"] {
-        transition: transform 120ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      button,
+      a[role="button"] {
+        transition:
+          transform 120ms ease,
+          box-shadow 160ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease,
+          opacity 160ms ease;
       }
-      button:active, a[role="button"]:active {
+
+      button:active,
+      a[role="button"]:active {
         transform: translateY(0.5px);
       }
 
-      /* Background wrapper styling */
       .cc-page-bg {
         background:
-          radial-gradient(900px 500px at 20% 0%, rgba(15, 42, 29, 0.10), transparent 60%),
-          radial-gradient(700px 420px at 90% 10%, rgba(17, 24, 39, 0.08), transparent 55%),
-          linear-gradient(to bottom, #f8fafc, #ffffff 55%);
+          radial-gradient(
+            900px 500px at 20% 0%,
+            rgba(15, 42, 29, 0.10),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 420px at 90% 10%,
+            rgba(17, 24, 39, 0.08),
+            transparent 55%
+          ),
+          linear-gradient(
+            to bottom,
+            #f8fafc,
+            #ffffff 55%
+          );
       }
 
-      /* Make cards feel a bit less “Tailwind demo” */
       .cc-card {
-        border-color: rgba(17, 24, 39, 0.12) !important;
+        border-color:
+          rgba(17, 24, 39, 0.12) !important;
+
         box-shadow:
           0 1px 0 rgba(17, 24, 39, 0.04),
           0 10px 30px rgba(17, 24, 39, 0.06) !important;
       }
-
-      
     </style>
 
+    <!-- Organization structured data -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Camera Central",
-      "url": "https://camera-central.com",
-      "logo": "https://camera-central.com/favicon2.png"
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Camera Central",
+        "url": "https://camera-central.com",
+        "logo": "https://camera-central.com/favicon2.png"
+      }
     </script>
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
     <SiteHeader />
 
-    <!-- ✅ New: original background wrapper -->
+    <!-- Main site content -->
     <main class="min-h-screen cc-page-bg">
-      <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
+      <div
+        class={`max-w-5xl mx-auto px-6 ${
+          tight ? "py-6" : "py-12"
+        }`}
+      >
         <slot name="hero" />
-          {lastUpdatedISO && (
-            <div class="mt-3">
-              <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-600">
-                <span class="h-2 w-2 rounded-full bg-green-500"></span>
-                <span>
-                  Last updated <strong id="ccUpdatedAgo">recently</strong>
-                </span>
-              </span>
-
-              <script is:inline data-updated={lastUpdatedISO}>
-                (function () {
-                  const iso = document.currentScript?.getAttribute("data-updated");
-                  const el = document.getElementById("ccUpdatedAgo");
-                  if (!iso || !el) return;
-
-                  const updated = new Date(iso).getTime();
-                  const now = Date.now();
-                  const mins = Math.floor((now - updated) / 60000);
-                  const hours = Math.floor(mins / 60);
-                  const days = Math.floor(hours / 24);
-
-                  el.textContent =
-                    mins < 60
-                      ? `${mins} minute${mins === 1 ? "" : "s"} ago`
-                      : hours < 24
-                      ? `${hours} hour${hours === 1 ? "" : "s"} ago`
-                      : `${days} day${days === 1 ? "" : "s"} ago`;
-                })();
-              </script>
-            </div>
-          )}
         <slot />
       </div>
     </main>
 
-    <!-- ✅ Global compare badge sync (works across transitions) -->
+    <!-- Global compare badge sync -->
     <script is:inline>
       (function () {
         const KEY = "cc_compare";
 
         function safeLoadIds() {
           try {
-            const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
-            return Array.isArray(arr) ? arr.filter(Boolean) : [];
+            const arr = JSON.parse(
+              localStorage.getItem(KEY) || "[]"
+            );
+
+            return Array.isArray(arr)
+              ? arr.filter(Boolean)
+              : [];
           } catch {
             return [];
           }
@@ -308,16 +363,25 @@ const ogImageUrl = new URL(ogImage, origin).toString();
 
         function unique(list) {
           const seen = new Set();
+
           return (list || []).filter((x) => {
             const k = String(x || "");
-            if (!k || seen.has(k)) return false;
+
+            if (!k || seen.has(k)) {
+              return false;
+            }
+
             seen.add(k);
             return true;
           });
         }
 
         function setBadge(count) {
-          const badge = document.getElementById("ccCompareBadge");
+          const badge =
+            document.getElementById(
+              "ccCompareBadge"
+            );
+
           if (!badge) return;
 
           if (!count) {
@@ -337,24 +401,42 @@ const ogImageUrl = new URL(ogImage, origin).toString();
 
         syncFromStorage();
 
-        window.addEventListener("cc-compare-updated", (e) => {
-          const ids = e?.detail?.ids;
-          if (Array.isArray(ids)) setBadge(unique(ids).length);
-          else syncFromStorage();
-        });
+        window.addEventListener(
+          "cc-compare-updated",
+          (e) => {
+            const ids = e?.detail?.ids;
 
-        window.addEventListener("storage", (e) => {
-          if (e.key === KEY) syncFromStorage();
-        });
+            if (Array.isArray(ids)) {
+              setBadge(unique(ids).length);
+            } else {
+              syncFromStorage();
+            }
+          }
+        );
 
-        document.addEventListener("astro:after-swap", syncFromStorage);
-        document.addEventListener("astro:page-load", syncFromStorage);
+        window.addEventListener(
+          "storage",
+          (e) => {
+            if (e.key === KEY) {
+              syncFromStorage();
+            }
+          }
+        );
+
+        document.addEventListener(
+          "astro:after-swap",
+          syncFromStorage
+        );
+
+        document.addEventListener(
+          "astro:page-load",
+          syncFromStorage
+        );
       })();
     </script>
 
     <SiteFooter />
 
-    <!-- ✅ Vercel Analytics (put near end of body) -->
     <Analytics />
   </body>
 </html>
