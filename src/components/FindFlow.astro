@@ -5,8 +5,8 @@
   <div id="flow" class="flex-1 flex flex-col">
     <div class="space-y-1">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500" id="progress">Question 1 of 10</p>
-        <p class="text-sm text-gray-500" id="percent">10%</p>
+        <p class="text-sm text-gray-500" id="progress">Question 1 of 12</p>
+        <p class="text-sm text-gray-500" id="percent">8%</p>
       </div>
 
       <!-- Progress bar -->
@@ -66,11 +66,19 @@
 
       function track(name, props) {
         try {
-          if (typeof window.ccTrack === "function") window.ccTrack(name, props || {});
+          if (typeof window.ccTrack === "function") {
+            window.ccTrack(name, props || {});
+          }
         } catch {}
       }
 
       const questions = [
+        {
+          id: "intent",
+          q: "What are you mainly looking to shoot?",
+          helper: "Choose the type of photography or video you care about most.",
+          options: ["Travel", "Wildlife", "Portraits", "Video"],
+        },
         {
           id: "genre",
           q: "What do you shoot most?",
@@ -99,7 +107,8 @@
         {
           id: "cameraType",
           q: "What type of camera are you looking for?",
-          helper: "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
+          helper:
+            "Fixed-lens is simpler. Detachable-lens is more flexible and upgradeable.",
           options: [
             "Detachable-lens camera",
             "Fixed-lens digital camera",
@@ -110,7 +119,12 @@
           id: "budget",
           q: "What’s your camera body budget?",
           helper: "Just the camera body, not lenses.",
-          options: ["Under $1,000", "$1,000–$1,800", "$1,800–$2,800", "$2,800+"],
+          options: [
+            "Under $1,000",
+            "$1,000–$1,800",
+            "$1,800–$2,800",
+            "$2,800+",
+          ],
         },
         {
           id: "weight",
@@ -134,12 +148,18 @@
           id: "upgrade",
           q: "Are you upgrading from something?",
           helper: "This helps avoid recommending upgrades you won’t notice.",
-          options: ["Phone only", "Older DSLR", "Older mirrorless", "Not sure"],
+          options: [
+            "Phone only",
+            "Older DSLR",
+            "Older mirrorless",
+            "Not sure",
+          ],
         },
         {
           id: "futureProofing",
           q: "How important is it that your lenses still work if you upgrade your camera body later?",
-          helper: "This helps us balance APS-C-only lenses vs more future-proof system recommendations.",
+          helper:
+            "This helps us balance APS-C-only lenses vs more future-proof system recommendations.",
           options: [
             "I need my setup to be future-proof",
             "Somewhat important",
@@ -149,7 +169,8 @@
         {
           id: "lensTypes",
           q: "What types of lenses are you interested in?",
-          helper: "Select one or more. If you want a balanced setup, choose All lens types.",
+          helper:
+            "Select one or more. If you want a balanced setup, choose All lens types.",
           options: [
             "Standard / everyday",
             "Wide angle",
@@ -169,19 +190,54 @@
 
       track("find_view", { questionCount: questions.length });
 
+      function isMultiQuestion(q) {
+        return q.multi === true;
+      }
+
+      function isAnswered(q) {
+        const value = answers[q.id];
+
+        if (isMultiQuestion(q)) {
+          return Array.isArray(value) && value.length > 0;
+        }
+
+        return !!value;
+      }
+
+      function saveProgress() {
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
+        } catch {}
+      }
+
+      // Resume an unfinished quiz.
       const saved = sessionStorage.getItem(SESSION_KEY);
+
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
+
           if (parsed && typeof parsed === "object") {
             Object.assign(answers, parsed);
-            const firstUnanswered = questions.findIndex((q) => !isAnswered(q));
-            idx = firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
-            track("find_resume", { answeredCount: Object.keys(answers).length, resumeIndex: idx });
+
+            const firstUnanswered = questions.findIndex(
+              (q) => !isAnswered(q)
+            );
+
+            idx =
+              firstUnanswered === -1
+                ? questions.length - 1
+                : firstUnanswered;
+
+            track("find_resume", {
+              answeredCount: Object.keys(answers).length,
+              resumeIndex: idx,
+            });
           }
         } catch {}
       }
 
+      // Read a category selected on the homepage.
       const params = new URLSearchParams(window.location.search);
 
       const intentMap = {
@@ -191,11 +247,29 @@
         video: "Video",
       };
 
-const homepageIntent = intentMap[params.get("intent")];
+      const homepageIntent = intentMap[params.get("intent")];
 
-if (homepageIntent) {
-  answers.intent = homepageIntent;
-}
+      if (homepageIntent) {
+        // Treat the homepage click as the answer to question 1.
+        answers.intent = homepageIntent;
+
+        // Start on the first question the user has not answered.
+        const firstUnanswered = questions.findIndex(
+          (q) => !isAnswered(q)
+        );
+
+        idx =
+          firstUnanswered === -1
+            ? questions.length - 1
+            : firstUnanswered;
+
+        saveProgress();
+
+        track("find_homepage_intent", {
+          intent: homepageIntent,
+          resumeIndex: idx,
+        });
+      }
 
       const optionBase =
         "w-full min-h-[56px] text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
@@ -204,7 +278,8 @@ if (homepageIntent) {
       const optionUnselected =
         "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 active:scale-[0.99]";
 
-      const optionSelected = "border-gray-900 bg-gray-50";
+      const optionSelected =
+        "border-gray-900 bg-gray-50";
 
       const progress = document.getElementById("progress");
       const percentEl = document.getElementById("percent");
@@ -216,42 +291,54 @@ if (homepageIntent) {
       const backBtn = document.getElementById("backBtn");
       const nextBtn = document.getElementById("nextBtn");
 
-      if (!progress || !percentEl || !bar || !question || !helper || !optionsWrap || !backBtn || !nextBtn) {
-        console.warn("[FindFlow] Missing expected DOM elements. Quiz script not started.");
+      if (
+        !progress ||
+        !percentEl ||
+        !bar ||
+        !question ||
+        !helper ||
+        !optionsWrap ||
+        !backBtn ||
+        !nextBtn
+      ) {
+        console.warn(
+          "[FindFlow] Missing expected DOM elements. Quiz script not started."
+        );
         return;
       }
 
       let hasStarted = false;
       let lastQuestionId = null;
 
-      function isMultiQuestion(q) {
-        return q.multi === true;
-      }
-
-      function isAnswered(q) {
-        const value = answers[q.id];
-        if (isMultiQuestion(q)) return Array.isArray(value) && value.length > 0;
-        return !!value;
-      }
-
       function updateProgressUI() {
-        const pct = Math.round(((idx + 1) / questions.length) * 100);
+        const pct = Math.round(
+          ((idx + 1) / questions.length) * 100
+        );
+
         bar.style.width = `${pct}%`;
         percentEl.textContent = `${pct}%`;
-        const pb = bar.parentElement;
-        if (pb) pb.setAttribute("aria-valuenow", String(pct));
-      }
 
-      function saveProgress() {
-        try {
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
-        } catch {}
+        const pb = bar.parentElement;
+
+        if (pb) {
+          pb.setAttribute("aria-valuenow", String(pct));
+        }
       }
 
       function finalizeAndGoToResults() {
         try {
-          localStorage.setItem(LS_KEY, JSON.stringify(answers));
-          localStorage.setItem(LS_META_KEY, JSON.stringify({ version: 1, updatedAt: Date.now() }));
+          localStorage.setItem(
+            LS_KEY,
+            JSON.stringify(answers)
+          );
+
+          localStorage.setItem(
+            LS_META_KEY,
+            JSON.stringify({
+              version: 1,
+              updatedAt: Date.now(),
+            })
+          );
         } catch {}
 
         try {
@@ -269,20 +356,30 @@ if (homepageIntent) {
 
       function makeSpacer() {
         const d = document.createElement("div");
-        d.className = "w-full min-h-[56px] px-4 py-3 rounded-xl border border-transparent";
+
+        d.className =
+          "w-full min-h-[56px] px-4 py-3 rounded-xl border border-transparent";
+
         d.setAttribute("aria-hidden", "true");
+
         return d;
       }
 
       function getSelectedState(q, opt) {
         if (isMultiQuestion(q)) {
-          return Array.isArray(answers[q.id]) && answers[q.id].includes(opt);
+          return (
+            Array.isArray(answers[q.id]) &&
+            answers[q.id].includes(opt)
+          );
         }
+
         return answers[q.id] === opt;
       }
 
       function toggleMultiSelect(q, opt) {
-        const current = Array.isArray(answers[q.id]) ? [...answers[q.id]] : [];
+        const current = Array.isArray(answers[q.id])
+          ? [...answers[q.id]]
+          : [];
 
         if (q.id === "brand") {
           if (opt === "No preference") {
@@ -290,52 +387,83 @@ if (homepageIntent) {
             return;
           }
 
-          const withoutNoPreference = current.filter((v) => v !== "No preference");
-          const alreadySelected = withoutNoPreference.includes(opt);
+          const withoutNoPreference = current.filter(
+            (v) => v !== "No preference"
+          );
+
+          const alreadySelected =
+            withoutNoPreference.includes(opt);
 
           if (alreadySelected) {
-            answers[q.id] = withoutNoPreference.filter((v) => v !== opt);
+            answers[q.id] =
+              withoutNoPreference.filter(
+                (v) => v !== opt
+              );
           } else {
-            answers[q.id] = [...withoutNoPreference, opt];
+            answers[q.id] = [
+              ...withoutNoPreference,
+              opt,
+            ];
           }
 
           if (answers[q.id].length === 0) {
             delete answers[q.id];
           }
+
           return;
         }
 
         if (q.id === "lensTypes") {
           const ALL_OPTION = "All lens types";
-          const INDIVIDUALS = ["Standard / everyday", "Wide angle", "Telephoto"];
+
+          const INDIVIDUALS = [
+            "Standard / everyday",
+            "Wide angle",
+            "Telephoto",
+          ];
 
           if (opt === ALL_OPTION) {
             answers[q.id] = [ALL_OPTION];
             return;
           }
 
-          let next = current.filter((v) => v !== ALL_OPTION);
+          let next = current.filter(
+            (v) => v !== ALL_OPTION
+          );
+
           const alreadySelected = next.includes(opt);
 
           if (alreadySelected) {
-            next = next.filter((v) => v !== opt);
+            next = next.filter(
+              (v) => v !== opt
+            );
           } else {
             next = [...next, opt];
           }
 
-          const hasAllIndividuals = INDIVIDUALS.every((item) => next.includes(item));
-          answers[q.id] = hasAllIndividuals ? [ALL_OPTION] : next;
+          const hasAllIndividuals =
+            INDIVIDUALS.every((item) =>
+              next.includes(item)
+            );
+
+          answers[q.id] = hasAllIndividuals
+            ? [ALL_OPTION]
+            : next;
 
           if (answers[q.id].length === 0) {
             delete answers[q.id];
           }
+
           return;
         }
 
-        const alreadySelected = current.includes(opt);
+        const alreadySelected =
+          current.includes(opt);
 
         if (alreadySelected) {
-          answers[q.id] = current.filter((v) => v !== opt);
+          answers[q.id] = current.filter(
+            (v) => v !== opt
+          );
         } else {
           answers[q.id] = [...current, opt];
         }
@@ -348,7 +476,9 @@ if (homepageIntent) {
       function render() {
         const q = questions[idx];
 
-        progress.textContent = `Question ${idx + 1} of ${questions.length}`;
+        progress.textContent =
+          `Question ${idx + 1} of ${questions.length}`;
+
         question.textContent = q.q;
         helper.textContent = q.helper || "";
 
@@ -356,30 +486,47 @@ if (homepageIntent) {
 
         if (q.id !== lastQuestionId) {
           lastQuestionId = q.id;
-          track("find_question_view", { index: idx, id: q.id });
+
+          track("find_question_view", {
+            index: idx,
+            id: q.id,
+          });
         }
 
         optionsWrap.innerHTML = "";
 
         q.options.forEach((opt) => {
-          const selected = getSelectedState(q, opt);
+          const selected =
+            getSelectedState(q, opt);
 
-          const btn = document.createElement("button");
+          const btn =
+            document.createElement("button");
+
           btn.type = "button";
 
           btn.innerHTML = `
             <span class="flex items-center justify-between">
               <span>${opt}</span>
-              <span class="text-sm text-gray-500 w-4 text-right">${selected ? "✓" : ""}</span>
+              <span class="text-sm text-gray-500 w-4 text-right">${
+                selected ? "✓" : ""
+              }</span>
             </span>
           `;
 
-          btn.className = optionBase + " " + (selected ? optionSelected : optionUnselected);
+          btn.className =
+            optionBase +
+            " " +
+            (selected
+              ? optionSelected
+              : optionUnselected);
 
           btn.addEventListener("click", () => {
             if (!hasStarted) {
               hasStarted = true;
-              track("find_start", { firstQuestionId: q.id });
+
+              track("find_start", {
+                firstQuestionId: q.id,
+              });
             }
 
             if (isMultiQuestion(q)) {
@@ -392,37 +539,63 @@ if (homepageIntent) {
 
             track("find_answer_select", {
               questionId: q.id,
-              value: isMultiQuestion(q) ? answers[q.id] : opt,
+              value: isMultiQuestion(q)
+                ? answers[q.id]
+                : opt,
               index: idx,
             });
 
-            nextBtn.disabled = !isAnswered(q);
+            nextBtn.disabled =
+              !isAnswered(q);
+
             render();
           });
 
           optionsWrap.appendChild(btn);
         });
 
-        const TARGET = Math.max(5, q.options.length);
-        const missing = Math.max(0, TARGET - q.options.length);
+        const TARGET = Math.max(
+          5,
+          q.options.length
+        );
+
+        const missing = Math.max(
+          0,
+          TARGET - q.options.length
+        );
+
         for (let i = 0; i < missing; i++) {
-          optionsWrap.appendChild(makeSpacer());
+          optionsWrap.appendChild(
+            makeSpacer()
+          );
         }
 
         backBtn.disabled = idx === 0;
-        nextBtn.textContent = idx === questions.length - 1 ? "Show my recommendation" : "Next";
-        nextBtn.disabled = !isAnswered(q);
+
+        nextBtn.textContent =
+          idx === questions.length - 1
+            ? "Show my recommendation"
+            : "Next";
+
+        nextBtn.disabled =
+          !isAnswered(q);
       }
 
       backBtn.addEventListener("click", () => {
-        track("find_back", { fromIndex: idx });
+        track("find_back", {
+          fromIndex: idx,
+        });
+
         if (idx <= 0) return;
+
         idx--;
         render();
       });
 
       nextBtn.addEventListener("click", () => {
-        track("find_next", { fromIndex: idx });
+        track("find_next", {
+          fromIndex: idx,
+        });
 
         if (idx < questions.length - 1) {
           idx++;
@@ -439,17 +612,31 @@ if (homepageIntent) {
       try {
         initFindFlow();
       } catch (e) {
-        console.error("[FindFlow] init error", e);
+        console.error(
+          "[FindFlow] init error",
+          e
+        );
       }
     }
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", boot, { once: true });
+      document.addEventListener(
+        "DOMContentLoaded",
+        boot,
+        { once: true }
+      );
     } else {
       boot();
     }
 
-    document.addEventListener("astro:page-load", boot);
-    document.addEventListener("astro:after-swap", boot);
+    document.addEventListener(
+      "astro:page-load",
+      boot
+    );
+
+    document.addEventListener(
+      "astro:after-swap",
+      boot
+    );
   })();
 </script>
