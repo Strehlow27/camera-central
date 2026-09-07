@@ -23,18 +23,15 @@
     </a>
 
     <!-- Right: desktop nav -->
-    <nav class="hidden sm:flex items-center gap-4 text-sm text-gray-700">
-      <a href="/" class="hover:text-gray-900" style="cursor:pointer;">Home</a>
-      <a href="/find" class="hover:text-gray-900" style="cursor:pointer;">Quiz</a>
-      <a href="/cameras" class="hover:text-gray-900" style="cursor:pointer;">Cameras</a>
-      <a href="/lenses" class="hover:text-gray-900" style="cursor:pointer;">Lenses</a>
-      <a href="/about" class="hover:text-gray-900" style="cursor:pointer;">About</a>
+    <nav class="hidden sm:flex items-center gap-5 text-sm text-gray-700">
+      <a href="/cameras" class="transition hover:text-black">Cameras</a>
+      <a href="/lenses" class="transition hover:text-black">Lenses</a>
+      <a href="/about" class="transition hover:text-black">About</a>
 
       <a
         id="headerResultsLink"
         href="/results"
-        class="inline-flex items-center gap-1 hover:text-gray-900 text-gray-700"
-        style="cursor:pointer;"
+        class="inline-flex items-center gap-1 transition hover:text-black"
       >
         Results
         <span
@@ -43,6 +40,13 @@
         >
           0
         </span>
+      </a>
+
+      <a
+        href="/find"
+        class="ml-1 inline-flex items-center justify-center rounded-xl bg-black px-4 py-2.5 font-medium text-white transition hover:bg-gray-800"
+      >
+        Find my camera
       </a>
     </nav>
 
@@ -61,18 +65,15 @@
 
   <!-- Mobile menu panel -->
   <div id="ccMobileMenu" class="sm:hidden hidden border-t border-gray-200 bg-white">
-    <nav class="mx-auto max-w-5xl px-6 py-3 flex flex-col gap-2 text-sm text-gray-700">
-      <a href="/" class="py-2 hover:text-gray-900" style="cursor:pointer;">Home</a>
-      <a href="/find" class="py-2 hover:text-gray-900" style="cursor:pointer;">Quiz</a>
-      <a href="/cameras" class="py-2 hover:text-gray-900" style="cursor:pointer;">Cameras</a>
-      <a href="/lenses" class="py-2 hover:text-gray-900" style="cursor:pointer;">Lenses</a>
-      <a href="/about" class="py-2 hover:text-gray-900" style="cursor:pointer;">About</a>
+    <nav class="mx-auto max-w-5xl px-6 py-4 flex flex-col gap-1 text-sm text-gray-700">
+      <a href="/cameras" class="py-2 hover:text-black">Cameras</a>
+      <a href="/lenses" class="py-2 hover:text-black">Lenses</a>
+      <a href="/about" class="py-2 hover:text-black">About</a>
 
       <a
         id="headerResultsLinkMobile"
         href="/results"
-        class="py-2 inline-flex items-center gap-2 hover:text-gray-900 text-gray-700"
-        style="cursor:pointer;"
+        class="py-2 inline-flex items-center gap-2 hover:text-black"
       >
         Results
         <span
@@ -81,6 +82,13 @@
         >
           0
         </span>
+      </a>
+
+      <a
+        href="/find"
+        class="mt-2 inline-flex items-center justify-center rounded-xl bg-black px-4 py-3 font-medium text-white"
+      >
+        Find my camera
       </a>
     </nav>
   </div>

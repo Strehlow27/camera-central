@@ -24,17 +24,19 @@ const canonicalUrl = new URL(Astro.url.pathname, origin).toString();
 const ogImageUrl = new URL(ogImage, origin).toString();
 
 // ✅ "Last updated" (from Vercel git metadata when available)
-const vercelCommit = import.meta.env.VERCEL_GIT_COMMIT_TIMESTAMP;
-const lastUpdatedISO = vercelCommit
-  ? new Date(Number(vercelCommit) * 1000).toISOString()
-  : null;
+<main class="min-h-screen cc-page-bg">
+  <div class={`max-w-5xl mx-auto px-6 ${tight ? "py-6" : "py-12"}`}>
+    <slot name="hero" />
+    <slot />
+  </div>
+</main>
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
 
-    <link rel="canonical" href={`https://www.camera-central.com${Astro.url.pathname}`} />
+    
     
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
