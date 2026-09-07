@@ -212,6 +212,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 3,
+    portrait: 3,
     beginnerFriendly: 5,
     video: 4,
 
@@ -248,6 +250,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 5,
     video: 4,
 
@@ -284,6 +288,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 4,
     landscape: 5,
+    wildlife: 5,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 4,
 
@@ -321,6 +327,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 4,
     landscape: 3,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 2,
 
@@ -357,6 +365,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 5,
     landscape: 4,
+    wildlife: 4,
+    portrait: 5,
     beginnerFriendly: 4,
     video: 4,
 
@@ -393,6 +403,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 3,
 
@@ -430,6 +442,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 4,
     landscape: 3,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 4,
     video: 4,
 
@@ -466,6 +480,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 4,
     landscape: 4,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 4,
     video: 4,
 
@@ -502,6 +518,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 3,
     landscape: 5,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 3,
     video: 5,
 
@@ -538,6 +556,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 1,
     landscape: 3,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 2,
     video: 5,
 
@@ -575,6 +595,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 2,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 3,
 
@@ -611,6 +633,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 2,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 3,
 
@@ -653,6 +677,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 5,
     video: 3,
 
@@ -689,6 +715,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 4,
 
@@ -725,6 +753,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 4,
 
@@ -761,6 +791,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 5,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 5,
 
@@ -798,6 +830,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 3,
     landscape: 3,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 2,
 
@@ -834,6 +868,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 3,
+    portrait: 5,
     beginnerFriendly: 3,
     video: 3,
 
@@ -871,6 +907,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 3,
     video: 5,
 
@@ -907,6 +945,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 5,
     landscape: 4,
+    wildlife: 4,
+    portrait: 5,
     beginnerFriendly: 4,
     video: 4,
 
@@ -944,6 +984,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 5,
+    wildlife: 4,
+    portrait: 5,
     beginnerFriendly: 2,
     video: 3,
 
@@ -980,6 +1022,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 5,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 2,
     video: 4,
 
@@ -1017,6 +1061,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 3,
     landscape: 2,
+    wildlife: 4,
+    portrait: 4,
     beginnerFriendly: 2,
     video: 5,
 
@@ -1054,6 +1100,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 2,
     landscape: 5,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 1,
     video: 5,
 
@@ -1095,6 +1143,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 3,
+    portrait: 3,
     beginnerFriendly: 5,
     video: 4,
 
@@ -1131,6 +1181,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 2,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 4,
 
@@ -1168,6 +1220,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 3,
 
@@ -1204,6 +1258,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 3,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 4,
 
@@ -1240,6 +1296,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 3,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 4,
 
@@ -1276,6 +1334,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 5,
+    wildlife: 2,
+    portrait: 5,
     beginnerFriendly: 3,
     video: 3,
 
@@ -1312,6 +1372,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 5,
+    wildlife: 3,
+    portrait: 5,
     beginnerFriendly: 3,
     video: 4,
 
@@ -1348,6 +1410,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 2,
     landscape: 4,
+    wildlife: 5,
+    portrait: 5,
     beginnerFriendly: 2,
     video: 5,
 
@@ -1389,6 +1453,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 3,
 
@@ -1425,6 +1491,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 3,
 
@@ -1461,6 +1529,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 3,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 4,
 
@@ -1497,6 +1567,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 4,
     landscape: 4,
+    wildlife: 3,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 4,
 
@@ -1533,6 +1605,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 5,
+    wildlife: 4,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 3,
 
@@ -1569,6 +1643,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 3,
     landscape: 5,
+    wildlife: 4,
+    portrait: 4,
     beginnerFriendly: 2,
     video: 4,
 
@@ -1605,6 +1681,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 4,
+    wildlife: 5,
+    portrait: 4,
     beginnerFriendly: 2,
     video: 5,
 
@@ -1641,6 +1719,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 1,
     landscape: 5,
+    wildlife: 1,
+    portrait: 5,
     beginnerFriendly: 1,
     video: 2,
 
@@ -1677,6 +1757,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 1,
     landscape: 5,
+    wildlife: 1,
+    portrait: 5,
     beginnerFriendly: 1,
     video: 3,
 
@@ -1718,6 +1800,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 5,
 
@@ -1754,6 +1838,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 4,
+    wildlife: 3,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 5,
 
@@ -1790,6 +1876,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 3,
     landscape: 4,
+    wildlife: 2,
+    portrait: 4,
     beginnerFriendly: 3,
     video: 5,
 
@@ -1826,6 +1914,8 @@ const RAW_CAMERAS = [
     lowLight: 2,
     travel: 4,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 4,
 
@@ -1862,6 +1952,8 @@ const RAW_CAMERAS = [
     lowLight: 2,
     travel: 4,
     landscape: 4,
+    wildlife: 5,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 5,
 
@@ -1903,6 +1995,8 @@ const RAW_CAMERAS = [
     lowLight: 2,
     travel: 5,
     landscape: 4,
+    wildlife: 3,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 3,
 
@@ -1939,6 +2033,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 4,
     landscape: 4,
+    wildlife: 5,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 4,
 
@@ -1975,6 +2071,8 @@ const RAW_CAMERAS = [
     lowLight: 2,
     travel: 4,
     landscape: 4,
+    wildlife: 4,
+    portrait: 3,
     beginnerFriendly: 3,
     video: 3,
 
@@ -2011,6 +2109,8 @@ const RAW_CAMERAS = [
     lowLight: 2,
     travel: 5,
     landscape: 3,
+    wildlife: 2,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 3,
 
@@ -2052,6 +2152,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 1,
     landscape: 5,
+    wildlife: 2,
+    portrait: 5,
     beginnerFriendly: 1,
     video: 4,
 
@@ -2088,6 +2190,8 @@ const RAW_CAMERAS = [
     lowLight: 5,
     travel: 1,
     landscape: 4,
+    wildlife: 2,
+    portrait: 5,
     beginnerFriendly: 1,
     video: 5,
 
@@ -2133,6 +2237,8 @@ const RAW_CAMERAS = [
     lowLight: 4,
     travel: 4,
     landscape: 4,
+    wildlife: 1,
+    portrait: 4,
     beginnerFriendly: 2,
     video: 4,
 
@@ -2173,6 +2279,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 3,
     landscape: 5,
+    wildlife: 1,
+    portrait: 4,
     beginnerFriendly: 1,
     video: 4,
 
@@ -2214,6 +2322,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 3,
+    portrait: 2,
     beginnerFriendly: 5,
     video: 4,
 
@@ -2251,6 +2361,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 2,
+    wildlife: 1,
+    portrait: 2,
     beginnerFriendly: 5,
     video: 5,
 
@@ -2288,6 +2400,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 2,
+    wildlife: 1,
+    portrait: 2,
     beginnerFriendly: 5,
     video: 4,
 
@@ -2325,6 +2439,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 3,
+    wildlife: 1,
+    portrait: 3,
     beginnerFriendly: 4,
     video: 2,
 
@@ -2362,6 +2478,8 @@ const RAW_CAMERAS = [
     lowLight: 3,
     travel: 5,
     landscape: 4,
+    wildlife: 1,
+    portrait: 4,
     beginnerFriendly: 4,
     video: 3,
 

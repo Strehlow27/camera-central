@@ -73,9 +73,15 @@
       const questions = [
         {
           id: "genre",
-          q: "What do you shoot most when you travel?",
+          q: "What do you shoot most?",
           helper: "Pick what you care about most. You can refine later.",
-          options: ["Landscapes", "City/Street", "People", "A mix of everything"],
+          options: [
+            "Landscapes",
+            "City/Street",
+            "People",
+            "Wildlife",
+            "A mix of everything",
+          ],
         },
         {
           id: "primary",
@@ -175,6 +181,21 @@
           }
         } catch {}
       }
+
+      const params = new URLSearchParams(window.location.search);
+
+      const intentMap = {
+        travel: "Travel",
+        wildlife: "Wildlife",
+        portraits: "Portraits",
+        video: "Video",
+      };
+
+const homepageIntent = intentMap[params.get("intent")];
+
+if (homepageIntent) {
+  answers.intent = homepageIntent;
+}
 
       const optionBase =
         "w-full min-h-[56px] text-left px-4 py-3 rounded-xl border transition cursor-pointer " +
